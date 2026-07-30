@@ -12,7 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
+import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
+import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
+import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
+import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
+import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
+import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 
@@ -30,9 +37,46 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAnalyseraRoute = AuthenticatedAnalyseraRouteImport.update({
+  id: '/analysera',
+  path: '/analysera',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAutomationRoute = AuthenticatedAutomationRouteImport.update({
+  id: '/automation',
+  path: '/automation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEfterrapporterRoute =
+  AuthenticatedEfterrapporterRouteImport.update({
+    id: '/efterrapporter',
+    path: '/efterrapporter',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEkonomiRoute = AuthenticatedEkonomiRouteImport.update({
+  id: '/ekonomi',
+  path: '/ekonomi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInstallningarRoute =
+  AuthenticatedInstallningarRouteImport.update({
+    id: '/installningar',
+    path: '/installningar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLarandeRoute = AuthenticatedLarandeRouteImport.update({
+  id: '/larande',
+  path: '/larande',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
   id: '/oversikt',
   path: '/oversikt',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOmgangarIndexRoute =
@@ -51,14 +95,28 @@ const AuthenticatedOmgangarRoundIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/analysera': typeof AuthenticatedAnalyseraRoute
+  '/automation': typeof AuthenticatedAutomationRoute
+  '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
+  '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/installningar': typeof AuthenticatedInstallningarRoute
+  '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/analysera': typeof AuthenticatedAnalyseraRoute
+  '/automation': typeof AuthenticatedAutomationRoute
+  '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
+  '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/installningar': typeof AuthenticatedInstallningarRoute
+  '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
 }
@@ -67,21 +125,59 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
+  '/_authenticated/automation': typeof AuthenticatedAutomationRoute
+  '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
+  '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
+  '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
+  '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/oversikt' | '/omgangar/$roundId' | '/omgangar/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/analysera'
+    | '/automation'
+    | '/efterrapporter'
+    | '/ekonomi'
+    | '/installningar'
+    | '/larande'
+    | '/oversikt'
+    | '/system'
+    | '/omgangar/$roundId'
+    | '/omgangar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/oversikt' | '/omgangar/$roundId' | '/omgangar'
+  to:
+    | '/'
+    | '/auth'
+    | '/analysera'
+    | '/automation'
+    | '/efterrapporter'
+    | '/ekonomi'
+    | '/installningar'
+    | '/larande'
+    | '/oversikt'
+    | '/system'
+    | '/omgangar/$roundId'
+    | '/omgangar'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/analysera'
+    | '/_authenticated/automation'
+    | '/_authenticated/efterrapporter'
+    | '/_authenticated/ekonomi'
+    | '/_authenticated/installningar'
+    | '/_authenticated/larande'
     | '/_authenticated/oversikt'
+    | '/_authenticated/system'
     | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
   fileRoutesById: FileRoutesById
@@ -115,11 +211,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/analysera': {
+      id: '/_authenticated/analysera'
+      path: '/analysera'
+      fullPath: '/analysera'
+      preLoaderRoute: typeof AuthenticatedAnalyseraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/automation': {
+      id: '/_authenticated/automation'
+      path: '/automation'
+      fullPath: '/automation'
+      preLoaderRoute: typeof AuthenticatedAutomationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/efterrapporter': {
+      id: '/_authenticated/efterrapporter'
+      path: '/efterrapporter'
+      fullPath: '/efterrapporter'
+      preLoaderRoute: typeof AuthenticatedEfterrapporterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ekonomi': {
+      id: '/_authenticated/ekonomi'
+      path: '/ekonomi'
+      fullPath: '/ekonomi'
+      preLoaderRoute: typeof AuthenticatedEkonomiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/installningar': {
+      id: '/_authenticated/installningar'
+      path: '/installningar'
+      fullPath: '/installningar'
+      preLoaderRoute: typeof AuthenticatedInstallningarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/larande': {
+      id: '/_authenticated/larande'
+      path: '/larande'
+      fullPath: '/larande'
+      preLoaderRoute: typeof AuthenticatedLarandeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/oversikt': {
       id: '/_authenticated/oversikt'
       path: '/oversikt'
       fullPath: '/oversikt'
       preLoaderRoute: typeof AuthenticatedOversiktRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/system': {
+      id: '/_authenticated/system'
+      path: '/system'
+      fullPath: '/system'
+      preLoaderRoute: typeof AuthenticatedSystemRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/omgangar/': {
@@ -140,13 +285,27 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
+  AuthenticatedAutomationRoute: typeof AuthenticatedAutomationRoute
+  AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
+  AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
+  AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
+  AuthenticatedLarandeRoute: typeof AuthenticatedLarandeRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
+  AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
   AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
+  AuthenticatedAutomationRoute: AuthenticatedAutomationRoute,
+  AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
+  AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
+  AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
+  AuthenticatedLarandeRoute: AuthenticatedLarandeRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
+  AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
   AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
 }

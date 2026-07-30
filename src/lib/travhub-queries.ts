@@ -22,7 +22,7 @@ export function useGroups() {
 }
 
 export function useActiveGroupId() {
-  const { data: groups } = useGroups();
+  const { data: groups, refetch: refetchGroups } = useGroups();
   const [stored, setStored] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export function useActiveGroupId() {
     setStored(id);
   };
 
-  return { groupId, setActiveGroupId, groups: groups ?? [] };
+  return { groupId, setActiveGroupId, groups: groups ?? [], refetchGroups };
 }
 
 export function useMembers(groupId: string | null) {

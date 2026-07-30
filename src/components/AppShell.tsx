@@ -18,6 +18,7 @@ import { useActiveGroupId } from "@/lib/travhub-queries";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Workflow } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -33,6 +34,7 @@ const NAV = [
   { to: "/system", label: "System", icon: Grid3x3 },
   { to: "/efterrapporter", label: "Efterrapporter", icon: FileText },
   { to: "/larande", label: "Lärande", icon: BarChart3 },
+  { to: "/automation", label: "Automation", icon: Workflow },
   { to: "/ekonomi", label: "Ekonomi", icon: Coins },
   { to: "/installningar", label: "Inställningar", icon: Settings },
 ] as const;

@@ -10,6 +10,7 @@ import { StartfaltTab } from "@/components/round/StartfaltTab";
 import { AnalysTab } from "@/components/round/AnalysTab";
 import { SystemTab } from "@/components/round/SystemTab";
 import { ResultatTab } from "@/components/round/ResultatTab";
+import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 
 export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
   head: () => ({
@@ -52,6 +53,10 @@ function RoundDetail() {
           </>
         }
       />
+
+      <div className="mb-4">
+        <ResponsibilityCard roundId={roundId} groupId={round.group_id} />
+      </div>
 
       <Tabs defaultValue="startfalt">
         <TabsList className="flex flex-wrap">
