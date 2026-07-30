@@ -178,6 +178,17 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
     const normalized = normalize(valid);
 
     let assessmentId = assessment?.id as string | undefined;
+    if (!assessmentId) {
+      // Kan finnas sedan tidigare även om inbäddningen inte gav något träff.
+      const { data: found } = await db
+        .from("group_race_assessments")
+        .select("id, status")
+        .eq("race_id", race.id)
+        .maybeSingle();
+      if (found?.status === "locked") continue;
+      assessmentId = found?.id as string | undefined;
+    }
+
     if (assessmentId) {
       await db
         .from("group_race_assessments")
@@ -186,17 +197,21 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
     } else {
       const { data: inserted, error } = await db
         .from("group_race_assessments")
-        .insert({
-          race_id: race.id,
-          status: "draft",
-          pace_scenario: draft.pace_scenario ?? null,
-          notes: draft.notes ?? null,
-        })
+        .upsert(
+          {
+            race_id: race.id,
+            status: "draft",
+            pace_scenario: draft.pace_scenario ?? null,
+            notes: draft.notes ?? null,
+          },
+          { onConflict: "race_id" },
+        )
         .select("id")
         .single();
       if (error) throw error;
       assessmentId = inserted.id;
     }
+
 
     const { data: existingEntries } = await db
       .from("group_entry_assessments")
