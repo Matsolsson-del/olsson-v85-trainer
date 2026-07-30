@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "sdk_version": "0.25.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://mblxpuyrkefrrhbwlsvy.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "familjen-olssons-travhub",
+      "version": "0.1.0",
+      "title": "Familjen Olssons Travhub"
+    },
+    "tools": [
+      {
+        "name": "list_rounds",
+        "title": "Lista omgångar",
+        "description": "Lista V85-omgångar i familjens grupp med datum, bana, status, budget och radpris.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991,
+              "description": "Max antal omgångar att returnera (standard 10)."
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_round",
+        "title": "Hämta omgång med startfält",
+        "description": "Hämta en omgång med alla åtta avdelningar och komplett startfält (häst, kusk, tränare, spår, distans, struken).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "round_id": {
+              "type": "string",
+              "description": "Omgångens id (från list_rounds)."
+            }
+          },
+          "required": [
+            "round_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_market",
+        "title": "Hämta marknadsfördelning",
+        "description": "Hämta senaste marknadssnapshot (ATG:s spelfördelning i procent per startnummer) för en omgångs avdelningar.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "round_id": {
+              "type": "string",
+              "description": "Omgångens id (från list_rounds)."
+            }
+          },
+          "required": [
+            "round_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_risk_flag",
+        "title": "Skapa riskflagga",
+        "description": "Lägg en riskflagga (varning eller observation) på en omgång, eventuellt kopplad till en avdelning.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "round_id": {
+              "type": "string",
+              "description": "Omgångens id."
+            },
+            "body": {
+              "type": "string",
+              "description": "Vad risken består i, kort och konkret."
+            },
+            "race_id": {
+              "type": "string",
+              "description": "Avdelningens id om flaggan gäller en enskild avdelning."
+            },
+            "flag_type": {
+              "type": "string",
+              "description": "Typ av flagga, t.ex. 'risk', 'data' eller 'info'."
+            }
+          },
+          "required": [
+            "round_id",
+            "body"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
