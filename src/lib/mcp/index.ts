@@ -5,6 +5,8 @@ import getMarketTool from "./tools/get-market";
 import createRiskFlagTool from "./tools/create-risk-flag";
 import getSystemTool from "./tools/get-system";
 import proposeSystemTool from "./tools/propose-system";
+import getImportFormatTool from "./tools/get-import-format";
+import importAiAnalysisTool from "./tools/import-ai-analysis";
 
 const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unset";
 
