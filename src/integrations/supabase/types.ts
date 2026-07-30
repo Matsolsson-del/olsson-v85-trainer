@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_log: {
+        Row: {
+          after_value: Json | null
+          before_value: Json | null
+          created_at: string
+          description: string | null
+          event_type: string
+          group_id: string
+          id: string
+          round_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          after_value?: Json | null
+          before_value?: Json | null
+          created_at?: string
+          description?: string | null
+          event_type: string
+          group_id: string
+          id?: string
+          round_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          after_value?: Json | null
+          before_value?: Json | null
+          created_at?: string
+          description?: string | null
+          event_type?: string
+          group_id?: string
+          id?: string
+          round_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_log_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_log_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_analysis_runs: {
         Row: {
           approved: boolean
@@ -74,6 +125,44 @@ export type Database = {
             columns: ["round_id"]
             isOneToOne: false
             referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comments: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          group_id: string
+          id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by: string
+          entity_id: string
+          entity_type: string
+          group_id: string
+          id?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          entity_id?: string
+          entity_type?: string
+          group_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
         ]
@@ -187,6 +276,51 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      entry_results: {
+        Row: {
+          disqualified: boolean
+          event_notes: string | null
+          finish_position: number | null
+          galloped: boolean
+          id: string
+          race_entry_id: string
+          race_result_id: string
+        }
+        Insert: {
+          disqualified?: boolean
+          event_notes?: string | null
+          finish_position?: number | null
+          galloped?: boolean
+          id?: string
+          race_entry_id: string
+          race_result_id: string
+        }
+        Update: {
+          disqualified?: boolean
+          event_notes?: string | null
+          finish_position?: number | null
+          galloped?: boolean
+          id?: string
+          race_entry_id?: string
+          race_result_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_results_race_entry_id_fkey"
+            columns: ["race_entry_id"]
+            isOneToOne: false
+            referencedRelation: "race_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_results_race_result_id_fkey"
+            columns: ["race_result_id"]
+            isOneToOne: false
+            referencedRelation: "race_results"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       group_entry_assessments: {
         Row: {
@@ -588,6 +722,101 @@ export type Database = {
           },
         ]
       }
+      learning_hypotheses: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          group_id: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          group_id: string
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          group_id?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_hypotheses_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ledger_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          group_id: string
+          id: string
+          note: string | null
+          round_id: string | null
+          transaction_date: string
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          group_id: string
+          id?: string
+          note?: string | null
+          round_id?: string | null
+          transaction_date?: string
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          group_id?: string
+          id?: string
+          note?: string | null
+          round_id?: string | null
+          transaction_date?: string
+          transaction_type?: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ledger_transactions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ledger_transactions_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_snapshots: {
         Row: {
           bet_share_percent: number
@@ -682,6 +911,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "model_versions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          group_id: string
+          id: string
+          link_path: string | null
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          group_id: string
+          id?: string
+          link_path?: string | null
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          link_path?: string | null
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_group_id_fkey"
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "groups"
@@ -824,6 +1094,126 @@ export type Database = {
           },
         ]
       }
+      race_postmortems: {
+        Row: {
+          actual_scenario: string | null
+          approved_at: string | null
+          concrete_lesson: string | null
+          created_at: string
+          driver_execution: Database["public"]["Enums"]["driver_execution"]
+          expected_scenario: string | null
+          id: string
+          preventable: boolean | null
+          primary_error_category:
+            | Database["public"]["Enums"]["error_category"]
+            | null
+          process_quality: number | null
+          race_id: string
+          unpredictable_event_description: string | null
+          updated_at: string
+          winner_was_selected: boolean | null
+        }
+        Insert: {
+          actual_scenario?: string | null
+          approved_at?: string | null
+          concrete_lesson?: string | null
+          created_at?: string
+          driver_execution?: Database["public"]["Enums"]["driver_execution"]
+          expected_scenario?: string | null
+          id?: string
+          preventable?: boolean | null
+          primary_error_category?:
+            | Database["public"]["Enums"]["error_category"]
+            | null
+          process_quality?: number | null
+          race_id: string
+          unpredictable_event_description?: string | null
+          updated_at?: string
+          winner_was_selected?: boolean | null
+        }
+        Update: {
+          actual_scenario?: string | null
+          approved_at?: string | null
+          concrete_lesson?: string | null
+          created_at?: string
+          driver_execution?: Database["public"]["Enums"]["driver_execution"]
+          expected_scenario?: string | null
+          id?: string
+          preventable?: boolean | null
+          primary_error_category?:
+            | Database["public"]["Enums"]["error_category"]
+            | null
+          process_quality?: number | null
+          race_id?: string
+          unpredictable_event_description?: string | null
+          updated_at?: string
+          winner_was_selected?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_postmortems_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: true
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      race_results: {
+        Row: {
+          final_market_snapshot_at: string | null
+          id: string
+          notable_event: string | null
+          race_id: string
+          registered_at: string
+          registered_by: string
+          result_source_id: string | null
+          winner_entry_id: string | null
+        }
+        Insert: {
+          final_market_snapshot_at?: string | null
+          id?: string
+          notable_event?: string | null
+          race_id: string
+          registered_at?: string
+          registered_by: string
+          result_source_id?: string | null
+          winner_entry_id?: string | null
+        }
+        Update: {
+          final_market_snapshot_at?: string | null
+          id?: string
+          notable_event?: string | null
+          race_id?: string
+          registered_at?: string
+          registered_by?: string
+          result_source_id?: string | null
+          winner_entry_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_results_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: true
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_results_result_source_id_fkey"
+            columns: ["result_source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_results_winner_entry_id_fkey"
+            columns: ["winner_entry_id"]
+            isOneToOne: false
+            referencedRelation: "race_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       races: {
         Row: {
           created_at: string
@@ -878,6 +1268,94 @@ export type Database = {
             foreignKeyName: "races_round_id_fkey"
             columns: ["round_id"]
             isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_postmortems: {
+        Row: {
+          ai_draft: string | null
+          approved_at: string | null
+          approved_text: string | null
+          bad_decisions_despite_win: string | null
+          created_at: string
+          do_not_change_yet: string | null
+          good_decisions_despite_loss: string | null
+          id: string
+          max_three_changes_to_test: string | null
+          round_id: string
+          strengths: string | null
+          three_main_errors: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_draft?: string | null
+          approved_at?: string | null
+          approved_text?: string | null
+          bad_decisions_despite_win?: string | null
+          created_at?: string
+          do_not_change_yet?: string | null
+          good_decisions_despite_loss?: string | null
+          id?: string
+          max_three_changes_to_test?: string | null
+          round_id: string
+          strengths?: string | null
+          three_main_errors?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_draft?: string | null
+          approved_at?: string | null
+          approved_text?: string | null
+          bad_decisions_despite_win?: string | null
+          created_at?: string
+          do_not_change_yet?: string | null
+          good_decisions_despite_loss?: string | null
+          id?: string
+          max_three_changes_to_test?: string | null
+          round_id?: string
+          strengths?: string | null
+          three_main_errors?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_postmortems_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: true
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_results: {
+        Row: {
+          group_winnings: number
+          id: string
+          registered_at: string
+          round_id: string
+          v85_payout: number | null
+        }
+        Insert: {
+          group_winnings?: number
+          id?: string
+          registered_at?: string
+          round_id: string
+          v85_payout?: number | null
+        }
+        Update: {
+          group_winnings?: number
+          id?: string
+          registered_at?: string
+          round_id?: string
+          v85_payout?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_results_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: true
             referencedRelation: "rounds"
             referencedColumns: ["id"]
           },
@@ -971,6 +1449,222 @@ export type Database = {
           },
         ]
       }
+      spike_protocols: {
+        Row: {
+          created_at: string
+          driver_assessment: string | null
+          expected_position: string | null
+          group_win_probability: number | null
+          id: string
+          main_loss_risk: string | null
+          main_opponent: string | null
+          main_strength: string | null
+          market_percent: number | null
+          race_entry_id: string
+          race_id: string
+          revoke_condition: string | null
+          system_version_id: string
+          updated_at: string
+          why_spike: string | null
+        }
+        Insert: {
+          created_at?: string
+          driver_assessment?: string | null
+          expected_position?: string | null
+          group_win_probability?: number | null
+          id?: string
+          main_loss_risk?: string | null
+          main_opponent?: string | null
+          main_strength?: string | null
+          market_percent?: number | null
+          race_entry_id: string
+          race_id: string
+          revoke_condition?: string | null
+          system_version_id: string
+          updated_at?: string
+          why_spike?: string | null
+        }
+        Update: {
+          created_at?: string
+          driver_assessment?: string | null
+          expected_position?: string | null
+          group_win_probability?: number | null
+          id?: string
+          main_loss_risk?: string | null
+          main_opponent?: string | null
+          main_strength?: string | null
+          market_percent?: number | null
+          race_entry_id?: string
+          race_id?: string
+          revoke_condition?: string | null
+          system_version_id?: string
+          updated_at?: string
+          why_spike?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spike_protocols_race_entry_id_fkey"
+            columns: ["race_entry_id"]
+            isOneToOne: false
+            referencedRelation: "race_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spike_protocols_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spike_protocols_system_version_id_fkey"
+            columns: ["system_version_id"]
+            isOneToOne: false
+            referencedRelation: "system_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_selections: {
+        Row: {
+          created_at: string
+          id: string
+          race_entry_id: string
+          race_id: string
+          system_version_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          race_entry_id: string
+          race_id: string
+          system_version_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          race_entry_id?: string
+          race_id?: string
+          system_version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_selections_race_entry_id_fkey"
+            columns: ["race_entry_id"]
+            isOneToOne: false
+            referencedRelation: "race_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_selections_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_selections_system_version_id_fkey"
+            columns: ["system_version_id"]
+            isOneToOne: false
+            referencedRelation: "system_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_versions: {
+        Row: {
+          approximate_coverage: number | null
+          budget: number
+          calculated_cost: number
+          calculated_rows: number
+          change_reason: string | null
+          created_at: string
+          id: string
+          locked_at: string | null
+          locked_by: string | null
+          row_price: number
+          system_id: string
+          updated_at: string
+          version_number: number
+        }
+        Insert: {
+          approximate_coverage?: number | null
+          budget: number
+          calculated_cost?: number
+          calculated_rows?: number
+          change_reason?: string | null
+          created_at?: string
+          id?: string
+          locked_at?: string | null
+          locked_by?: string | null
+          row_price: number
+          system_id: string
+          updated_at?: string
+          version_number: number
+        }
+        Update: {
+          approximate_coverage?: number | null
+          budget?: number
+          calculated_cost?: number
+          calculated_rows?: number
+          change_reason?: string | null
+          created_at?: string
+          id?: string
+          locked_at?: string | null
+          locked_by?: string | null
+          row_price?: number
+          system_id?: string
+          updated_at?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_versions_system_id_fkey"
+            columns: ["system_id"]
+            isOneToOne: false
+            referencedRelation: "systems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      systems: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          round_id: string
+          status: Database["public"]["Enums"]["system_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          round_id: string
+          status?: Database["public"]["Enums"]["system_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          round_id?: string
+          status?: Database["public"]["Enums"]["system_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "systems_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracks: {
         Row: {
           created_at: string
@@ -1037,6 +1731,8 @@ export type Database = {
       race_group_id: { Args: { _race_id: string }; Returns: string }
       race_round_id: { Args: { _race_id: string }; Returns: string }
       round_group_id: { Args: { _round_id: string }; Returns: string }
+      system_group_id: { Args: { _system_id: string }; Returns: string }
+      system_version_group_id: { Args: { _sv_id: string }; Returns: string }
     }
     Enums: {
       assessment_status: "draft" | "locked"
