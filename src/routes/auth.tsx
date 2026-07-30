@@ -81,8 +81,18 @@ function AuthPage() {
         if (error) throw error;
       }
 
-      await supabase.rpc("join_family_group");
+      const { data: groupId } = await supabase.rpc("join_family_group");
+      if (!groupId) {
+        const { data: auth } = await supabase.auth.getUser();
+        if (auth.user) {
+          await supabase.from("groups").insert({
+            name: "Familjen Olsson",
+            owner_id: auth.user.id,
+          });
+        }
+      }
       navigate({ to: "/oversikt", replace: true });
+
     } catch (e: any) {
       toast.error(e.message ?? "Kunde inte fortsätta.");
     } finally {
