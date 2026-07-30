@@ -19,10 +19,10 @@ import { useInvalidateRound, type RoundData } from "@/lib/travhub-queries";
 import { formatDateTime, formatPercent } from "@/lib/labels";
 
 const TIERS = [
-  { value: "a", label: "A – huvudchans" },
-  { value: "b", label: "B – utmanare" },
-  { value: "c", label: "C – skräll" },
-  { value: "d", label: "D – bortval" },
+  { value: "A", label: "A – huvudchans" },
+  { value: "B", label: "B – utmanare" },
+  { value: "C", label: "C – skräll" },
+  { value: "D", label: "D – bortval" },
 ];
 
 export function AnalysTab({ data, roundId }: { data: RoundData; roundId: string }) {
