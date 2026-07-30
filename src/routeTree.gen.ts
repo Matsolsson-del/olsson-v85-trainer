@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
+import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 
@@ -41,6 +42,11 @@ const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
   path: '/oversikt',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOmgangarIndexRoute =
   AuthenticatedOmgangarIndexRouteImport.update({
     id: '/omgangar/',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
 }
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
+  '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/analysera'
     | '/oversikt'
+    | '/system'
     | '/omgangar/$roundId'
     | '/omgangar/'
   fileRoutesByTo: FileRoutesByTo
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/analysera'
     | '/oversikt'
+    | '/system'
     | '/omgangar/$roundId'
     | '/omgangar'
   id:
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/analysera'
     | '/_authenticated/oversikt'
+    | '/_authenticated/system'
     | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
   fileRoutesById: FileRoutesById
@@ -151,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOversiktRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/system': {
+      id: '/_authenticated/system'
+      path: '/system'
+      fullPath: '/system'
+      preLoaderRoute: typeof AuthenticatedSystemRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/omgangar/': {
       id: '/_authenticated/omgangar/'
       path: '/omgangar'
@@ -171,6 +190,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
+  AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
   AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
 }
@@ -178,6 +198,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
+  AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
   AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
 }
