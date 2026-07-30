@@ -14,16 +14,23 @@ type Leg = { raceId: string; legNumber: number; candidates: Cand[] };
 export type Profile = "balanserat" | "sakrare" | "varde";
 
 const PROFILE_TITLES: Record<Profile, string> = {
+  sakrare: "Tryggt",
   balanserat: "Balanserat",
-  sakrare: "Säkrare",
-  varde: "Värdejakt",
+  varde: "Offensivt",
+};
+
+const PROFILE_RISK: Record<Profile, string> = {
+  sakrare: "Låg risk",
+  balanserat: "Mellanrisk",
+  varde: "Hög risk",
 };
 
 const PROFILE_RATIONALE: Record<Profile, string> = {
-  balanserat: "Bredd där avdelningarna är osäkra, spik där en häst är klart bäst.",
   sakrare: "Prioriterar täckning – fler hästar i de mest osäkra avdelningarna.",
+  balanserat: "Bredd där avdelningarna är osäkra, spik där en häst är klart bäst.",
   varde: "Tar med hästar som bedöms bättre än vad spelarna strecker dem.",
 };
+
 
 function latestShare(entry: any): number {
   const snaps = [...(entry.market_snapshots ?? [])].sort((a: any, b: any) =>
