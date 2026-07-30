@@ -12,6 +12,7 @@ import { AnalysTab } from "@/components/round/AnalysTab";
 import { SystemTab } from "@/components/round/SystemTab";
 import { ResultatTab } from "@/components/round/ResultatTab";
 import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
+import { AutomatikCard } from "@/components/round/AutomatikCard";
 
 export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
   head: () => ({
@@ -55,8 +56,9 @@ function RoundDetail() {
         }
       />
 
-      <div className="mb-4">
+      <div className="mb-4 space-y-4">
         <ResponsibilityCard roundId={roundId} groupId={round.group_id} />
+        <AutomatikCard roundId={roundId} />
       </div>
 
       <Tabs defaultValue="startfalt">
