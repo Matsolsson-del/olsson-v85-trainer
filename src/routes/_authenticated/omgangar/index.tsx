@@ -184,6 +184,7 @@ function OmgangarPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
+                    {r.is_demo && <Badge variant="outline">Demo</Badge>}
                     <Badge variant="secondary">{ROUND_STATUS_LABELS[r.status] ?? r.status}</Badge>
                     <Button asChild size="sm" variant="secondary">
                       <Link to="/omgangar/$roundId" params={{ roundId: r.id }}>

@@ -103,7 +103,7 @@ function VeckansSpel() {
     );
   }
 
-  const active = rounds?.find((r) => r.status !== "completed") ?? null;
+  const active = rounds?.find((r) => r.status !== "completed" && !r.is_demo) ?? null;
 
   if (error) {
     return (
