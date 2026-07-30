@@ -27,6 +27,7 @@ import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
+import { Route as ApiPublicHooksResultatV85RouteImport } from './routes/api/public/hooks/resultat-v85'
 import { Route as ApiPublicHooksVeckansV85RouteImport } from './routes/api/public/hooks/veckans-v85'
 
 const IndexRoute = IndexRouteImport.update({
@@ -125,6 +126,12 @@ const AuthenticatedOmgangarRoundIdRoute =
     path: '/omgangar/$roundId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicHooksResultatV85Route =
+  ApiPublicHooksResultatV85RouteImport.update({
+    id: '/api/public/hooks/resultat-v85',
+    path: '/api/public/hooks/resultat-v85',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksVeckansV85Route =
   ApiPublicHooksVeckansV85RouteImport.update({
     id: '/api/public/hooks/veckans-v85',
@@ -150,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
 export interface FileRoutesByTo {
@@ -170,6 +178,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
 export interface FileRoutesById {
@@ -192,6 +201,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
 export interface FileRouteTypes {
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
     | '/omgangar/'
+    | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
     | '/omgangar'
+    | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   id:
     | '__root__'
@@ -255,6 +267,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
+    | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   fileRoutesById: FileRoutesById
 }
@@ -267,6 +280,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicHooksResultatV85Route: typeof ApiPublicHooksResultatV85Route
   ApiPublicHooksVeckansV85Route: typeof ApiPublicHooksVeckansV85Route
 }
 
@@ -398,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOmgangarRoundIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/resultat-v85': {
+      id: '/api/public/hooks/resultat-v85'
+      path: '/api/public/hooks/resultat-v85'
+      fullPath: '/api/public/hooks/resultat-v85'
+      preLoaderRoute: typeof ApiPublicHooksResultatV85RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/veckans-v85': {
       id: '/api/public/hooks/veckans-v85'
       path: '/api/public/hooks/veckans-v85'
@@ -447,6 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicHooksResultatV85Route: ApiPublicHooksResultatV85Route,
   ApiPublicHooksVeckansV85Route: ApiPublicHooksVeckansV85Route,
 }
 export const routeTree = rootRouteImport
