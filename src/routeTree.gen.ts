@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedAiImportRouteImport } from './routes/_authenticated/ai-import'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
 import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
@@ -66,6 +67,11 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAiImportRoute = AuthenticatedAiImportRouteImport.update({
+  id: '/ai-import',
+  path: '/ai-import',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAnalyseraRoute = AuthenticatedAnalyseraRouteImport.update({
   id: '/analysera',
   path: '/analysera',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/ai-import': typeof AuthenticatedAiImportRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/ai-import': typeof AuthenticatedAiImportRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/ai-import': typeof AuthenticatedAiImportRoute
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
   '/_authenticated/automation': typeof AuthenticatedAutomationRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/ai-import'
     | '/analysera'
     | '/automation'
     | '/efterrapporter'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/ai-import'
     | '/analysera'
     | '/automation'
     | '/efterrapporter'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/ai-import'
     | '/_authenticated/analysera'
     | '/_authenticated/automation'
     | '/_authenticated/efterrapporter'
@@ -389,6 +401,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.well-known/oauth-protected-resource'
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/ai-import': {
+      id: '/_authenticated/ai-import'
+      path: '/ai-import'
+      fullPath: '/ai-import'
+      preLoaderRoute: typeof AuthenticatedAiImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/analysera': {
       id: '/_authenticated/analysera'
@@ -527,6 +546,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAiImportRoute: typeof AuthenticatedAiImportRoute
   AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
   AuthenticatedAutomationRoute: typeof AuthenticatedAutomationRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
@@ -544,6 +564,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAiImportRoute: AuthenticatedAiImportRoute,
   AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
   AuthenticatedAutomationRoute: AuthenticatedAutomationRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
