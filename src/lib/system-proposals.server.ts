@@ -76,10 +76,49 @@ function build(legs: Leg[], rowPrice: number, budget: number, profile: Profile) 
     1,
   );
 
+  const legCoverage = chosen.map((c) => ({
+    raceId: c.leg.raceId,
+    legNumber: c.leg.legNumber,
+    count: c.picked.length,
+    covered: Math.round(c.picked.reduce((s, x) => s + x.prob, 0) * 10) / 10,
+    entryIds: c.picked.map((p) => p.entryId),
+  }));
+
+  const spikes = legCoverage
+    .filter((l) => l.count === 1)
+    .map((l) => ({
+      race_id: l.raceId,
+      leg_number: l.legNumber,
+      entry_id: l.entryIds[0],
+      probability: l.covered,
+    }));
+
+  const hedges = legCoverage
+    .filter((l) => l.count > 1)
+    .map((l) => ({
+      race_id: l.raceId,
+      leg_number: l.legNumber,
+      count: l.count,
+      entry_ids: l.entryIds,
+      coverage: l.covered,
+    }));
+
+  const weakest = [...legCoverage].sort((a, b) => a.covered - b.covered)[0];
+  const weakestAssumption = weakest
+    ? weakest.count === 1
+      ? `Avdelning ${weakest.legNumber}: hela systemet faller om spiken inte vinner (bedömd vinstchans ${weakest.covered} %).`
+      : `Avdelning ${weakest.legNumber}: ${weakest.count} hästar täcker bara ${weakest.covered} % av bedömd vinstchans.`
+    : null;
+
   return {
     profile,
     title: PROFILE_TITLES[profile],
+    riskLevel: PROFILE_RISK[profile],
+    recommended: profile === "balanserat",
     rationale: PROFILE_RATIONALE[profile],
+    weakestAssumption,
+    spikes,
+    hedges,
     rows: rows(),
     cost: cost(),
     coverage: Math.round(coverage * 10000) / 10000,
@@ -90,6 +129,7 @@ function build(legs: Leg[], rowPrice: number, budget: number, profile: Profile) 
     })),
   };
 }
+
 
 /** Skapar (eller ersätter) tre systemförslag för omgången. */
 export async function buildSystemCandidates(roundId: string, userId: string) {
