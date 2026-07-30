@@ -44,6 +44,7 @@ const ADVANCED_NAV = [
   { to: "/larande", label: "Lärande", icon: BarChart3 },
   { to: "/mina-rad", label: "Mina råd", icon: Sparkles },
   { to: "/automation", label: "Automation", icon: Workflow },
+  { to: "/ai-import", label: "AI-import", icon: Sparkles },
   { to: "/ekonomi", label: "Ekonomi", icon: Coins },
   { to: "/installningar", label: "Inställningar", icon: Settings },
 ] as const;

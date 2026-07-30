@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { AlertTriangle, CheckCircle2, Circle } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
+import { AiImportCard } from "@/components/round/AiImportCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -282,6 +283,7 @@ function Workflow({ roundId }: { roundId: string }) {
 
         {/* 2. AI-analys */}
         <Step number={2} title="AI:ns analys" state={aiNotes.length ? "klar" : "vantar"}>
+          <AiImportCard roundId={roundId} />
           {aiNotes.length === 0 ? (
             <p className="text-muted-foreground">Ingen analys är gjord ännu.</p>
           ) : (

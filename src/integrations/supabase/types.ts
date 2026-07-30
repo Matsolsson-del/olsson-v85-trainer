@@ -129,6 +129,189 @@ export type Database = {
           },
         ]
       }
+      ai_import_attempts: {
+        Row: {
+          created_at: string
+          group_id: string | null
+          id: string
+          idempotency_key: string | null
+          message: string | null
+          ok: boolean
+          round_id: string | null
+          status_code: number
+          validation_errors: Json
+          version_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          idempotency_key?: string | null
+          message?: string | null
+          ok?: boolean
+          round_id?: string | null
+          status_code?: number
+          validation_errors?: Json
+          version_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          group_id?: string | null
+          id?: string
+          idempotency_key?: string | null
+          message?: string | null
+          ok?: boolean
+          round_id?: string | null
+          status_code?: number
+          validation_errors?: Json
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_import_attempts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_import_attempts_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_import_attempts_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "ai_import_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_import_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          group_id: string
+          key_created_at: string | null
+          key_hash: string | null
+          key_prefix: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          group_id: string
+          key_created_at?: string | null
+          key_hash?: string | null
+          key_prefix?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          group_id?: string
+          key_created_at?: string | null
+          key_hash?: string | null
+          key_prefix?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_import_settings_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: true
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_import_versions: {
+        Row: {
+          analysis_version: string | null
+          analyzed_at: string | null
+          bet_stop_at: string | null
+          created_at: string
+          data_quality: Json
+          external_round_id: string | null
+          group_id: string
+          id: string
+          idempotency_key: string
+          legs: Json
+          main_recommendation: string | null
+          model_name: string | null
+          payload: Json
+          race_date: string | null
+          round_id: string
+          sources: Json
+          status: string
+          systems: Json
+          track_name: string | null
+          version: number
+        }
+        Insert: {
+          analysis_version?: string | null
+          analyzed_at?: string | null
+          bet_stop_at?: string | null
+          created_at?: string
+          data_quality?: Json
+          external_round_id?: string | null
+          group_id: string
+          id?: string
+          idempotency_key: string
+          legs?: Json
+          main_recommendation?: string | null
+          model_name?: string | null
+          payload: Json
+          race_date?: string | null
+          round_id: string
+          sources?: Json
+          status?: string
+          systems?: Json
+          track_name?: string | null
+          version: number
+        }
+        Update: {
+          analysis_version?: string | null
+          analyzed_at?: string | null
+          bet_stop_at?: string | null
+          created_at?: string
+          data_quality?: Json
+          external_round_id?: string | null
+          group_id?: string
+          id?: string
+          idempotency_key?: string
+          legs?: Json
+          main_recommendation?: string | null
+          model_name?: string | null
+          payload?: Json
+          race_date?: string | null
+          round_id?: string
+          sources?: Json
+          status?: string
+          systems?: Json
+          track_name?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_import_versions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_import_versions_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analysis_layers: {
         Row: {
           content: Json

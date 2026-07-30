@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -78,6 +78,21 @@ function AutomationPage() {
 
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">AI-import</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <p className="text-muted-foreground">
+              Låt din AI skicka in veckans färdiga underlag automatiskt. Här finns adress,
+              API-nyckel, senaste försök och exempelfil.
+            </p>
+            <Button asChild variant="secondary" className="h-12">
+              <Link to="/ai-import">Öppna AI-import</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Veckans körningsplan</CardTitle>
