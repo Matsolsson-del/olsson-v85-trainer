@@ -1,18 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ArrowRight, Clock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  useActiveGroupId,
-  useLedger,
-  useMembers,
-  useRoundData,
-  useRounds,
-} from "@/lib/travhub-queries";
-import { ROUND_STATUS_LABELS, formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
+import { useActiveGroupId, useMyProfile, useRoundData, useRounds } from "@/lib/travhub-queries";
+import { useRoundResponsibility } from "@/lib/responsibility-queries";
+import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/oversikt")({
@@ -21,241 +15,241 @@ export const Route = createFileRoute("/_authenticated/oversikt")({
       { title: "Översikt – Familjen Olssons Travhub" },
       {
         name: "description",
-        content: "Nästa omgång, spelstopp, analysstatus, aktuellt system och gruppens saldo.",
+        content: "Veckans V85, vem som är ansvarig, din uppgift, AI:ns analys och senaste resultat.",
       },
       { property: "og:title", content: "Översikt – Familjen Olssons Travhub" },
-      { property: "og:description", content: "Status för gruppens pågående V85-omgång." },
+      { property: "og:description", content: "Allt du behöver inför veckans V85, på ett ställe." },
     ],
   }),
   component: OversiktPage,
 });
 
+function BigCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="text-lg">{children}</CardContent>
+    </Card>
+  );
+}
+
 function OversiktPage() {
   const { groupId, groups } = useActiveGroupId();
-  const { data: rounds, isLoading } = useRounds(groupId);
-  const { data: ledger } = useLedger(groupId);
+  const { data: rounds, isLoading, error } = useRounds(groupId);
 
-  const balance = (ledger ?? []).reduce((sum, t) => {
-    if (t.transaction_type === "contribution" || t.transaction_type === "winnings")
-      return sum + Number(t.amount);
-    if (t.transaction_type === "stake" || t.transaction_type === "withdrawal")
-      return sum - Number(t.amount);
-    return sum + Number(t.amount);
-  }, 0);
-
-  const active = rounds?.find((r) => r.status !== "completed");
-  const latest = rounds?.find((r) => r.status === "completed");
-
-  if (groups.length === 0) {
+  if (isLoading) {
     return (
       <>
-        <PageHeader title="Översikt" description="Kom igång genom att skapa gruppen." />
+        <PageHeader title="Översikt" />
+        <Skeleton className="h-64 w-full" />
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <PageHeader title="Översikt" />
         <EmptyState
-          title="Du är inte med i någon grupp ännu"
-          description="Skapa gruppen och bjud in de andra medlemmarna under Inställningar."
-          action={
-            <Button asChild>
-              <Link to="/installningar">Till inställningar</Link>
-            </Button>
-          }
+          title="Det gick inte att hämta informationen"
+          description="Prova att ladda om sidan."
         />
       </>
     );
   }
 
+  if (groups.length === 0) {
+    return (
+      <>
+        <PageHeader title="Översikt" />
+        <EmptyState title="Du är inte med i någon grupp ännu" />
+      </>
+    );
+  }
+
+  const active = rounds?.find((r) => r.status !== "completed") ?? null;
+  const latest = rounds?.find((r) => r.status === "completed") ?? null;
+
   return (
     <>
-      <PageHeader
-        title="Översikt"
-        description="Status för gruppens pågående omgång och ekonomi."
-        actions={
-          <Button asChild variant="secondary">
-            <Link to="/omgangar">Alla omgångar</Link>
-          </Button>
-        }
-      />
-
-      {isLoading ? (
-        <Skeleton className="h-40 w-full" />
-      ) : !active ? (
-        <EmptyState
-          title="Ingen pågående omgång"
-          description="Skapa en ny V85-omgång för att komma igång."
-          action={
-            <Button asChild>
-              <Link to="/omgangar">Skapa omgång</Link>
-            </Button>
-          }
-        />
+      <PageHeader title="Översikt" description="Det här gäller den här veckan." />
+      {active ? (
+        <ActiveRound roundId={active.id} latestId={latest?.id ?? null} />
       ) : (
-        <ActiveRoundCard roundId={active.id} />
+        <div className="space-y-5">
+          <BigCard title="Veckans V85">
+            <p>Ingen omgång är inlagd ännu. Den hämtas automatiskt på torsdagar.</p>
+          </BigCard>
+          <BigCard title="Min uppgift">
+            <p className="font-medium">Du behöver inte göra något just nu.</p>
+          </BigCard>
+          {latest && <SenasteResultat roundId={latest.id} />}
+        </div>
       )}
-
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Gruppsaldo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="font-serif text-3xl font-semibold">{formatCurrency(balance)}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Baserat på {ledger?.length ?? 0} bokförda transaktioner.
-            </p>
-            <Button asChild variant="link" className="mt-2 px-0">
-              <Link to="/ekonomi">
-                Till ekonomi <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Senaste avslutade omgång</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {latest ? (
-              <>
-                <p className="font-medium">
-                  {formatDate(latest.race_date)} · {latest.tracks?.name ?? "Okänd bana"}
-                </p>
-                <Button asChild variant="link" className="mt-2 px-0">
-                  <Link to="/omgangar/$roundId" params={{ roundId: latest.id }}>
-                    Öppna efterrapport <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">Ingen avslutad omgång ännu.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </>
   );
 }
 
-function ActiveRoundCard({ roundId }: { roundId: string }) {
+function ActiveRound({ roundId, latestId }: { roundId: string; latestId: string | null }) {
   const { user } = useAuth();
-  const { groupId } = useActiveGroupId();
-  const { data: members } = useMembers(groupId);
-  const { data, isLoading } = useRoundData(roundId);
+  const { data: profile } = useMyProfile();
+  const { data, isLoading, error } = useRoundData(roundId);
+  const { data: responsibility, isLoading: respLoading } = useRoundResponsibility(roundId);
 
-  if (isLoading || !data) return <Skeleton className="h-48 w-full" />;
+  if (isLoading) return <Skeleton className="h-64 w-full" />;
+  if (error || !data)
+    return (
+      <EmptyState
+        title="Omgången kunde inte visas"
+        description="Prova att ladda om sidan."
+      />
+    );
 
   const { round, races, systems } = data;
-  const totalRaces = races.length;
-  const memberStatus = (members ?? []).map((m) => {
-    const submitted = races.filter((r) =>
-      r.individual_race_assessments?.some(
-        (a: any) => a.user_id === m.user_id && a.locked_at !== null,
-      ),
-    ).length;
-    return {
-      id: m.user_id,
-      name: (m.profiles as any)?.display_name ?? (m.profiles as any)?.email ?? "Medlem",
-      submitted,
-      isMe: m.user_id === user?.id,
-    };
-  });
+  const responsibleName =
+    (responsibility as any)?.profiles?.display_name ??
+    (respLoading ? "Hämtar …" : "Ingen utsedd ännu");
+  const iAmResponsible = !!user && (responsibility as any)?.user_id === user.id;
 
-  const lockedVersion = systems
-    .flatMap((s: any) => s.system_versions.map((v: any) => ({ ...v, systemName: s.name })))
-    .filter((v: any) => v.locked_at)
-    .sort((a: any, b: any) => (a.locked_at < b.locked_at ? 1 : -1))[0];
+  const aiNotes = races
+    .map((r: any) => ({
+      leg: r.leg_number,
+      note: r.group_race_assessments?.[0]?.notes ?? r.pace_notes ?? null,
+    }))
+    .filter((r) => r.note);
 
-  const betStopSoon =
-    round.bet_stop_at && new Date(round.bet_stop_at).getTime() - Date.now() < 1000 * 60 * 60 * 24;
+  const versions = (systems as any[]).flatMap((s) =>
+    (s.system_versions ?? []).map((v: any) => ({ ...v, systemName: s.name })),
+  );
+  const currentVersion =
+    versions.filter((v) => v.locked_at).sort((a, b) => (a.locked_at < b.locked_at ? 1 : -1))[0] ??
+    versions.sort((a, b) => (a.version_number < b.version_number ? 1 : -1))[0] ??
+    null;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3">
-        <div>
-          <CardTitle className="font-serif text-xl">
-            {round.product_type} · {formatDate(round.race_date)} ·{" "}
-            {(round.tracks as any)?.name ?? "Bana ej vald"}
-          </CardTitle>
-          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-            <Clock className="h-4 w-4" aria-hidden />
-            Spelstopp: {formatDateTime(round.bet_stop_at)}
-            {betStopSoon && (
-              <span className="inline-flex items-center gap-1 font-medium text-destructive">
-                <AlertTriangle className="h-4 w-4" aria-hidden /> Snart spelstopp
-              </span>
-            )}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="secondary">{ROUND_STATUS_LABELS[round.status]}</Badge>
-          <Button asChild size="sm">
-            <Link to="/omgangar/$roundId" params={{ roundId }}>
-              Öppna omgången
-            </Link>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="grid gap-6 md:grid-cols-3">
-        <div>
-          <h3 className="text-sm font-medium">Analysstatus</h3>
-          <ul className="mt-2 space-y-1 text-sm">
-            {memberStatus.map((m) => (
-              <li key={m.id} className="flex items-center justify-between gap-2">
-                <span>
-                  {m.name}
-                  {m.isMe && <span className="text-muted-foreground"> (du)</span>}
-                </span>
-                <span
-                  className={
-                    m.submitted === totalRaces && totalRaces > 0
-                      ? "font-medium text-success"
-                      : "text-muted-foreground"
-                  }
-                >
-                  {m.submitted}/{totalRaces} inlämnade
-                </span>
+    <div className="space-y-5">
+      <BigCard title="Veckans V85">
+        <p className="text-2xl font-semibold">
+          {formatDate(round.race_date)} · {(round as any).tracks?.name ?? "Bana ej vald"}
+        </p>
+        <p className="mt-1 text-muted-foreground">
+          Spelstopp {formatDateTime(round.bet_stop_at)} · Budget {formatCurrency(Number(round.budget))}
+        </p>
+        <Button asChild size="lg" className="mt-4 h-14 w-full text-lg sm:w-auto">
+          <Link to="/omgangar/$roundId" params={{ roundId }}>
+            Öppna omgången
+          </Link>
+        </Button>
+      </BigCard>
+
+      <BigCard title="Veckans ansvarige">
+        <p className="text-2xl font-semibold">{responsibleName}</p>
+        <p className="mt-1 text-muted-foreground">
+          Ansvarig väljer system och lämnar in spelet hos ATG.
+        </p>
+      </BigCard>
+
+      <BigCard title="Min uppgift">
+        {iAmResponsible ? (
+          <>
+            <p className="font-medium">
+              {profile?.display_name ?? "Du"}, du är ansvarig den här veckan.
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              Välj systemförslag, gör eventuella justeringar och lämna in hos ATG.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-medium">Du behöver inte göra något just nu.</p>
+            <p className="mt-1 text-muted-foreground">
+              Vill du vara med och tycka till? Läs analysen och skriv en kommentar.
+            </p>
+          </>
+        )}
+      </BigCard>
+
+      <BigCard title="AI:s senaste analys">
+        {aiNotes.length === 0 ? (
+          <p className="text-muted-foreground">Ingen analys är gjord ännu för den här omgången.</p>
+        ) : (
+          <ul className="space-y-2">
+            {aiNotes.slice(0, 3).map((r) => (
+              <li key={r.leg}>
+                <span className="font-medium">Avdelning {r.leg}: </span>
+                <span className="text-muted-foreground">{String(r.note).slice(0, 180)}</span>
               </li>
             ))}
-            {memberStatus.length === 0 && (
-              <li className="text-muted-foreground">Inga medlemmar registrerade.</li>
-            )}
           </ul>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {round.analyses_revealed_at
-              ? `Analyser öppnade ${formatDateTime(round.analyses_revealed_at)}`
-              : "Analyserna är blinda tills alla har lämnat in."}
-          </p>
-        </div>
+        )}
+      </BigCard>
 
-        <div>
-          <h3 className="text-sm font-medium">Budget</h3>
-          <p className="mt-2 font-serif text-2xl font-semibold">
-            {formatCurrency(Number(round.budget))}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Radpris {formatCurrency(Number(round.row_price))}
-          </p>
-        </div>
+      <BigCard title="Aktuellt systemförslag">
+        {!currentVersion ? (
+          <p className="text-muted-foreground">Inget systemförslag är skapat ännu.</p>
+        ) : (
+          <>
+            <p className="text-2xl font-semibold">
+              {currentVersion.calculated_rows} rader ·{" "}
+              {formatCurrency(Number(currentVersion.calculated_cost))}
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              {currentVersion.locked_at ? "Färdigt system" : "Förslag, ej färdigt"}
+            </p>
+          </>
+        )}
+      </BigCard>
 
-        <div>
-          <h3 className="text-sm font-medium">Aktuellt system</h3>
-          {lockedVersion ? (
-            <div className="mt-2 text-sm">
-              <p className="font-medium">
-                {lockedVersion.systemName} v{lockedVersion.version_number}
-              </p>
-              <p className="text-muted-foreground">
-                {lockedVersion.calculated_rows} rader ·{" "}
-                {formatCurrency(Number(lockedVersion.calculated_cost))}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Låst {formatDateTime(lockedVersion.locked_at)}
-              </p>
-            </div>
-          ) : (
-            <p className="mt-2 text-sm text-muted-foreground">Inget system är låst ännu.</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      <Button asChild size="lg" className="h-16 w-full text-xl">
+        <Link to="/kommentera">
+          Läs och kommentera <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
+        </Link>
+      </Button>
+
+      {latestId ? (
+        <SenasteResultat roundId={latestId} />
+      ) : (
+        <BigCard title="Senaste resultat">
+          <p className="text-muted-foreground">Inga avgjorda omgångar ännu.</p>
+        </BigCard>
+      )}
+    </div>
+  );
+}
+
+function SenasteResultat({ roundId }: { roundId: string }) {
+  const { data, isLoading, error } = useRoundData(roundId);
+
+  return (
+    <BigCard title="Senaste resultat">
+      {isLoading ? (
+        <p className="text-muted-foreground">Hämtar …</p>
+      ) : error || !data ? (
+        <p className="text-muted-foreground">Resultatet kunde inte hämtas just nu.</p>
+      ) : (
+        <>
+          <p className="text-xl font-semibold">
+            {formatDate(data.round.race_date)} ·{" "}
+            {(data.round as any).tracks?.name ?? "Bana ej vald"}
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            {data.roundResult
+              ? `Vinst ${formatCurrency(Number(data.roundResult.group_winnings ?? 0))}`
+              : "Inget resultat registrerat."}
+          </p>
+          <Button asChild variant="link" className="mt-2 px-0 text-lg">
+            <Link to="/resultat">Se alla resultat</Link>
+          </Button>
+        </>
+      )}
+    </BigCard>
   );
 }

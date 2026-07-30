@@ -46,8 +46,34 @@ export function useMembers(groupId: string | null) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("group_members")
-        .select("*, profiles:user_id(id, display_name, email)")
-        .eq("group_id", groupId!);
+        .select("*")
+        .eq("group_id", groupId!)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+
+      const ids = (data ?? []).map((m) => m.user_id);
+      if (ids.length === 0) return [];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, display_name, email")
+        .in("id", ids);
+      const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+      return (data ?? []).map((m) => ({ ...m, profiles: byId.get(m.user_id) ?? null }));
+    },
+  });
+}
+
+export function useMyProfile() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["my-profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, email")
+        .eq("id", user!.id)
+        .maybeSingle();
       if (error) throw error;
       return data;
     },

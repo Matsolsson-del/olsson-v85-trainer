@@ -20,11 +20,13 @@ import { Route as AuthenticatedAutomationRouteImport } from './routes/_authentic
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
+import { Route as AuthenticatedKommenteraRouteImport } from './routes/_authenticated/kommentera'
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedMinaRadRouteImport } from './routes/_authenticated/mina-rad'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedResultatRouteImport } from './routes/_authenticated/resultat'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
+import { Route as AuthenticatedVeckansSpelRouteImport } from './routes/_authenticated/veckans-spel'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
@@ -90,6 +92,11 @@ const AuthenticatedInstallningarRoute =
     path: '/installningar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedKommenteraRoute = AuthenticatedKommenteraRouteImport.update({
+  id: '/kommentera',
+  path: '/kommentera',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLarandeRoute = AuthenticatedLarandeRouteImport.update({
   id: '/larande',
   path: '/larande',
@@ -115,6 +122,12 @@ const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
   path: '/system',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVeckansSpelRoute =
+  AuthenticatedVeckansSpelRouteImport.update({
+    id: '/veckans-spel',
+    path: '/veckans-spel',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -162,11 +175,13 @@ export interface FileRoutesByFullPath {
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
+  '/kommentera': typeof AuthenticatedKommenteraRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/mina-rad': typeof AuthenticatedMinaRadRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/resultat': typeof AuthenticatedResultatRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/veckans-spel': typeof AuthenticatedVeckansSpelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -185,11 +200,13 @@ export interface FileRoutesByTo {
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
+  '/kommentera': typeof AuthenticatedKommenteraRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/mina-rad': typeof AuthenticatedMinaRadRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/resultat': typeof AuthenticatedResultatRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/veckans-spel': typeof AuthenticatedVeckansSpelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -210,11 +227,13 @@ export interface FileRoutesById {
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
+  '/_authenticated/kommentera': typeof AuthenticatedKommenteraRoute
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/mina-rad': typeof AuthenticatedMinaRadRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/resultat': typeof AuthenticatedResultatRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
+  '/_authenticated/veckans-spel': typeof AuthenticatedVeckansSpelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -235,11 +254,13 @@ export interface FileRouteTypes {
     | '/efterrapporter'
     | '/ekonomi'
     | '/installningar'
+    | '/kommentera'
     | '/larande'
     | '/mina-rad'
     | '/oversikt'
     | '/resultat'
     | '/system'
+    | '/veckans-spel'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
@@ -258,11 +279,13 @@ export interface FileRouteTypes {
     | '/efterrapporter'
     | '/ekonomi'
     | '/installningar'
+    | '/kommentera'
     | '/larande'
     | '/mina-rad'
     | '/oversikt'
     | '/resultat'
     | '/system'
+    | '/veckans-spel'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
@@ -282,11 +305,13 @@ export interface FileRouteTypes {
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
     | '/_authenticated/installningar'
+    | '/_authenticated/kommentera'
     | '/_authenticated/larande'
     | '/_authenticated/mina-rad'
     | '/_authenticated/oversikt'
     | '/_authenticated/resultat'
     | '/_authenticated/system'
+    | '/_authenticated/veckans-spel'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/omgangar/$roundId'
@@ -387,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstallningarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/kommentera': {
+      id: '/_authenticated/kommentera'
+      path: '/kommentera'
+      fullPath: '/kommentera'
+      preLoaderRoute: typeof AuthenticatedKommenteraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/larande': {
       id: '/_authenticated/larande'
       path: '/larande'
@@ -420,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/system'
       fullPath: '/system'
       preLoaderRoute: typeof AuthenticatedSystemRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/veckans-spel': {
+      id: '/_authenticated/veckans-spel'
+      path: '/veckans-spel'
+      fullPath: '/veckans-spel'
+      preLoaderRoute: typeof AuthenticatedVeckansSpelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/.lovable/oauth/consent': {
@@ -473,11 +512,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
+  AuthenticatedKommenteraRoute: typeof AuthenticatedKommenteraRoute
   AuthenticatedLarandeRoute: typeof AuthenticatedLarandeRoute
   AuthenticatedMinaRadRoute: typeof AuthenticatedMinaRadRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedResultatRoute: typeof AuthenticatedResultatRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
+  AuthenticatedVeckansSpelRoute: typeof AuthenticatedVeckansSpelRoute
   AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
   AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
 }
@@ -488,11 +529,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
+  AuthenticatedKommenteraRoute: AuthenticatedKommenteraRoute,
   AuthenticatedLarandeRoute: AuthenticatedLarandeRoute,
   AuthenticatedMinaRadRoute: AuthenticatedMinaRadRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedResultatRoute: AuthenticatedResultatRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
+  AuthenticatedVeckansSpelRoute: AuthenticatedVeckansSpelRoute,
   AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
   AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
 }

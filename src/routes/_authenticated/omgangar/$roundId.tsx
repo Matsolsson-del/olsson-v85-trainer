@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUND_STATUS_LABELS, formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
-import { useRoundData } from "@/lib/travhub-queries";
+import { useIsOwner, useRoundData } from "@/lib/travhub-queries";
 import { StartfaltTab } from "@/components/round/StartfaltTab";
 import { DataTab } from "@/components/round/DataTab";
 import { AnalysTab } from "@/components/round/AnalysTab";
@@ -32,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
 function RoundDetail() {
   const { roundId } = Route.useParams();
   const { data, isLoading, error } = useRoundData(roundId);
+  const isOwner = useIsOwner(data?.round.group_id ?? null);
 
   if (isLoading) return <Skeleton className="h-96 w-full" />;
   if (error || !data)
@@ -58,26 +59,20 @@ function RoundDetail() {
 
       <div className="mb-4 space-y-4">
         <ResponsibilityCard roundId={roundId} groupId={round.group_id} />
-        <AutomatikCard roundId={roundId} />
+        {isOwner && <AutomatikCard roundId={roundId} />}
       </div>
 
       <Tabs defaultValue="startfalt">
         <TabsList className="flex flex-wrap">
           <TabsTrigger value="startfalt">Startfält</TabsTrigger>
-          <TabsTrigger value="data">Data &amp; kvalitet</TabsTrigger>
-          <TabsTrigger value="analys">Analys</TabsTrigger>
           <TabsTrigger value="system">System</TabsTrigger>
           <TabsTrigger value="resultat">Resultat &amp; efterrapport</TabsTrigger>
+          {isOwner && <TabsTrigger value="data">Data &amp; kvalitet</TabsTrigger>}
+          {isOwner && <TabsTrigger value="analys">Analys</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="startfalt" className="pt-4">
           <StartfaltTab data={data} roundId={roundId} />
-        </TabsContent>
-        <TabsContent value="data" className="pt-4">
-          <DataTab data={data} roundId={roundId} />
-        </TabsContent>
-        <TabsContent value="analys" className="pt-4">
-          <AnalysTab data={data} roundId={roundId} />
         </TabsContent>
         <TabsContent value="system" className="pt-4">
           <SystemTab data={data} roundId={roundId} />
@@ -85,6 +80,16 @@ function RoundDetail() {
         <TabsContent value="resultat" className="pt-4">
           <ResultatTab data={data} roundId={roundId} />
         </TabsContent>
+        {isOwner && (
+          <>
+            <TabsContent value="data" className="pt-4">
+              <DataTab data={data} roundId={roundId} />
+            </TabsContent>
+            <TabsContent value="analys" className="pt-4">
+              <AnalysTab data={data} roundId={roundId} />
+            </TabsContent>
+          </>
+        )}
       </Tabs>
     </>
   );
