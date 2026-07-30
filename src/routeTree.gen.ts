@@ -22,6 +22,7 @@ import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
+import { Route as ApiPublicHooksVeckansV85RouteImport } from './routes/api/public/hooks/veckans-v85'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -91,6 +92,12 @@ const AuthenticatedOmgangarRoundIdRoute =
     path: '/omgangar/$roundId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicHooksVeckansV85Route =
+  ApiPublicHooksVeckansV85RouteImport.update({
+    id: '/api/public/hooks/veckans-v85',
+    path: '/api/public/hooks/veckans-v85',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/system'
     | '/omgangar/$roundId'
     | '/omgangar/'
+    | '/api/public/hooks/veckans-v85'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/system'
     | '/omgangar/$roundId'
     | '/omgangar'
+    | '/api/public/hooks/veckans-v85'
   id:
     | '__root__'
     | '/'
@@ -180,12 +192,14 @@ export interface FileRouteTypes {
     | '/_authenticated/system'
     | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
+    | '/api/public/hooks/veckans-v85'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiPublicHooksVeckansV85Route: typeof ApiPublicHooksVeckansV85Route
 }
 
 declare module '@tanstack/react-router' {
@@ -281,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOmgangarRoundIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/veckans-v85': {
+      id: '/api/public/hooks/veckans-v85'
+      path: '/api/public/hooks/veckans-v85'
+      fullPath: '/api/public/hooks/veckans-v85'
+      preLoaderRoute: typeof ApiPublicHooksVeckansV85RouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -317,6 +338,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiPublicHooksVeckansV85Route: ApiPublicHooksVeckansV85Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

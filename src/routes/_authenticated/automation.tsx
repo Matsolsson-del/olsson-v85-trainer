@@ -1,4 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { importV85Now } from "@/lib/atg.functions";
 import { PageHeader } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,19 +38,44 @@ const STATUS_LABELS: Record<string, string> = {
 
 function AutomationPage() {
   const { groupId } = useActiveGroupId();
-  const { data: jobs } = useJobs(groupId);
-  const { data: runs } = useJobRuns(groupId);
+  const { data: jobs, refetch: refetchJobs } = useJobs(groupId);
+  const { data: runs, refetch: refetchRuns } = useJobRuns(groupId);
+  const runImport = useServerFn(importV85Now);
+  const [busy, setBusy] = useState(false);
 
   const failed = (runs ?? []).filter(
     (r) => r.status === "failed" || r.status === "needs_manual",
   );
+
+  async function handleImport() {
+    if (!groupId) return;
+    setBusy(true);
+    try {
+      const res: any = await runImport({ data: { groupId } });
+      toast.success(
+        `${res.created ? "Ny omgång skapad" : "Omgången uppdaterad"}: ${res.trackName} ${res.raceDate} – ${res.races} avdelningar, ${res.entries} startande.`,
+      );
+      refetchJobs();
+      refetchRuns();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Importen misslyckades.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <>
       <PageHeader
         title="Automation"
         description="Körningsplan, senaste jobb och manuella uppgifter."
+        actions={
+          <Button onClick={handleImport} disabled={!groupId || busy}>
+            {busy ? "Hämtar från ATG …" : "Importera veckans V85 nu"}
+          </Button>
+        }
       />
+
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
