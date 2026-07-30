@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
+import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,17 +41,25 @@ const AuthenticatedOmgangarIndexRoute =
     path: '/omgangar/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOmgangarRoundIdRoute =
+  AuthenticatedOmgangarRoundIdRouteImport.update({
+    id: '/omgangar/$roundId',
+    path: '/omgangar/$roundId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesById {
@@ -59,19 +68,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
+  '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/oversikt' | '/omgangar/'
+  fullPaths: '/' | '/auth' | '/oversikt' | '/omgangar/$roundId' | '/omgangar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/oversikt' | '/omgangar'
+  to: '/' | '/auth' | '/oversikt' | '/omgangar/$roundId' | '/omgangar'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/oversikt'
+    | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
   fileRoutesById: FileRoutesById
 }
@@ -118,16 +129,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOmgangarIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/omgangar/$roundId': {
+      id: '/_authenticated/omgangar/$roundId'
+      path: '/omgangar/$roundId'
+      fullPath: '/omgangar/$roundId'
+      preLoaderRoute: typeof AuthenticatedOmgangarRoundIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
+  AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
   AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
+  AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
   AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
 }
 
