@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
+import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
@@ -45,6 +46,11 @@ const AuthenticatedEfterrapporterRoute =
     path: '/efterrapporter',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedEkonomiRoute = AuthenticatedEkonomiRouteImport.update({
+  id: '/ekonomi',
+  path: '/ekonomi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLarandeRoute = AuthenticatedLarandeRouteImport.update({
   id: '/larande',
   path: '/larande',
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
+  '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
+  '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
+  '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/analysera'
     | '/efterrapporter'
+    | '/ekonomi'
     | '/larande'
     | '/oversikt'
     | '/system'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/analysera'
     | '/efterrapporter'
+    | '/ekonomi'
     | '/larande'
     | '/oversikt'
     | '/system'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/analysera'
     | '/_authenticated/efterrapporter'
+    | '/_authenticated/ekonomi'
     | '/_authenticated/larande'
     | '/_authenticated/oversikt'
     | '/_authenticated/system'
@@ -188,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEfterrapporterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/ekonomi': {
+      id: '/_authenticated/ekonomi'
+      path: '/ekonomi'
+      fullPath: '/ekonomi'
+      preLoaderRoute: typeof AuthenticatedEkonomiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/larande': {
       id: '/_authenticated/larande'
       path: '/larande'
@@ -229,6 +248,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
+  AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
   AuthenticatedLarandeRoute: typeof AuthenticatedLarandeRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
@@ -239,6 +259,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
+  AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
   AuthenticatedLarandeRoute: AuthenticatedLarandeRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
