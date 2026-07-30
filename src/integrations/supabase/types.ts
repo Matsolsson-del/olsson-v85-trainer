@@ -215,6 +215,54 @@ export type Database = {
           },
         ]
       }
+      data_quality_reports: {
+        Row: {
+          created_at: string
+          id: string
+          missing_fields: Json | null
+          race_id: string | null
+          round_id: string
+          score: number | null
+          sufficient_for_final: boolean
+          warnings: Json | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          missing_fields?: Json | null
+          race_id?: string | null
+          round_id: string
+          score?: number | null
+          sufficient_for_final?: boolean
+          warnings?: Json | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          missing_fields?: Json | null
+          race_id?: string | null
+          round_id?: string
+          score?: number | null
+          sufficient_for_final?: boolean
+          warnings?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_quality_reports_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_quality_reports_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       data_sources: {
         Row: {
           created_at: string
@@ -718,6 +766,114 @@ export type Database = {
             columns: ["underbet_entry_id"]
             isOneToOne: false
             referencedRelation: "race_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_runs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          finished_at: string | null
+          group_id: string
+          id: string
+          job_id: string | null
+          job_type: string
+          log: Json | null
+          round_id: string | null
+          started_at: string
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          group_id: string
+          id?: string
+          job_id?: string | null
+          job_type: string
+          log?: Json | null
+          round_id?: string | null
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          group_id?: string
+          id?: string
+          job_id?: string | null
+          job_type?: string
+          log?: Json | null
+          round_id?: string | null
+          started_at?: string
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_runs_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_runs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_runs_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          group_id: string
+          id: string
+          job_type: string
+          schedule_cron: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          group_id: string
+          id?: string
+          job_type: string
+          schedule_cron?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          group_id?: string
+          id?: string
+          job_type?: string
+          schedule_cron?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
             referencedColumns: ["id"]
           },
         ]
@@ -1273,6 +1429,92 @@ export type Database = {
           },
         ]
       }
+      responsibility_rotation: {
+        Row: {
+          active: boolean
+          created_at: string
+          group_id: string
+          id: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          group_id: string
+          id?: string
+          position: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          group_id?: string
+          id?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responsibility_rotation_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      risk_flags: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string
+          flag_type: string
+          id: string
+          race_id: string | null
+          resolved_at: string | null
+          round_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          created_by: string
+          flag_type?: string
+          id?: string
+          race_id?: string | null
+          resolved_at?: string | null
+          round_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string
+          flag_type?: string
+          id?: string
+          race_id?: string | null
+          resolved_at?: string | null
+          round_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_flags_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_flags_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       round_postmortems: {
         Row: {
           ai_draft: string | null
@@ -1329,6 +1571,53 @@ export type Database = {
           },
         ]
       }
+      round_responsibility: {
+        Row: {
+          assigned_at: string
+          change_reason: string | null
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          replaced_user_id: string | null
+          rotation_mode: string
+          round_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          change_reason?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          replaced_user_id?: string | null
+          rotation_mode?: string
+          round_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          change_reason?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          replaced_user_id?: string | null
+          rotation_mode?: string
+          round_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_responsibility_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: true
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       round_results: {
         Row: {
           group_winnings: number
@@ -1363,6 +1652,7 @@ export type Database = {
       }
       rounds: {
         Row: {
+          ai_status: string
           analyses_revealed_at: string | null
           bet_stop_at: string | null
           budget: number
@@ -1378,12 +1668,15 @@ export type Database = {
           race_date: string
           row_price: number
           status: Database["public"]["Enums"]["round_status"]
+          submitted_by: string | null
+          submitted_manually_at: string | null
           track_condition: string | null
           track_id: string | null
           updated_at: string
           weather_notes: string | null
         }
         Insert: {
+          ai_status?: string
           analyses_revealed_at?: string | null
           bet_stop_at?: string | null
           budget?: number
@@ -1399,12 +1692,15 @@ export type Database = {
           race_date: string
           row_price?: number
           status?: Database["public"]["Enums"]["round_status"]
+          submitted_by?: string | null
+          submitted_manually_at?: string | null
           track_condition?: string | null
           track_id?: string | null
           updated_at?: string
           weather_notes?: string | null
         }
         Update: {
+          ai_status?: string
           analyses_revealed_at?: string | null
           bet_stop_at?: string | null
           budget?: number
@@ -1420,6 +1716,8 @@ export type Database = {
           race_date?: string
           row_price?: number
           status?: Database["public"]["Enums"]["round_status"]
+          submitted_by?: string | null
+          submitted_manually_at?: string | null
           track_condition?: string | null
           track_id?: string | null
           updated_at?: string
@@ -1521,6 +1819,69 @@ export type Database = {
             columns: ["system_version_id"]
             isOneToOne: false
             referencedRelation: "system_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      system_candidates: {
+        Row: {
+          ai_analysis_run_id: string | null
+          cost: number | null
+          created_at: string
+          estimated_coverage: number | null
+          id: string
+          profile: string
+          rationale: string | null
+          round_id: string
+          rows_count: number | null
+          selected: boolean
+          selections: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_analysis_run_id?: string | null
+          cost?: number | null
+          created_at?: string
+          estimated_coverage?: number | null
+          id?: string
+          profile: string
+          rationale?: string | null
+          round_id: string
+          rows_count?: number | null
+          selected?: boolean
+          selections?: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ai_analysis_run_id?: string | null
+          cost?: number | null
+          created_at?: string
+          estimated_coverage?: number | null
+          id?: string
+          profile?: string
+          rationale?: string | null
+          round_id?: string
+          rows_count?: number | null
+          selected?: boolean
+          selections?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_candidates_ai_analysis_run_id_fkey"
+            columns: ["ai_analysis_run_id"]
+            isOneToOne: false
+            referencedRelation: "ai_analysis_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_candidates_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
             referencedColumns: ["id"]
           },
         ]
@@ -1724,6 +2085,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_round_responsibility: {
+        Args: { _round_id: string }
+        Returns: string
+      }
+      change_round_responsibility: {
+        Args: {
+          _new_user_id: string
+          _reason: string
+          _rotation_mode?: string
+          _round_id: string
+        }
+        Returns: undefined
+      }
       clone_system_version: {
         Args: { _change_reason: string; _system_version_id: string }
         Returns: string
@@ -1731,6 +2105,7 @@ export type Database = {
       entry_group_id: { Args: { _entry_id: string }; Returns: string }
       is_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_group_owner: { Args: { _group_id: string }; Returns: boolean }
+      is_round_responsible: { Args: { _round_id: string }; Returns: boolean }
       lock_system_version: {
         Args: { _system_version_id: string }
         Returns: Json
