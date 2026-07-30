@@ -91,7 +91,7 @@ async function resolveTrack(db: any, name: string): Promise<string> {
   if (data?.id) return data.id;
   const { data: inserted, error } = await db
     .from("tracks")
-    .insert({ name, normalized_name: normalized })
+    .insert({ name })
     .select("id")
     .single();
   if (error) throw error;
