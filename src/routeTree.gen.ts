@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
+import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
@@ -37,6 +38,12 @@ const AuthenticatedAnalyseraRoute = AuthenticatedAnalyseraRouteImport.update({
   path: '/analysera',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedEfterrapporterRoute =
+  AuthenticatedEfterrapporterRouteImport.update({
+    id: '/efterrapporter',
+    path: '/efterrapporter',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
   id: '/oversikt',
   path: '/oversikt',
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
+  '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -73,6 +81,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
+  '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -84,6 +93,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
+  '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/analysera'
+    | '/efterrapporter'
     | '/oversikt'
     | '/system'
     | '/omgangar/$roundId'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/analysera'
+    | '/efterrapporter'
     | '/oversikt'
     | '/system'
     | '/omgangar/$roundId'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/analysera'
+    | '/_authenticated/efterrapporter'
     | '/_authenticated/oversikt'
     | '/_authenticated/system'
     | '/_authenticated/omgangar/$roundId'
@@ -156,6 +169,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyseraRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/efterrapporter': {
+      id: '/_authenticated/efterrapporter'
+      path: '/efterrapporter'
+      fullPath: '/efterrapporter'
+      preLoaderRoute: typeof AuthenticatedEfterrapporterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/oversikt': {
       id: '/_authenticated/oversikt'
       path: '/oversikt'
@@ -189,6 +209,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
+  AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
@@ -197,6 +218,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
+  AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
