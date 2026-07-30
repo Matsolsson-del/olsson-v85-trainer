@@ -112,7 +112,8 @@ function AuthPage() {
           });
         }
       }
-      navigate({ to: "/oversikt", replace: true });
+      goOn();
+
 
     } catch (e: any) {
       toast.error(e.message ?? "Kunde inte fortsätta.");
