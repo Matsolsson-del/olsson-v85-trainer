@@ -28,7 +28,7 @@ function Index() {
 
   useEffect(() => {
     if (loading) return;
-    navigate({ to: session ? "/oversikt" : "/auth", replace: true });
+    navigate({ to: session ? "/veckans-spel" : "/auth", replace: true });
   }, [loading, session, navigate]);
 
   return (
