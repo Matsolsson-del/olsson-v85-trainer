@@ -171,7 +171,7 @@ export async function importNextV85Round(
         status: "success",
         finished_at: new Date().toISOString(),
         round_id: result.roundId,
-        log: result as unknown as Record<string, unknown>,
+        log: JSON.parse(JSON.stringify(result)),
       })
       .eq("id", run!.id);
     return result;
