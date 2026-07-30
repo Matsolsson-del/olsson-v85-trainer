@@ -229,13 +229,23 @@ function SystemVersionEditor({
           </p>
         </div>
         {!locked ? (
-          <div className="flex gap-2">
-            <Button variant="secondary" onClick={save} disabled={busy}>
-              Spara
-            </Button>
-            <Button onClick={lock} disabled={busy || overBudget || emptyLegs > 0}>
-              Lås system
-            </Button>
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex gap-2">
+              <Button variant="secondary" onClick={save} disabled={busy}>
+                Spara
+              </Button>
+              <Button
+                onClick={lock}
+                disabled={busy || overBudget || emptyLegs > 0 || !canFinalize}
+              >
+                Markera systemet som färdigt
+              </Button>
+            </div>
+            {!canFinalize && (
+              <p className="text-xs text-muted-foreground">
+                Bara veckans ansvarige kan göra systemet färdigt.
+              </p>
+            )}
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-2">
