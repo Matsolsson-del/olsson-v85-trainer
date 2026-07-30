@@ -249,6 +249,21 @@ function SystemVersionEditor({
         )}
       </CardHeader>
       <CardContent className="space-y-5">
+        {legSelections.some((l) => l.entryIds.length > 0) && (
+          <AtgExportCard
+            trackName={(data.round as any)?.tracks?.name}
+            raceDate={(data.round as any)?.race_date}
+            rows={rows}
+            cost={cost}
+            legs={(data.races as any[]).map((race) => ({
+              legNumber: race.leg_number,
+              numbers: (race.race_entries ?? [])
+                .filter((e: any) => (selections[race.id] ?? []).includes(e.id))
+                .map((e: any) => e.start_number)
+                .sort((a: number, b: number) => a - b),
+            }))}
+          />
+        )}
         {(data.races as any[]).map((race) => {
           const entries = [...(race.race_entries ?? [])]
             .filter((e: any) => !e.scratched)
