@@ -1724,13 +1724,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clone_system_version: {
+        Args: { _change_reason: string; _system_version_id: string }
+        Returns: string
+      }
       entry_group_id: { Args: { _entry_id: string }; Returns: string }
       is_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_group_owner: { Args: { _group_id: string }; Returns: boolean }
+      lock_system_version: {
+        Args: { _system_version_id: string }
+        Returns: Json
+      }
       race_analyses_revealed: { Args: { _race_id: string }; Returns: boolean }
       race_group_id: { Args: { _race_id: string }; Returns: string }
       race_round_id: { Args: { _race_id: string }; Returns: string }
+      reveal_analyses_early: {
+        Args: { _reason: string; _round_id: string }
+        Returns: undefined
+      }
       round_group_id: { Args: { _round_id: string }; Returns: string }
+      submit_individual_analysis: {
+        Args: { _assessment_id: string }
+        Returns: undefined
+      }
       system_group_id: { Args: { _system_id: string }; Returns: string }
       system_version_group_id: { Args: { _sv_id: string }; Returns: string }
     }
