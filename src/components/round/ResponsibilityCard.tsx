@@ -86,8 +86,8 @@ export function ResponsibilityCard({ roundId, groupId }: Props) {
               </p>
             )}
             <p className="text-xs text-muted-foreground">
-              Endast spelansvarig kan låsa system och markera spelet som inlämnat. Övrigas
-              godkännande krävs inte.
+              Endast spelansvarig låser systemet. Spelet lämnas alltid in hos ATG – appen
+              lämnar aldrig in något åt er.
             </p>
 
             <div className="flex flex-wrap gap-2">
