@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
+import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
@@ -39,6 +40,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedAnalyseraRoute = AuthenticatedAnalyseraRouteImport.update({
   id: '/analysera',
   path: '/analysera',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAutomationRoute = AuthenticatedAutomationRouteImport.update({
+  id: '/automation',
+  path: '/automation',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedEfterrapporterRoute =
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
+  '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
+  '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
+  '/_authenticated/automation': typeof AuthenticatedAutomationRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/analysera'
+    | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
     | '/installningar'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/analysera'
+    | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
     | '/installningar'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/analysera'
+    | '/_authenticated/automation'
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
     | '/_authenticated/installningar'
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/analysera'
       fullPath: '/analysera'
       preLoaderRoute: typeof AuthenticatedAnalyseraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/automation': {
+      id: '/_authenticated/automation'
+      path: '/automation'
+      fullPath: '/automation'
+      preLoaderRoute: typeof AuthenticatedAutomationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/efterrapporter': {
@@ -267,6 +286,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
+  AuthenticatedAutomationRoute: typeof AuthenticatedAutomationRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
@@ -279,6 +299,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
+  AuthenticatedAutomationRoute: AuthenticatedAutomationRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
