@@ -79,15 +79,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Familjen Olssons Travhub – V85-analys för spelgruppen" },
+      { title: "Familjen Olssons Travhub – privat V85-hubb" },
       {
         name: "description",
         content:
-          "Privat analyshubb för V85: blindanalys, gruppbedömning, systembyggare, efterrapporter och lärande över tid.",
+          "Logga in i Familjen Olssons Travhub för att analysera V85, bygga system, låsa beslut och följa upp gruppens lärande.",
       },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Familjen Olssons Travhub – privat V85-hubb" },
+      { name: "twitter:title", content: "Familjen Olssons Travhub – privat V85-hubb" },
+      { property: "og:description", content: "Logga in i Familjen Olssons Travhub för att analysera V85, bygga system, låsa beslut och följa upp gruppens lärande." },
+      { name: "twitter:description", content: "Logga in i Familjen Olssons Travhub för att analysera V85, bygga system, låsa beslut och följa upp gruppens lärande." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1ebb5e3-7692-4fa4-9fca-054fedb0feaf/id-preview-8379b162--4e3519b1-cdfb-4a3e-b3a4-794d238453bc.lovable.app-1785427102632.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1ebb5e3-7692-4fa4-9fca-054fedb0feaf/id-preview-8379b162--4e3519b1-cdfb-4a3e-b3a4-794d238453bc.lovable.app-1785427102632.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

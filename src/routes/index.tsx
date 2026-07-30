@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Familjen Olssons Travhub – privat V85-hubb" },
       {
         property: "og:description",
-        content: "Blindanalys, gruppbedömning, systembyggare och efterrapporter för V85.",
+        content: "Logga in i Familjen Olssons Travhub för att analysera V85, bygga system, låsa beslut och följa upp gruppens lärande.",
       },
     ],
   }),
