@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUND_STATUS_LABELS, formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
-import { useRoundData } from "@/lib/travhub-queries";
+import { useIsOwner, useRoundData } from "@/lib/travhub-queries";
 import { StartfaltTab } from "@/components/round/StartfaltTab";
 import { DataTab } from "@/components/round/DataTab";
 import { AnalysTab } from "@/components/round/AnalysTab";
