@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
 import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
@@ -20,6 +23,7 @@ import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authen
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 import { Route as ApiPublicHooksVeckansV85RouteImport } from './routes/api/public/hooks/veckans-v85'
@@ -38,6 +42,23 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAnalyseraRoute = AuthenticatedAnalyseraRouteImport.update({
   id: '/analysera',
   path: '/analysera',
@@ -80,6 +101,12 @@ const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
   path: '/system',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedOmgangarIndexRoute =
   AuthenticatedOmgangarIndexRouteImport.update({
     id: '/omgangar/',
@@ -102,6 +129,9 @@ const ApiPublicHooksVeckansV85Route =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
@@ -110,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
@@ -117,6 +148,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
@@ -125,6 +159,7 @@ export interface FileRoutesByTo {
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
@@ -134,6 +169,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
   '/_authenticated/automation': typeof AuthenticatedAutomationRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
@@ -142,6 +180,7 @@ export interface FileRoutesById {
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
@@ -151,6 +190,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/analysera'
     | '/automation'
     | '/efterrapporter'
@@ -159,6 +201,7 @@ export interface FileRouteTypes {
     | '/larande'
     | '/oversikt'
     | '/system'
+    | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
     | '/omgangar/'
     | '/api/public/hooks/veckans-v85'
@@ -166,6 +209,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/analysera'
     | '/automation'
     | '/efterrapporter'
@@ -174,6 +220,7 @@ export interface FileRouteTypes {
     | '/larande'
     | '/oversikt'
     | '/system'
+    | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
     | '/omgangar'
     | '/api/public/hooks/veckans-v85'
@@ -182,6 +229,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/analysera'
     | '/_authenticated/automation'
     | '/_authenticated/efterrapporter'
@@ -190,6 +240,7 @@ export interface FileRouteTypes {
     | '/_authenticated/larande'
     | '/_authenticated/oversikt'
     | '/_authenticated/system'
+    | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
     | '/api/public/hooks/veckans-v85'
@@ -199,6 +250,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  McpRoute: typeof McpRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicHooksVeckansV85Route: typeof ApiPublicHooksVeckansV85Route
 }
 
@@ -223,6 +278,27 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/analysera': {
@@ -281,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSystemRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/omgangar/': {
       id: '/_authenticated/omgangar/'
       path: '/omgangar'
@@ -338,6 +421,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  McpRoute: McpRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicHooksVeckansV85Route: ApiPublicHooksVeckansV85Route,
 }
 export const routeTree = rootRouteImport
