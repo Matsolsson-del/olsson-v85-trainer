@@ -88,6 +88,87 @@
         "outputSchema": null
       },
       {
+        "name": "get_system",
+        "title": "Hämta gruppens system för en omgång",
+        "description": "Hämta nuvarande systemförslag för en omgång: valda startnummer per avdelning, antal rader, kostnad, budget och om versionen är låst.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "round_id": {
+              "type": "string",
+              "description": "Omgångens id (från list_rounds)."
+            }
+          },
+          "required": [
+            "round_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "propose_system",
+        "title": "Föreslå system (utkast)",
+        "description": "Skriv in ett systemförslag som utkast för en omgång: startnummer per avdelning. Skapar eller uppdaterar ett olåst utkast. Låser aldrig systemet och lämnar aldrig in spelet – det görs manuellt hos ATG.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "round_id": {
+              "type": "string",
+              "description": "Omgångens id (från list_rounds)."
+            },
+            "legs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "leg_number": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991,
+                    "description": "Avdelning 1-8."
+                  },
+                  "start_numbers": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "description": "Startnummer som ska spelas."
+                  }
+                },
+                "required": [
+                  "leg_number",
+                  "start_numbers"
+                ]
+              },
+              "description": "Ett objekt per avdelning."
+            },
+            "motivation": {
+              "description": "Kort motivering som sparas som anteckning.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "round_id",
+            "legs"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "create_risk_flag",
         "title": "Skapa riskflagga",
         "description": "Lägg en riskflagga (varning eller observation) på en omgång, eventuellt kopplad till en avdelning.",
