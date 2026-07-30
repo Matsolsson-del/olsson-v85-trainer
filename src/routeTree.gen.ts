@@ -23,6 +23,7 @@ import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authen
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedMinaRadRouteImport } from './routes/_authenticated/mina-rad'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
+import { Route as AuthenticatedResultatRouteImport } from './routes/_authenticated/resultat'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -104,6 +105,11 @@ const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
   path: '/oversikt',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedResultatRoute = AuthenticatedResultatRouteImport.update({
+  id: '/resultat',
+  path: '/resultat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
   id: '/system',
   path: '/system',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/larande': typeof AuthenticatedLarandeRoute
   '/mina-rad': typeof AuthenticatedMinaRadRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/resultat': typeof AuthenticatedResultatRoute
   '/system': typeof AuthenticatedSystemRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/larande': typeof AuthenticatedLarandeRoute
   '/mina-rad': typeof AuthenticatedMinaRadRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/resultat': typeof AuthenticatedResultatRoute
   '/system': typeof AuthenticatedSystemRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/mina-rad': typeof AuthenticatedMinaRadRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
+  '/_authenticated/resultat': typeof AuthenticatedResultatRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/larande'
     | '/mina-rad'
     | '/oversikt'
+    | '/resultat'
     | '/system'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/larande'
     | '/mina-rad'
     | '/oversikt'
+    | '/resultat'
     | '/system'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/larande'
     | '/_authenticated/mina-rad'
     | '/_authenticated/oversikt'
+    | '/_authenticated/resultat'
     | '/_authenticated/system'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -396,6 +408,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOversiktRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/resultat': {
+      id: '/_authenticated/resultat'
+      path: '/resultat'
+      fullPath: '/resultat'
+      preLoaderRoute: typeof AuthenticatedResultatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/system': {
       id: '/_authenticated/system'
       path: '/system'
@@ -457,6 +476,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLarandeRoute: typeof AuthenticatedLarandeRoute
   AuthenticatedMinaRadRoute: typeof AuthenticatedMinaRadRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
+  AuthenticatedResultatRoute: typeof AuthenticatedResultatRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
   AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
   AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
@@ -471,6 +491,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLarandeRoute: AuthenticatedLarandeRoute,
   AuthenticatedMinaRadRoute: AuthenticatedMinaRadRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
+  AuthenticatedResultatRoute: AuthenticatedResultatRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
   AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
   AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
