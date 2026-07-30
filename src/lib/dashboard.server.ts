@@ -46,6 +46,7 @@ export async function getDashboardData(groupId: string) {
        systems(system_versions(calculated_cost, locked_at, system_selections(race_id, race_entry_id)))`,
     )
     .eq("group_id", groupId)
+    .eq("is_demo", false)
     .order("race_date", { ascending: false })
     .limit(60);
   if (error) throw error;
