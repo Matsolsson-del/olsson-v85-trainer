@@ -85,8 +85,8 @@ export function DataTab({ data, roundId }: { data: RoundData; roundId: string })
             ))}
           </ul>
           <p className="text-xs text-muted-foreground">
-            Ingen automatik låser system eller markerar spel som inlämnat – importen skapar bara
-            underlag. Spelansvarig fattar besluten.
+            Ingen automatik låser systemet – importen skapar bara underlag. Spelansvarig fattar
+            besluten och spelet lämnas in hos ATG.
           </p>
         </CardContent>
       </Card>
