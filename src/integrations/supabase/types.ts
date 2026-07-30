@@ -129,6 +129,128 @@ export type Database = {
           },
         ]
       }
+      analysis_layers: {
+        Row: {
+          content: Json
+          created_at: string
+          created_by: string | null
+          group_id: string
+          id: string
+          layer: string
+          race_id: string | null
+          round_id: string
+          source_label: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          group_id: string
+          id?: string
+          layer: string
+          race_id?: string | null
+          round_id: string
+          source_label?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          group_id?: string
+          id?: string
+          layer?: string
+          race_id?: string | null
+          round_id?: string
+          source_label?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_layers_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_layers_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_layers_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bet_snapshots: {
+        Row: {
+          cost: number | null
+          created_at: string
+          group_id: string
+          id: string
+          payload: Json
+          responsible_user_id: string
+          round_id: string
+          rows_count: number | null
+          submitted_at: string
+          system_version_id: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          group_id: string
+          id?: string
+          payload?: Json
+          responsible_user_id: string
+          round_id: string
+          rows_count?: number | null
+          submitted_at?: string
+          system_version_id?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          payload?: Json
+          responsible_user_id?: string
+          round_id?: string
+          rows_count?: number | null
+          submitted_at?: string
+          system_version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bet_snapshots_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bet_snapshots_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bet_snapshots_system_version_id_fkey"
+            columns: ["system_version_id"]
+            isOneToOne: false
+            referencedRelation: "system_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           body: string
@@ -366,6 +488,57 @@ export type Database = {
             columns: ["race_result_id"]
             isOneToOne: false
             referencedRelation: "race_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      final_checks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          findings: Json
+          group_id: string
+          id: string
+          round_id: string
+          run_at: string
+          status: string
+          suggestions: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          findings?: Json
+          group_id: string
+          id?: string
+          round_id: string
+          run_at?: string
+          status?: string
+          suggestions?: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          findings?: Json
+          group_id?: string
+          id?: string
+          round_id?: string
+          run_at?: string
+          status?: string
+          suggestions?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "final_checks_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "final_checks_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
             referencedColumns: ["id"]
           },
         ]
@@ -1913,45 +2086,60 @@ export type Database = {
           cost: number | null
           created_at: string
           estimated_coverage: number | null
+          hedges: Json
           id: string
           profile: string
           rationale: string | null
+          recommended: boolean
+          risk_level: string | null
           round_id: string
           rows_count: number | null
           selected: boolean
           selections: Json
+          spikes: Json
           title: string
           updated_at: string
+          weakest_assumption: string | null
         }
         Insert: {
           ai_analysis_run_id?: string | null
           cost?: number | null
           created_at?: string
           estimated_coverage?: number | null
+          hedges?: Json
           id?: string
           profile: string
           rationale?: string | null
+          recommended?: boolean
+          risk_level?: string | null
           round_id: string
           rows_count?: number | null
           selected?: boolean
           selections?: Json
+          spikes?: Json
           title: string
           updated_at?: string
+          weakest_assumption?: string | null
         }
         Update: {
           ai_analysis_run_id?: string | null
           cost?: number | null
           created_at?: string
           estimated_coverage?: number | null
+          hedges?: Json
           id?: string
           profile?: string
           rationale?: string | null
+          recommended?: boolean
+          risk_level?: string | null
           round_id?: string
           rows_count?: number | null
           selected?: boolean
           selections?: Json
+          spikes?: Json
           title?: string
           updated_at?: string
+          weakest_assumption?: string | null
         }
         Relationships: [
           {

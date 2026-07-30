@@ -29,8 +29,9 @@ import { lockFamily } from "@/lib/gate.functions";
 import { forgetPerson } from "@/lib/person-memory";
 
 const SIMPLE_NAV = [
-  { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
   { to: "/veckans-spel", label: "Veckans spel", icon: CalendarDays },
+  { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
+
   { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
   { to: "/resultat", label: "Resultat", icon: Trophy },
   { to: "/omgangar", label: "Historik", icon: History },
