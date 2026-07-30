@@ -48,9 +48,11 @@ function AiImportPage() {
   const [newKey, setNewKey] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [endpoint, setEndpoint] = useState("");
+  const [mcpUrl, setMcpUrl] = useState("");
 
   useEffect(() => {
     setEndpoint(`${window.location.origin}/api/public/ai-import`);
+    setMcpUrl(`${window.location.origin}/mcp`);
   }, []);
 
   const status = useQuery({
