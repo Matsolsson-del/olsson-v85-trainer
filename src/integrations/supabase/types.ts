@@ -1115,6 +1115,69 @@ export type Database = {
           },
         ]
       }
+      personal_recommendations: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          improvements: string | null
+          model_used: string | null
+          next_focus: string | null
+          round_id: string | null
+          rounds_analyzed: number
+          stats: Json
+          strengths: string | null
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          improvements?: string | null
+          model_used?: string | null
+          next_focus?: string | null
+          round_id?: string | null
+          rounds_analyzed?: number
+          stats?: Json
+          strengths?: string | null
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          improvements?: string | null
+          model_used?: string | null
+          next_focus?: string | null
+          round_id?: string | null
+          rounds_analyzed?: number
+          stats?: Json
+          strengths?: string | null
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_recommendations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "personal_recommendations_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
