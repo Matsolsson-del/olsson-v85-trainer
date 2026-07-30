@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useActiveGroupId, useGroups, useIsOwner, useMembers } from "@/lib/travhub-queries";
+import { useActiveGroupId, useIsOwner, useMembers } from "@/lib/travhub-queries";
 
 export const Route = createFileRoute("/_authenticated/installningar")({
   head: () => ({
