@@ -34,6 +34,7 @@ const NAV = [
   { to: "/system", label: "System", icon: Grid3x3 },
   { to: "/efterrapporter", label: "Efterrapporter", icon: FileText },
   { to: "/larande", label: "Lärande", icon: BarChart3 },
+  { to: "/mina-rad", label: "Mina råd", icon: Sparkles },
   { to: "/automation", label: "Automation", icon: Workflow },
   { to: "/ekonomi", label: "Ekonomi", icon: Coins },
   { to: "/installningar", label: "Inställningar", icon: Settings },
