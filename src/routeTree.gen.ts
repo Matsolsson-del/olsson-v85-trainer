@@ -23,6 +23,7 @@ import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authen
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
@@ -101,6 +102,11 @@ const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
   path: '/system',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/larande'
     | '/oversikt'
     | '/system'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
     | '/omgangar/'
@@ -220,6 +230,7 @@ export interface FileRouteTypes {
     | '/larande'
     | '/oversikt'
     | '/system'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
     | '/omgangar'
@@ -240,6 +251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/larande'
     | '/_authenticated/oversikt'
     | '/_authenticated/system'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/omgangar/$roundId'
     | '/_authenticated/omgangar/'
@@ -253,6 +265,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicHooksVeckansV85Route: typeof ApiPublicHooksVeckansV85Route
 }
@@ -357,6 +370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSystemRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -425,6 +445,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicHooksVeckansV85Route: ApiPublicHooksVeckansV85Route,
 }
