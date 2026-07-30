@@ -1,22 +1,19 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { getGateState, unlockFamily, signInAsMember } from "@/lib/gate.functions";
+import { getRememberedPerson, rememberPerson } from "@/lib/person-memory";
 
-/**
- * Ingen inloggningsspärr: hubben delas bara mellan familjens två spelare.
- * Man väljer bara vem man är, så att analyser, ansvar och ekonomi kan
- * kopplas till rätt person. Sessionen skapas i bakgrunden.
- */
-const MEMBER_SLOTS = [
-  { slug: "1", email: "olsson-1@olssonstravhub.se", label: "Mats" },
-  { slug: "2", email: "olsson-2@olssonstravhub.se", label: "Bosse" },
-  { slug: "3", email: "olsson-3@olssonstravhub.se", label: "Olle" },
+const SLOTS = [
+  { slug: "mats", label: "Mats" },
+  { slug: "bosse", label: "Bosse" },
+  { slug: "olle", label: "Olle" },
 ] as const;
-
-const SHARED_SECRET = "familjen-olsson-travhub-2026";
 
 function safeNext(next: unknown): string | null {
   if (typeof next !== "string") return null;
@@ -26,20 +23,19 @@ function safeNext(next: unknown): string | null {
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>): { next?: string } => {
+  validateSearch: (s: Record<string, unknown>): { next?: string; byt?: boolean } => {
     const next = safeNext(s.next);
-    return next ? { next } : {};
+    return { ...(next ? { next } : {}), ...(s.byt ? { byt: true } : {}) };
   },
-
   head: () => ({
     meta: [
-      { title: "Välj användare – Familjen Olssons Travhub" },
+      { title: "Välkommen – Familjen Olssons Travhub" },
       {
         name: "description",
-        content: "Välj vem du är för att fortsätta i familjens privata V85-hubb.",
+        content: "Ange familjens lösenord och välj vem du är för att komma in i Travhubben.",
       },
-      { property: "og:title", content: "Välj användare – Familjen Olssons Travhub" },
-      { property: "og:description", content: "Familjens privata V85-analyshubb." },
+      { property: "og:title", content: "Välkommen – Familjen Olssons Travhub" },
+      { property: "og:description", content: "Familjens privata V85-hubb." },
     ],
   }),
   component: AuthPage,
@@ -48,9 +44,22 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const { next } = Route.useSearch();
+  const { next, byt } = Route.useSearch();
+
+  const gateFn = useServerFn(getGateState);
+  const unlockFn = useServerFn(unlockFamily);
+  const signInFn = useServerFn(signInAsMember);
+
+  const {
+    data: gate,
+    isLoading: gateLoading,
+    refetch: refetchGate,
+  } = useQuery({ queryKey: ["gate"], queryFn: () => gateFn(), retry: false });
+
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [names, setNames] = useState<Record<string, string>>({});
+  const autoTried = useRef(false);
 
   function goOn() {
     if (next) {
@@ -63,98 +72,119 @@ function AuthPage() {
   useEffect(() => {
     if (session) goOn();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, navigate, next]);
+  }, [session]);
 
-
+  // Kom ihåg personen i 90 dagar: öppna direkt utan att fråga igen.
   useEffect(() => {
-    supabase
-      .from("profiles")
-      .select("email, display_name")
-      .then(({ data }) => {
-        if (!data) return;
-        const map: Record<string, string> = {};
-        for (const p of data) if (p.email && p.display_name) map[p.email] = p.display_name;
-        setNames(map);
-      });
-  }, []);
+    if (autoTried.current || byt || session || !gate?.unlocked) return;
+    const slug = getRememberedPerson();
+    if (!slug) return;
+    autoTried.current = true;
+    void enterAs(slug, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gate?.unlocked, session, byt]);
 
-  async function enterAs(slot: (typeof MEMBER_SLOTS)[number]) {
-    setBusy(slot.slug);
+  async function submitPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy("password");
+    setMessage(null);
     try {
-      let { error } = await supabase.auth.signInWithPassword({
-        email: slot.email,
-        password: SHARED_SECRET,
-      });
-
-      if (error) {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: slot.email,
-          password: SHARED_SECRET,
-          options: {
-            emailRedirectTo: window.location.origin,
-            data: { display_name: slot.label },
-          },
-        });
-        if (signUpError) throw signUpError;
-
-        ({ error } = await supabase.auth.signInWithPassword({
-          email: slot.email,
-          password: SHARED_SECRET,
-        }));
-        if (error) throw error;
+      const res = await unlockFn({ data: { password } });
+      if (res.ok) {
+        setPassword("");
+        await refetchGate();
+        return;
       }
-
-      const { data: groupId } = await supabase.rpc("join_family_group");
-      if (!groupId) {
-        const { data: auth } = await supabase.auth.getUser();
-        if (auth.user) {
-          await supabase.from("groups").insert({
-            name: "Familjen Olsson",
-            owner_id: auth.user.id,
-          });
-        }
+      if (res.reason === "locked") {
+        setMessage("För många försök – vänta några minuter och prova igen.");
+      } else if (res.reason === "config") {
+        setMessage("Lösenordet är inte inställt på servern ännu.");
+      } else {
+        setMessage("Fel lösenord – försök igen.");
       }
-      goOn();
-
-
-    } catch (e: any) {
-      toast.error(e.message ?? "Kunde inte fortsätta.");
+    } catch {
+      setMessage("Det gick inte just nu. Försök igen.");
     } finally {
       setBusy(null);
     }
   }
+
+  async function enterAs(slug: string, silent = false) {
+    setBusy(slug);
+    if (!silent) setMessage(null);
+    try {
+      const res = await signInFn({ data: { slug } });
+      if (!res.ok || !("session" in res)) {
+        if (!silent) setMessage("Det gick inte att öppna just nu. Försök igen.");
+        return;
+      }
+      const { error } = await supabase.auth.setSession(res.session);
+      if (error) {
+        if (!silent) setMessage("Det gick inte att öppna just nu. Försök igen.");
+        return;
+      }
+      rememberPerson(slug);
+      goOn();
+    } catch {
+      if (!silent) setMessage("Det gick inte att öppna just nu. Försök igen.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  const unlocked = gate?.unlocked === true;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="font-serif text-3xl font-semibold text-primary">
-            Familjen Olssons Travhub
+            Välkommen till Familjen Olssons Travhub
           </h1>
-          <p className="mt-2 text-sm text-white/70">
-            Ingen inloggning – välj bara vem du är så vet hubben vems analys som är vems.
-          </p>
         </div>
 
-        <div className="space-y-3 rounded-lg bg-card p-6 text-card-foreground shadow-lg">
-          <p className="text-sm font-medium">Vem är du?</p>
-          {MEMBER_SLOTS.map((slot) => (
-            <Button
-              key={slot.slug}
-              className="w-full justify-start"
-              variant="secondary"
-              size="lg"
-              disabled={busy !== null}
-              onClick={() => enterAs(slot)}
-            >
-              {busy === slot.slug ? "Öppnar …" : (names[slot.email] ?? slot.label)}
-            </Button>
-          ))}
-          <p className="pt-2 text-xs text-muted-foreground">
-            Du kan byta ditt visningsnamn under Inställningar. Eftersom det inte finns någon
-            spärr kommer alla med länken in – blindanalysen bygger på att ni håller er till
-            era egna namn.
-          </p>
+        <div className="space-y-4 rounded-lg bg-card p-6 text-card-foreground shadow-lg">
+          {gateLoading ? (
+            <p className="text-center text-base text-muted-foreground">Laddar …</p>
+          ) : !unlocked ? (
+            <form onSubmit={submitPassword} className="space-y-4">
+              <label htmlFor="familypw" className="block text-lg font-medium">
+                Ange familjens lösenord
+              </label>
+              <Input
+                id="familypw"
+                type="password"
+                autoComplete="current-password"
+                className="h-14 text-lg"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <Button type="submit" size="lg" className="h-14 w-full text-lg" disabled={busy !== null}>
+                {busy === "password" ? "Kontrollerar …" : "Fortsätt"}
+              </Button>
+            </form>
+          ) : (
+            <>
+              <p className="text-lg font-medium">Vem är du?</p>
+              {SLOTS.map((slot) => (
+                <Button
+                  key={slot.slug}
+                  className="h-16 w-full justify-center text-xl"
+                  variant="secondary"
+                  disabled={busy !== null}
+                  onClick={() => enterAs(slot.slug)}
+                >
+                  {busy === slot.slug ? "Öppnar …" : slot.label}
+                </Button>
+              ))}
+            </>
+          )}
+
+          {message && (
+            <p role="alert" className="text-center text-base font-medium text-destructive">
+              {message}
+            </p>
+          )}
         </div>
       </div>
     </div>
