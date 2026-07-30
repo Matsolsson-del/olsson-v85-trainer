@@ -65,6 +65,7 @@ export async function collectPersonalData(groupId: string, userId: string) {
     )
     .eq("user_id", userId)
     .eq("races.rounds.group_id", groupId)
+    .eq("races.rounds.is_demo", false)
     .order("created_at", { ascending: false })
     .limit(120);
   if (error) throw error;
