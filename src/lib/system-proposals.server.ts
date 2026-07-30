@@ -179,7 +179,7 @@ export async function buildSystemCandidates(roundId: string, userId: string) {
 
   const budget = Number(round.budget);
   const rowPrice = Number(round.row_price);
-  const proposals = (["balanserat", "sakrare", "varde"] as Profile[]).map((p) =>
+  const proposals = (["sakrare", "balanserat", "varde"] as Profile[]).map((p) =>
     build(legs, rowPrice, budget, p),
   );
 
@@ -190,6 +190,11 @@ export async function buildSystemCandidates(roundId: string, userId: string) {
     profile: p.profile,
     title: p.title,
     rationale: p.rationale,
+    risk_level: p.riskLevel,
+    recommended: p.recommended,
+    weakest_assumption: p.weakestAssumption,
+    spikes: p.spikes,
+    hedges: p.hedges,
     selections: p.selections,
     rows_count: p.rows,
     cost: p.cost,
@@ -198,6 +203,28 @@ export async function buildSystemCandidates(roundId: string, userId: string) {
   }));
   const { error: insertError } = await db.from("system_candidates").insert(rows);
   if (insertError) throw insertError;
+
+  // Spara AI-lagret separat från fakta och gruppens beslut.
+  await db.from("analysis_layers").insert({
+    round_id: roundId,
+    group_id: round.group_id,
+    layer: "ai",
+    source_label: "Automatisk systembyggare",
+    created_by: userId,
+    content: {
+      kind: "system_candidates",
+      proposals: proposals.map((p) => ({
+        profile: p.profile,
+        title: p.title,
+        risk_level: p.riskLevel,
+        rows: p.rows,
+        cost: p.cost,
+        coverage: p.coverage,
+        weakest_assumption: p.weakestAssumption,
+      })),
+    },
+  });
+
 
   await db.from("activity_log").insert({
     group_id: round.group_id,
