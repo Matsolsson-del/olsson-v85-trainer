@@ -36,18 +36,91 @@ export const Route = createFileRoute("/_authenticated/omgangar/")({
   component: OmgangarPage,
 });
 
+function kr(v: number) {
+  return new Intl.NumberFormat("sv-SE", {
+    style: "currency",
+    currency: "SEK",
+    maximumFractionDigits: 0,
+  }).format(v);
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "good" | "bad" }) {
+  return (
+    <Card>
+      <CardContent className="py-5">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p
+          className={
+            "mt-1 text-2xl font-bold " +
+            (tone === "good" ? "text-emerald-500" : tone === "bad" ? "text-destructive" : "")
+          }
+        >
+          {value}
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 function OmgangarPage() {
   const { groupId } = useActiveGroupId();
   const { data: rounds, isLoading, refetch } = useRounds(groupId);
+  const run = useServerFn(getDashboard);
+
+  const { data: dash, isLoading: dashLoading } = useQuery({
+    queryKey: ["dashboard", groupId],
+    enabled: !!groupId,
+    queryFn: () => run({ data: { groupId: groupId! } }),
+  });
+
+  const byRound = new Map<string, any>((dash?.rounds ?? []).map((r: any) => [r.roundId, r]));
 
   return (
     <>
       <PageHeader
-        title="Omgångar"
-        description="Varje omgång innehåller åtta avdelningar, analyser, system och efterrapport."
+        title="Historik"
+        description="Alla omgångar vi spelat – med insats, vinst och hur många avdelningar vi hade rätt på."
         actions={groupId ? <NewRoundDialog groupId={groupId} onCreated={refetch} /> : null}
       />
 
+      <section className="mb-8">
+        <h2 className="mb-3 text-lg font-semibold">Sammanlagt</h2>
+        {dashLoading ? (
+          <Skeleton className="h-28 w-full" />
+        ) : !dash ? (
+          <p className="text-sm text-muted-foreground">Ingen historik att visa ännu.</p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <Stat label="Spelade omgångar" value={String(dash.totals.rounds)} />
+            <Stat label="Satsat totalt" value={kr(dash.totals.cost)} />
+            <Stat label="Vunnit totalt" value={kr(dash.totals.winnings)} tone="good" />
+            <Stat
+              label="Netto"
+              value={kr(dash.totals.net)}
+              tone={dash.totals.net >= 0 ? "good" : "bad"}
+            />
+            <Stat
+              label="Omgångar med vinst"
+              value={`${dash.totals.roundsWithWin} av ${dash.totals.rounds}`}
+            />
+            <Stat
+              label="Rätt avdelningar i snitt"
+              value={dash.totals.avgCorrectLegs === null ? "–" : `${dash.totals.avgCorrectLegs} av 8`}
+            />
+            <Stat
+              label="Bästa omgång, rätt"
+              value={dash.totals.bestCorrectLegs === null ? "–" : `${dash.totals.bestCorrectLegs} av 8`}
+            />
+            <Stat
+              label="Bästa omgång, netto"
+              value={dash.totals.bestRound ? kr(dash.totals.bestRound.net) : "–"}
+              tone="good"
+            />
+          </div>
+        )}
+      </section>
+
+      <h2 className="mb-3 text-lg font-semibold">Omgång för omgång</h2>
       {isLoading ? (
         <Skeleton className="h-40 w-full" />
       ) : !rounds || rounds.length === 0 ? (
@@ -57,29 +130,62 @@ function OmgangarPage() {
         />
       ) : (
         <div className="space-y-3">
-          {rounds.map((r: any) => (
-            <Card key={r.id}>
-              <CardContent className="flex flex-wrap items-center justify-between gap-4 py-4">
-                <div>
-                  <p className="font-serif text-lg font-semibold">
-                    {formatDate(r.race_date)} · {r.tracks?.name ?? "Bana ej vald"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Spelstopp {formatDateTime(r.bet_stop_at)} · Budget{" "}
-                    {formatCurrency(Number(r.budget))}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Badge variant="secondary">{ROUND_STATUS_LABELS[r.status] ?? r.status}</Badge>
-                  <Button asChild size="sm" variant="secondary">
-                    <Link to="/omgangar/$roundId" params={{ roundId: r.id }}>
-                      Öppna
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {rounds.map((r: any) => {
+            const d = byRound.get(r.id);
+            const hasEconomy = !!d && (d.cost > 0 || d.winnings > 0);
+            return (
+              <Card key={r.id}>
+                <CardContent className="flex flex-wrap items-center justify-between gap-4 py-4">
+                  <div>
+                    <p className="font-serif text-lg font-semibold">
+                      {formatDate(r.race_date)} · {r.tracks?.name ?? "Bana ej vald"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Spelstopp {formatDateTime(r.bet_stop_at)} · Budget{" "}
+                      {formatCurrency(Number(r.budget))}
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {d && d.correctLegs !== null ? (
+                        <span className="font-medium">
+                          {d.correctLegs} av {d.legs || 8} rätt
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">Inget resultat ännu</span>
+                      )}
+                      {hasEconomy ? (
+                        <>
+                          <span className="text-muted-foreground"> · </span>
+                          <span>
+                            Insats {kr(d.cost)} · Vinst {kr(d.winnings)} ·{" "}
+                            <span
+                              className={
+                                "font-semibold " +
+                                (d.net > 0
+                                  ? "text-emerald-500"
+                                  : d.net < 0
+                                    ? "text-destructive"
+                                    : "")
+                              }
+                            >
+                              Netto {kr(d.net)}
+                            </span>
+                          </span>
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant="secondary">{ROUND_STATUS_LABELS[r.status] ?? r.status}</Badge>
+                    <Button asChild size="sm" variant="secondary">
+                      <Link to="/omgangar/$roundId" params={{ roundId: r.id }}>
+                        Öppna
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </>
@@ -88,6 +194,7 @@ function OmgangarPage() {
 
 function NewRoundDialog({ groupId, onCreated }: { groupId: string; onCreated: () => void }) {
   const navigate = useNavigate();
+
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
