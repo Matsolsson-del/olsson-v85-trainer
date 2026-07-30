@@ -18,8 +18,19 @@ const MEMBER_SLOTS = [
 
 const SHARED_SECRET = "familjen-olsson-travhub-2026";
 
+function safeNext(next: unknown): string | null {
+  if (typeof next !== "string") return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: (s: Record<string, unknown>): { next?: string } => {
+    const next = safeNext(s.next);
+    return next ? { next } : {};
+  },
+
   head: () => ({
     meta: [
       { title: "Välj användare – Familjen Olssons Travhub" },
@@ -37,12 +48,23 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [busy, setBusy] = useState<string | null>(null);
   const [names, setNames] = useState<Record<string, string>>({});
 
+  function goOn() {
+    if (next) {
+      window.location.href = next;
+      return;
+    }
+    navigate({ to: "/oversikt", replace: true });
+  }
+
   useEffect(() => {
-    if (session) navigate({ to: "/oversikt", replace: true });
-  }, [session, navigate]);
+    if (session) goOn();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, navigate, next]);
+
 
   useEffect(() => {
     supabase
@@ -92,7 +114,8 @@ function AuthPage() {
           });
         }
       }
-      navigate({ to: "/oversikt", replace: true });
+      goOn();
+
 
     } catch (e: any) {
       toast.error(e.message ?? "Kunde inte fortsätta.");
