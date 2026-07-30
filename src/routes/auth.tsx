@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
  * kopplas till rätt person. Sessionen skapas i bakgrunden.
  */
 const MEMBER_SLOTS = [
-  { slug: "1", email: "olsson-1@olssonstravhub.se", label: "Medlem 1" },
-  { slug: "2", email: "olsson-2@olssonstravhub.se", label: "Medlem 2" },
+  { slug: "1", email: "olsson-1@olssonstravhub.se", label: "Mats" },
+  { slug: "2", email: "olsson-2@olssonstravhub.se", label: "Bosse" },
+  { slug: "3", email: "olsson-3@olssonstravhub.se", label: "Olle" },
 ] as const;
 
 const SHARED_SECRET = "familjen-olsson-travhub-2026";
