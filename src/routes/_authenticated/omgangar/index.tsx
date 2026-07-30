@@ -25,16 +25,26 @@ import { useActiveGroupId, useRounds } from "@/lib/travhub-queries";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/omgangar/")({
+export const Route = createFileRoute("/_authenticated/omgangar/")({
   head: () => ({
     meta: [
-      { title: "Omgångar – Familjen Olssons Travhub" },
-      { name: "description", content: "Alla V85-omgångar: pågående, kommande och avslutade." },
-      { property: "og:title", content: "Omgångar – Familjen Olssons Travhub" },
-      { property: "og:description", content: "Skapa och följ gruppens V85-omgångar." },
+      { title: "Historik – Familjen Olssons Travhub" },
+      {
+        name: "description",
+        content: "Alla V85-omgångar med insats, vinst, netto och antal rätt avdelningar.",
+      },
+      { property: "og:title", content: "Historik – Familjen Olssons Travhub" },
+      {
+        property: "og:description",
+        content: "Följ hur familjens V85-spel gått omgång för omgång.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: OmgangarPage,
 });
+
 
 function kr(v: number) {
   return new Intl.NumberFormat("sv-SE", {
