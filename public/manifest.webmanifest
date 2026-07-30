@@ -1,0 +1,16 @@
+{
+  "name": "Travhubben",
+  "short_name": "Travhubben",
+  "description": "Familjen Olssons hubb för V85 – veckans spel, analys, system och resultat.",
+  "start_url": "/veckans-spel",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1b33",
+  "theme_color": "#0b1b33",
+  "lang": "sv",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
