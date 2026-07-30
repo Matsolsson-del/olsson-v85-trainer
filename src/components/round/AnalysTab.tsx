@@ -84,8 +84,8 @@ function RevealButton({ roundId, onDone }: { roundId: string; onDone: () => void
       return toast.error("Ange en motivering för tidig öppning (minst 5 tecken).");
     setBusy(true);
     const { error } = await supabase.rpc("reveal_analyses_early", {
-      p_round_id: roundId,
-      p_reason: reason.trim(),
+      _round_id: roundId,
+      _reason: reason.trim(),
     });
     setBusy(false);
     if (error) return toast.error(error.message);
@@ -186,7 +186,7 @@ function MyAnalysis({ race, onSaved }: { race: any; onSaved: () => void }) {
 
       if (lock) {
         const { error } = await supabase.rpc("submit_individual_analysis", {
-          p_race_id: race.id,
+          _assessment_id: assessmentId!,
         });
         if (error) throw error;
         toast.success("Analysen är inlämnad och låst.");
