@@ -12,9 +12,9 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Logga in – Travhubben" },
+      { title: "Logga in – Familjen Olssons Travhub" },
       { name: "description", content: "Logga in eller skapa konto i gruppens privata V85-hubb." },
-      { property: "og:title", content: "Logga in – Travhubben" },
+      { property: "og:title", content: "Logga in – Familjen Olssons Travhub" },
       { property: "og:description", content: "Privat inloggning till gruppens V85-analyshubb." },
     ],
   }),
@@ -62,7 +62,7 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="font-serif text-3xl font-semibold text-primary">Travhubben</h1>
+          <h1 className="font-serif text-3xl font-semibold text-primary">Familjen Olssons Travhub</h1>
           <p className="mt-2 text-sm text-white/70">
             Privat analyshubb för gruppens V85-spel. Ingen anonym åtkomst.
           </p>

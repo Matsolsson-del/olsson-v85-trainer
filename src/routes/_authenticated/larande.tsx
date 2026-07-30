@@ -8,9 +8,9 @@ import { CALIBRATION_BUCKETS, sampleWarning } from "@/lib/system-math";
 export const Route = createFileRoute("/_authenticated/larande")({
   head: () => ({
     meta: [
-      { title: "Lärande – Travhubben" },
+      { title: "Lärande – Familjen Olssons Travhub" },
       { name: "description", content: "Kalibrering, återkommande fel och gruppens utveckling över tid." },
-      { property: "og:title", content: "Lärande – Travhubben" },
+      { property: "og:title", content: "Lärande – Familjen Olssons Travhub" },
       { property: "og:description", content: "Se mönster i gruppens bedömningar över många omgångar." },
     ],
   }),

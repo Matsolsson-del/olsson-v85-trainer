@@ -14,9 +14,9 @@ import { useActiveGroupId, useIsOwner, useMembers } from "@/lib/travhub-queries"
 export const Route = createFileRoute("/_authenticated/installningar")({
   head: () => ({
     meta: [
-      { title: "Inställningar – Travhubben" },
+      { title: "Inställningar – Familjen Olssons Travhub" },
       { name: "description", content: "Grupp, medlemmar, inbjudningar och standardvärden." },
-      { property: "og:title", content: "Inställningar – Travhubben" },
+      { property: "og:title", content: "Inställningar – Familjen Olssons Travhub" },
       { property: "og:description", content: "Administrera gruppen och dess spelregler." },
     ],
   }),

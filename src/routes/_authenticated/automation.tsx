@@ -9,12 +9,12 @@ import { useJobRuns, useJobs } from "@/lib/responsibility-queries";
 export const Route = createFileRoute("/_authenticated/automation")({
   head: () => ({
     meta: [
-      { title: "Automation – Travhubben" },
+      { title: "Automation – Familjen Olssons Travhub" },
       {
         name: "description",
         content: "Veckans körningsplan, jobbstatus, fel och manuella uppgifter.",
       },
-      { property: "og:title", content: "Automation – Travhubben" },
+      { property: "og:title", content: "Automation – Familjen Olssons Travhub" },
       {
         property: "og:description",
         content: "Övervaka automatiska körningar för V85-omgångarna.",

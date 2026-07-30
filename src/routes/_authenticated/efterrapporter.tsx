@@ -8,9 +8,9 @@ import { formatDate } from "@/lib/labels";
 export const Route = createFileRoute("/_authenticated/efterrapporter")({
   head: () => ({
     meta: [
-      { title: "Efterrapporter – Travhubben" },
+      { title: "Efterrapporter – Familjen Olssons Travhub" },
       { name: "description", content: "Strukturerad uppföljning av varje avslutad V85-omgång." },
-      { property: "og:title", content: "Efterrapporter – Travhubben" },
+      { property: "og:title", content: "Efterrapporter – Familjen Olssons Travhub" },
       { property: "og:description", content: "Vad gick rätt, vad gick fel och vad testar vi härnäst." },
     ],
   }),

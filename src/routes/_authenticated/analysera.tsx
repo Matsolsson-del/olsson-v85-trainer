@@ -8,9 +8,9 @@ import { ROUND_STATUS_LABELS, formatDate } from "@/lib/labels";
 export const Route = createFileRoute("/_authenticated/analysera")({
   head: () => ({
     meta: [
-      { title: "Analysera – Travhubben" },
+      { title: "Analysera – Familjen Olssons Travhub" },
       { name: "description", content: "Gå direkt till analysen för pågående V85-omgång." },
-      { property: "og:title", content: "Analysera – Travhubben" },
+      { property: "og:title", content: "Analysera – Familjen Olssons Travhub" },
       { property: "og:description", content: "Blindanalys per avdelning inför spelstopp." },
     ],
   }),

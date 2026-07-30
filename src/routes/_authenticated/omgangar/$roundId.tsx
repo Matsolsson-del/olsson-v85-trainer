@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ROUND_STATUS_LABELS, formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useRoundData } from "@/lib/travhub-queries";
 import { StartfaltTab } from "@/components/round/StartfaltTab";
+import { DataTab } from "@/components/round/DataTab";
 import { AnalysTab } from "@/components/round/AnalysTab";
 import { SystemTab } from "@/components/round/SystemTab";
 import { ResultatTab } from "@/components/round/ResultatTab";
@@ -15,12 +16,12 @@ import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
   head: () => ({
     meta: [
-      { title: "Omgång – Travhubben" },
+      { title: "Omgång – Familjen Olssons Travhub" },
       {
         name: "description",
         content: "Startfält, blindanalys, gruppbedömning, systembyggare och efterrapport.",
       },
-      { property: "og:title", content: "Omgång – Travhubben" },
+      { property: "og:title", content: "Omgång – Familjen Olssons Travhub" },
       { property: "og:description", content: "Arbetsytan för en V85-omgång." },
     ],
   }),
@@ -61,6 +62,7 @@ function RoundDetail() {
       <Tabs defaultValue="startfalt">
         <TabsList className="flex flex-wrap">
           <TabsTrigger value="startfalt">Startfält</TabsTrigger>
+          <TabsTrigger value="data">Data &amp; kvalitet</TabsTrigger>
           <TabsTrigger value="analys">Analys</TabsTrigger>
           <TabsTrigger value="system">System</TabsTrigger>
           <TabsTrigger value="resultat">Resultat &amp; efterrapport</TabsTrigger>
@@ -68,6 +70,9 @@ function RoundDetail() {
 
         <TabsContent value="startfalt" className="pt-4">
           <StartfaltTab data={data} roundId={roundId} />
+        </TabsContent>
+        <TabsContent value="data" className="pt-4">
+          <DataTab data={data} roundId={roundId} />
         </TabsContent>
         <TabsContent value="analys" className="pt-4">
           <AnalysTab data={data} roundId={roundId} />

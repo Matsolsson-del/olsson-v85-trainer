@@ -6,13 +6,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Travhubben – privat V85-hubb för familjen Olsson" },
+      { title: "Familjen Olssons Travhub – privat V85-hubb" },
       {
         name: "description",
         content:
-          "Logga in i Travhubben för att analysera V85, bygga system, låsa beslut och följa upp gruppens lärande.",
+          "Logga in i Familjen Olssons Travhub för att analysera V85, bygga system, låsa beslut och följa upp gruppens lärande.",
       },
-      { property: "og:title", content: "Travhubben – privat V85-hubb" },
+      { property: "og:title", content: "Familjen Olssons Travhub – privat V85-hubb" },
       {
         property: "og:description",
         content: "Blindanalys, gruppbedömning, systembyggare och efterrapporter för V85.",
@@ -33,7 +33,7 @@ function Index() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background px-4 text-center">
-      <h1 className="font-serif text-3xl font-semibold text-primary">Travhubben</h1>
+      <h1 className="font-serif text-3xl font-semibold text-primary">Familjen Olssons Travhub</h1>
       <p className="text-sm text-white/70">Laddar din analyshubb …</p>
     </div>
   );

@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Travhubben – V85-analys för spelgruppen" },
+      { title: "Familjen Olssons Travhub – V85-analys för spelgruppen" },
       {
         name: "description",
         content:
