@@ -48,9 +48,11 @@ function AiImportPage() {
   const [newKey, setNewKey] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [endpoint, setEndpoint] = useState("");
+  const [mcpUrl, setMcpUrl] = useState("");
 
   useEffect(() => {
     setEndpoint(`${window.location.origin}/api/public/ai-import`);
+    setMcpUrl(`${window.location.origin}/mcp`);
   }, []);
 
   const status = useQuery({
@@ -130,6 +132,36 @@ function AiImportPage() {
       />
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="lg:col-span-2 border-primary/40">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">
+              Rekommenderat: koppla ChatGPT direkt (ingen API-nyckel)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              Lägg till Travhubben som kopplad app i ChatGPT. Du loggar in med ditt eget konto en
+              gång och godkänner åtkomsten – ingen hemlig nyckel behöver klistras in någonstans.
+            </p>
+            <code className="block break-all rounded-md bg-muted p-3 text-xs">
+              {mcpUrl || "…"}
+            </code>
+            <Button
+              className="h-12"
+              variant="secondary"
+              disabled={!mcpUrl}
+              onClick={() => copy(mcpUrl, "Anslutningsadressen")}
+            >
+              Kopiera anslutningsadress
+            </Button>
+            <p className="text-muted-foreground">
+              Be sedan ChatGPT: “Hämta importformatet och skicka in veckans analys till
+              Travhubben.” Analysen sparas alltid som AI-utkast – veckans ansvarige bestämmer.
+            </p>
+          </CardContent>
+        </Card>
+
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Adress att skicka till</CardTitle>

@@ -169,6 +169,50 @@
         "outputSchema": null
       },
       {
+        "name": "get_import_format",
+        "title": "Hämta importformat",
+        "description": "Returnerar ett komplett exempel på det JSON-format som import_ai_analysis förväntar sig (omgång, källor, datakvalitet, analys per avdelning, hästar, spikar, skrällar samt tre system: tryggt, balanserat och offensivt). Anropa detta först om du är osäker på formatet.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "import_ai_analysis",
+        "title": "Importera AI-analys (utkast)",
+        "description": "Skicka in en komplett V85-analys för en omgång som versionshanterat AI-utkast. Använd get_import_format för exakt JSON-format och list_rounds för att hitta omgångens id. Importen skapar aldrig en ny omgång, låser inget system, ändrar inga resultat och lämnar aldrig in spelet – veckans ansvarige väljer och färdigställer.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "analysis_json": {
+              "type": "string",
+              "description": "Hela analysen som en JSON-sträng enligt formatet från get_import_format (round, analysis, legs, systems, main_recommendation)."
+            },
+            "idempotency_key": {
+              "description": "Valfri unik nyckel så att samma import inte registreras dubbelt.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "analysis_json"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "create_risk_flag",
         "title": "Skapa riskflagga",
         "description": "Lägg en riskflagga (varning eller observation) på en omgång, eventuellt kopplad till en avdelning.",
