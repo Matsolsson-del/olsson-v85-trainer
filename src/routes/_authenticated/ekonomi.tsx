@@ -29,9 +29,9 @@ import { useActiveGroupId, useLedger } from "@/lib/travhub-queries";
 export const Route = createFileRoute("/_authenticated/ekonomi")({
   head: () => ({
     meta: [
-      { title: "Ekonomi – Travhubben" },
+      { title: "Ekonomi – Familjen Olssons Travhub" },
       { name: "description", content: "Insatser, vinster, insättningar och gruppens saldo." },
-      { property: "og:title", content: "Ekonomi – Travhubben" },
+      { property: "og:title", content: "Ekonomi – Familjen Olssons Travhub" },
       { property: "og:description", content: "Full spårbarhet över gruppens spelekonomi." },
     ],
   }),

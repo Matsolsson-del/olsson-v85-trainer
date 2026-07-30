@@ -9,9 +9,9 @@ import { formatDate } from "@/lib/labels";
 export const Route = createFileRoute("/_authenticated/system")({
   head: () => ({
     meta: [
-      { title: "System – Travhubben" },
+      { title: "System – Familjen Olssons Travhub" },
       { name: "description", content: "Bygg, kontrollera och lås V85-system inom budget." },
-      { property: "og:title", content: "System – Travhubben" },
+      { property: "og:title", content: "System – Familjen Olssons Travhub" },
       { property: "og:description", content: "Systembyggare med radmatematik och spikprotokoll." },
     ],
   }),

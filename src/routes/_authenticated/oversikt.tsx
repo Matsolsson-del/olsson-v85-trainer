@@ -18,12 +18,12 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/_authenticated/oversikt")({
   head: () => ({
     meta: [
-      { title: "Översikt – Travhubben" },
+      { title: "Översikt – Familjen Olssons Travhub" },
       {
         name: "description",
         content: "Nästa omgång, spelstopp, analysstatus, aktuellt system och gruppens saldo.",
       },
-      { property: "og:title", content: "Översikt – Travhubben" },
+      { property: "og:title", content: "Översikt – Familjen Olssons Travhub" },
       { property: "og:description", content: "Status för gruppens pågående V85-omgång." },
     ],
   }),

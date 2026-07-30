@@ -56,7 +56,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         >
           <div className="flex h-full flex-col">
             <div className="border-b border-sidebar-border px-5 py-5">
-              <p className="font-serif text-lg font-semibold text-primary">Travhubben</p>
+              <p className="font-serif text-lg font-semibold text-primary">Familjen Olssons Travhub</p>
               <p className="mt-0.5 text-xs text-sidebar-foreground/70">V85-analys och lärande</p>
             </div>
 
@@ -128,7 +128,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label="Öppna meny">
               <Menu className="h-5 w-5" />
             </Button>
-            <span className="font-serif font-semibold text-primary">Travhubben</span>
+            <span className="font-serif font-semibold text-primary">Familjen Olssons Travhub</span>
           </header>
           <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
         </div>

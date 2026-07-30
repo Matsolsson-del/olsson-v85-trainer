@@ -24,9 +24,9 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/_authenticated/omgangar/")({
   head: () => ({
     meta: [
-      { title: "Omgångar – Travhubben" },
+      { title: "Omgångar – Familjen Olssons Travhub" },
       { name: "description", content: "Alla V85-omgångar: pågående, kommande och avslutade." },
-      { property: "og:title", content: "Omgångar – Travhubben" },
+      { property: "og:title", content: "Omgångar – Familjen Olssons Travhub" },
       { property: "og:description", content: "Skapa och följ gruppens V85-omgångar." },
     ],
   }),

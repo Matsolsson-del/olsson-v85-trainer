@@ -15,12 +15,12 @@ import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
   head: () => ({
     meta: [
-      { title: "Omgång – Travhubben" },
+      { title: "Omgång – Familjen Olssons Travhub" },
       {
         name: "description",
         content: "Startfält, blindanalys, gruppbedömning, systembyggare och efterrapport.",
       },
-      { property: "og:title", content: "Omgång – Travhubben" },
+      { property: "og:title", content: "Omgång – Familjen Olssons Travhub" },
       { property: "og:description", content: "Arbetsytan för en V85-omgång." },
     ],
   }),
