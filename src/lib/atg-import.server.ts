@@ -73,7 +73,7 @@ async function resolveActor(
 
   const { data: inserted, error } = await db
     .from(table)
-    .insert({ name, normalized_name: normalized, external_id: externalId })
+    .insert({ name, external_id: externalId })
     .select("id")
     .single();
   if (error) throw error;
