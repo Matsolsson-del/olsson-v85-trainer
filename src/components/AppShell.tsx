@@ -31,6 +31,7 @@ import {
 const NAV = [
   { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
   { to: "/omgangar", label: "Omgångar", icon: CalendarDays },
+  { to: "/resultat", label: "Resultat", icon: Trophy },
   { to: "/analysera", label: "Analysera", icon: ClipboardList },
   { to: "/system", label: "System", icon: Grid3x3 },
   { to: "/efterrapporter", label: "Efterrapporter", icon: FileText },
