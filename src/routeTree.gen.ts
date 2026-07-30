@@ -25,6 +25,7 @@ import { Route as AuthenticatedMinaRadRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedResultatRouteImport } from './routes/_authenticated/resultat'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
+import { Route as AuthenticatedVeckansSpelRouteImport } from './routes/_authenticated/veckans-spel'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
@@ -115,6 +116,12 @@ const AuthenticatedSystemRoute = AuthenticatedSystemRouteImport.update({
   path: '/system',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedVeckansSpelRoute =
+  AuthenticatedVeckansSpelRouteImport.update({
+    id: '/veckans-spel',
+    path: '/veckans-spel',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   id: '/.lovable/oauth/consent',
   path: '/.lovable/oauth/consent',
@@ -167,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/resultat': typeof AuthenticatedResultatRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/veckans-spel': typeof AuthenticatedVeckansSpelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -190,6 +198,7 @@ export interface FileRoutesByTo {
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/resultat': typeof AuthenticatedResultatRoute
   '/system': typeof AuthenticatedSystemRoute
+  '/veckans-spel': typeof AuthenticatedVeckansSpelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -215,6 +224,7 @@ export interface FileRoutesById {
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/resultat': typeof AuthenticatedResultatRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
+  '/_authenticated/veckans-spel': typeof AuthenticatedVeckansSpelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/oversikt'
     | '/resultat'
     | '/system'
+    | '/veckans-spel'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/oversikt'
     | '/resultat'
     | '/system'
+    | '/veckans-spel'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/omgangar/$roundId'
@@ -287,6 +299,7 @@ export interface FileRouteTypes {
     | '/_authenticated/oversikt'
     | '/_authenticated/resultat'
     | '/_authenticated/system'
+    | '/_authenticated/veckans-spel'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/omgangar/$roundId'
@@ -422,6 +435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSystemRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/veckans-spel': {
+      id: '/_authenticated/veckans-spel'
+      path: '/veckans-spel'
+      fullPath: '/veckans-spel'
+      preLoaderRoute: typeof AuthenticatedVeckansSpelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/.lovable/oauth/consent': {
       id: '/.lovable/oauth/consent'
       path: '/.lovable/oauth/consent'
@@ -478,6 +498,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedResultatRoute: typeof AuthenticatedResultatRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
+  AuthenticatedVeckansSpelRoute: typeof AuthenticatedVeckansSpelRoute
   AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
   AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
 }
@@ -493,6 +514,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedResultatRoute: AuthenticatedResultatRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
+  AuthenticatedVeckansSpelRoute: AuthenticatedVeckansSpelRoute,
   AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
   AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
 }
