@@ -13,6 +13,7 @@ import { useInvalidateRound, type RoundData } from "@/lib/travhub-queries";
 import { AtgExportCard } from "@/components/round/AtgExportCard";
 import { calculateCost, calculateRows, type LegSelection } from "@/lib/system-math";
 import { formatCurrency, formatDateTime } from "@/lib/labels";
+import { useIsResponsible } from "@/lib/responsibility-queries";
 
 const SPIKE_FIELDS = [
   { key: "why_spike", label: "Varför spik?" },
