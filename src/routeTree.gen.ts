@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authenticated/analysera'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
+import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
 import { Route as AuthenticatedSystemRouteImport } from './routes/_authenticated/system'
@@ -51,6 +52,12 @@ const AuthenticatedEkonomiRoute = AuthenticatedEkonomiRouteImport.update({
   path: '/ekonomi',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInstallningarRoute =
+  AuthenticatedInstallningarRouteImport.update({
+    id: '/installningar',
+    path: '/installningar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLarandeRoute = AuthenticatedLarandeRouteImport.update({
   id: '/larande',
   path: '/larande',
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/installningar': typeof AuthenticatedInstallningarRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
@@ -97,6 +105,7 @@ export interface FileRoutesByTo {
   '/analysera': typeof AuthenticatedAnalyseraRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/installningar': typeof AuthenticatedInstallningarRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
   '/system': typeof AuthenticatedSystemRoute
@@ -111,6 +120,7 @@ export interface FileRoutesById {
   '/_authenticated/analysera': typeof AuthenticatedAnalyseraRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
   '/_authenticated/system': typeof AuthenticatedSystemRoute
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/analysera'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/installningar'
     | '/larande'
     | '/oversikt'
     | '/system'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/analysera'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/installningar'
     | '/larande'
     | '/oversikt'
     | '/system'
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
     | '/_authenticated/analysera'
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
+    | '/_authenticated/installningar'
     | '/_authenticated/larande'
     | '/_authenticated/oversikt'
     | '/_authenticated/system'
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEkonomiRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/installningar': {
+      id: '/_authenticated/installningar'
+      path: '/installningar'
+      fullPath: '/installningar'
+      preLoaderRoute: typeof AuthenticatedInstallningarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/larande': {
       id: '/_authenticated/larande'
       path: '/larande'
@@ -249,6 +269,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyseraRoute: typeof AuthenticatedAnalyseraRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
+  AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
   AuthenticatedLarandeRoute: typeof AuthenticatedLarandeRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
   AuthenticatedSystemRoute: typeof AuthenticatedSystemRoute
@@ -260,6 +281,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyseraRoute: AuthenticatedAnalyseraRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
+  AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
   AuthenticatedLarandeRoute: AuthenticatedLarandeRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
   AuthenticatedSystemRoute: AuthenticatedSystemRoute,
