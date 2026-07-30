@@ -29,7 +29,7 @@ import { lockFamily } from "@/lib/gate.functions";
 import { forgetPerson } from "@/lib/person-memory";
 
 const SIMPLE_NAV = [
-  { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
+  { to: "/veckans-spel", label: "Veckans spel", icon: CalendarDays },
   { to: "/veckans-spel", label: "Veckans spel", icon: CalendarDays },
   { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
   { to: "/resultat", label: "Resultat", icon: Trophy },
