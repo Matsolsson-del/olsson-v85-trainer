@@ -25,7 +25,6 @@ import { useActiveGroupId, useRounds } from "@/lib/travhub-queries";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/omgangar/")({
-export const Route = createFileRoute("/_authenticated/omgangar/")({
   head: () => ({
     meta: [
       { title: "Historik – Familjen Olssons Travhub" },
