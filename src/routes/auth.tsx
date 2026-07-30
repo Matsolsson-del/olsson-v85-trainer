@@ -4,18 +4,30 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+/**
+ * Ingen inloggningsspärr: hubben delas bara mellan familjens två spelare.
+ * Man väljer bara vem man är, så att analyser, ansvar och ekonomi kan
+ * kopplas till rätt person. Sessionen skapas i bakgrunden.
+ */
+const MEMBER_SLOTS = [
+  { slug: "1", email: "olsson-1@olssonstravhub.se", label: "Medlem 1" },
+  { slug: "2", email: "olsson-2@olssonstravhub.se", label: "Medlem 2" },
+] as const;
+
+const SHARED_SECRET = "familjen-olsson-travhub-2026";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Logga in – Familjen Olssons Travhub" },
-      { name: "description", content: "Logga in eller skapa konto i gruppens privata V85-hubb." },
-      { property: "og:title", content: "Logga in – Familjen Olssons Travhub" },
-      { property: "og:description", content: "Privat inloggning till gruppens V85-analyshubb." },
+      { title: "Välj användare – Familjen Olssons Travhub" },
+      {
+        name: "description",
+        content: "Välj vem du är för att fortsätta i familjens privata V85-hubb.",
+      },
+      { property: "og:title", content: "Välj användare – Familjen Olssons Travhub" },
+      { property: "og:description", content: "Familjens privata V85-analyshubb." },
     ],
   }),
   component: AuthPage,
@@ -24,128 +36,91 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [names, setNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (session) navigate({ to: "/oversikt", replace: true });
   }, [session, navigate]);
 
-  async function signIn(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) return toast.error("Inloggningen misslyckades: " + error.message);
-    navigate({ to: "/oversikt", replace: true });
-  }
+  useEffect(() => {
+    supabase
+      .from("profiles")
+      .select("email, display_name")
+      .then(({ data }) => {
+        if (!data) return;
+        const map: Record<string, string> = {};
+        for (const p of data) if (p.email && p.display_name) map[p.email] = p.display_name;
+        setNames(map);
+      });
+  }, []);
 
-  async function signUp(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { display_name: displayName || email.split("@")[0] },
-      },
-    });
-    setBusy(false);
-    if (error) return toast.error("Registreringen misslyckades: " + error.message);
-    toast.success("Konto skapat. Du kan logga in nu.");
+  async function enterAs(slot: (typeof MEMBER_SLOTS)[number]) {
+    setBusy(slot.slug);
+    try {
+      let { error } = await supabase.auth.signInWithPassword({
+        email: slot.email,
+        password: SHARED_SECRET,
+      });
+
+      if (error) {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: slot.email,
+          password: SHARED_SECRET,
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { display_name: slot.label },
+          },
+        });
+        if (signUpError) throw signUpError;
+
+        ({ error } = await supabase.auth.signInWithPassword({
+          email: slot.email,
+          password: SHARED_SECRET,
+        }));
+        if (error) throw error;
+      }
+
+      await supabase.rpc("join_family_group");
+      navigate({ to: "/oversikt", replace: true });
+    } catch (e: any) {
+      toast.error(e.message ?? "Kunde inte fortsätta.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="font-serif text-3xl font-semibold text-primary">Familjen Olssons Travhub</h1>
+          <h1 className="font-serif text-3xl font-semibold text-primary">
+            Familjen Olssons Travhub
+          </h1>
           <p className="mt-2 text-sm text-white/70">
-            Privat analyshubb för gruppens V85-spel. Ingen anonym åtkomst.
+            Ingen inloggning – välj bara vem du är så vet hubben vems analys som är vems.
           </p>
         </div>
 
-        <div className="rounded-lg bg-card p-6 text-card-foreground shadow-lg">
-          <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Logga in</TabsTrigger>
-              <TabsTrigger value="signup">Skapa konto</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="signin">
-              <form onSubmit={signIn} className="space-y-4 pt-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="email">E-post</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="password">Lösenord</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Loggar in …" : "Logga in"}
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="signup">
-              <form onSubmit={signUp} className="space-y-4 pt-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="name">Namn</Label>
-                  <Input
-                    id="name"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Ditt namn i gruppen"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="email2">E-post</Label>
-                  <Input
-                    id="email2"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="password2">Lösenord</Label>
-                  <Input
-                    id="password2"
-                    type="password"
-                    autoComplete="new-password"
-                    minLength={8}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">Minst 8 tecken.</p>
-                </div>
-                <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Skapar konto …" : "Skapa konto"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+        <div className="space-y-3 rounded-lg bg-card p-6 text-card-foreground shadow-lg">
+          <p className="text-sm font-medium">Vem är du?</p>
+          {MEMBER_SLOTS.map((slot) => (
+            <Button
+              key={slot.slug}
+              className="w-full justify-start"
+              variant="secondary"
+              size="lg"
+              disabled={busy !== null}
+              onClick={() => enterAs(slot)}
+            >
+              {busy === slot.slug ? "Öppnar …" : (names[slot.email] ?? slot.label)}
+            </Button>
+          ))}
+          <p className="pt-2 text-xs text-muted-foreground">
+            Du kan byta ditt visningsnamn under Inställningar. Eftersom det inte finns någon
+            spärr kommer alla med länken in – blindanalysen bygger på att ni håller er till
+            era egna namn.
+          </p>
         </div>
       </div>
     </div>
