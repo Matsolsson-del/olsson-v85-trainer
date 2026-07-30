@@ -10,33 +10,86 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
+import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
+import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
+  id: '/oversikt',
+  path: '/oversikt',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOmgangarIndexRoute =
+  AuthenticatedOmgangarIndexRouteImport.update({
+    id: '/omgangar/',
+    path: '/omgangar/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOmgangarRoundIdRoute =
+  AuthenticatedOmgangarRoundIdRouteImport.update({
+    id: '/omgangar/$roundId',
+    path: '/omgangar/$roundId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/oversikt': typeof AuthenticatedOversiktRoute
+  '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
+  '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/oversikt': typeof AuthenticatedOversiktRoute
+  '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
+  '/omgangar': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
+  '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
+  '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/auth' | '/oversikt' | '/omgangar/$roundId' | '/omgangar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/oversikt' | '/omgangar/$roundId' | '/omgangar'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/oversikt'
+    | '/_authenticated/omgangar/$roundId'
+    | '/_authenticated/omgangar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +101,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/oversikt': {
+      id: '/_authenticated/oversikt'
+      path: '/oversikt'
+      fullPath: '/oversikt'
+      preLoaderRoute: typeof AuthenticatedOversiktRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/omgangar/': {
+      id: '/_authenticated/omgangar/'
+      path: '/omgangar'
+      fullPath: '/omgangar/'
+      preLoaderRoute: typeof AuthenticatedOmgangarIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/omgangar/$roundId': {
+      id: '/_authenticated/omgangar/$roundId'
+      path: '/omgangar/$roundId'
+      fullPath: '/omgangar/$roundId'
+      preLoaderRoute: typeof AuthenticatedOmgangarRoundIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
+  AuthenticatedOmgangarRoundIdRoute: typeof AuthenticatedOmgangarRoundIdRoute
+  AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
+  AuthenticatedOmgangarRoundIdRoute: AuthenticatedOmgangarRoundIdRoute,
+  AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
