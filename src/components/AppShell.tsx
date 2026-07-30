@@ -12,6 +12,7 @@ import {
   Settings,
   Grid3x3,
   Sparkles,
+  Trophy,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
