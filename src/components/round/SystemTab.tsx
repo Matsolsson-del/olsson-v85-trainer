@@ -119,6 +119,7 @@ function SystemVersionEditor({
   onChanged: () => void;
 }) {
   const locked = !!version.locked_at;
+  const canFinalize = useIsResponsible((data.round as any).id);
   const [busy, setBusy] = useState(false);
   const [changeReason, setChangeReason] = useState("");
 
