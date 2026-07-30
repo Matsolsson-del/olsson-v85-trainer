@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
+import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,16 +34,24 @@ const AuthenticatedOversiktRoute = AuthenticatedOversiktRouteImport.update({
   path: '/oversikt',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOmgangarIndexRoute =
+  AuthenticatedOmgangarIndexRouteImport.update({
+    id: '/omgangar/',
+    path: '/omgangar/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
+  '/omgangar': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,14 +59,20 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
+  '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/oversikt'
+  fullPaths: '/' | '/auth' | '/oversikt' | '/omgangar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/oversikt'
+  to: '/' | '/auth' | '/oversikt' | '/omgangar'
   id:
-    '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/oversikt'
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/oversikt'
+    | '/_authenticated/omgangar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,15 +111,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOversiktRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/omgangar/': {
+      id: '/_authenticated/omgangar/'
+      path: '/omgangar'
+      fullPath: '/omgangar/'
+      preLoaderRoute: typeof AuthenticatedOmgangarIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
+  AuthenticatedOmgangarIndexRoute: typeof AuthenticatedOmgangarIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
+  AuthenticatedOmgangarIndexRoute: AuthenticatedOmgangarIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUND_STATUS_LABELS, formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useRounds } from "@/lib/travhub-queries";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/omgangar/")({
   head: () => ({
@@ -84,6 +85,7 @@ function OmgangarPage() {
 
 function NewRoundDialog({ groupId, onCreated }: { groupId: string; onCreated: () => void }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [trackName, setTrackName] = useState("");
@@ -118,6 +120,7 @@ function NewRoundDialog({ groupId, onCreated }: { groupId: string; onCreated: ()
         .from("rounds")
         .insert({
           group_id: groupId,
+          created_by: user!.id,
           track_id: trackId,
           race_date: raceDate,
           bet_stop_at: new Date(betStop).toISOString(),
