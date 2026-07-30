@@ -20,6 +20,7 @@ import { Route as AuthenticatedAutomationRouteImport } from './routes/_authentic
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
+import { Route as AuthenticatedKommenteraRouteImport } from './routes/_authenticated/kommentera'
 import { Route as AuthenticatedLarandeRouteImport } from './routes/_authenticated/larande'
 import { Route as AuthenticatedMinaRadRouteImport } from './routes/_authenticated/mina-rad'
 import { Route as AuthenticatedOversiktRouteImport } from './routes/_authenticated/oversikt'
@@ -91,6 +92,11 @@ const AuthenticatedInstallningarRoute =
     path: '/installningar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedKommenteraRoute = AuthenticatedKommenteraRouteImport.update({
+  id: '/kommentera',
+  path: '/kommentera',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLarandeRoute = AuthenticatedLarandeRouteImport.update({
   id: '/larande',
   path: '/larande',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
+  '/kommentera': typeof AuthenticatedKommenteraRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/mina-rad': typeof AuthenticatedMinaRadRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
+  '/kommentera': typeof AuthenticatedKommenteraRoute
   '/larande': typeof AuthenticatedLarandeRoute
   '/mina-rad': typeof AuthenticatedMinaRadRoute
   '/oversikt': typeof AuthenticatedOversiktRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
+  '/_authenticated/kommentera': typeof AuthenticatedKommenteraRoute
   '/_authenticated/larande': typeof AuthenticatedLarandeRoute
   '/_authenticated/mina-rad': typeof AuthenticatedMinaRadRoute
   '/_authenticated/oversikt': typeof AuthenticatedOversiktRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/efterrapporter'
     | '/ekonomi'
     | '/installningar'
+    | '/kommentera'
     | '/larande'
     | '/mina-rad'
     | '/oversikt'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/efterrapporter'
     | '/ekonomi'
     | '/installningar'
+    | '/kommentera'
     | '/larande'
     | '/mina-rad'
     | '/oversikt'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
     | '/_authenticated/installningar'
+    | '/_authenticated/kommentera'
     | '/_authenticated/larande'
     | '/_authenticated/mina-rad'
     | '/_authenticated/oversikt'
@@ -400,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInstallningarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/kommentera': {
+      id: '/_authenticated/kommentera'
+      path: '/kommentera'
+      fullPath: '/kommentera'
+      preLoaderRoute: typeof AuthenticatedKommenteraRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/larande': {
       id: '/_authenticated/larande'
       path: '/larande'
@@ -493,6 +512,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
+  AuthenticatedKommenteraRoute: typeof AuthenticatedKommenteraRoute
   AuthenticatedLarandeRoute: typeof AuthenticatedLarandeRoute
   AuthenticatedMinaRadRoute: typeof AuthenticatedMinaRadRoute
   AuthenticatedOversiktRoute: typeof AuthenticatedOversiktRoute
@@ -509,6 +529,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
+  AuthenticatedKommenteraRoute: AuthenticatedKommenteraRoute,
   AuthenticatedLarandeRoute: AuthenticatedLarandeRoute,
   AuthenticatedMinaRadRoute: AuthenticatedMinaRadRoute,
   AuthenticatedOversiktRoute: AuthenticatedOversiktRoute,
