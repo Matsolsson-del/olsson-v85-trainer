@@ -12,6 +12,7 @@ import {
   Settings,
   Grid3x3,
   Sparkles,
+  Trophy,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ import {
 const NAV = [
   { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
   { to: "/omgangar", label: "Omgångar", icon: CalendarDays },
+  { to: "/resultat", label: "Resultat", icon: Trophy },
   { to: "/analysera", label: "Analysera", icon: ClipboardList },
   { to: "/system", label: "System", icon: Grid3x3 },
   { to: "/efterrapporter", label: "Efterrapporter", icon: FileText },
