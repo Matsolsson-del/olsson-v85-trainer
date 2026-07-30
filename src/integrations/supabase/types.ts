@@ -2106,6 +2106,7 @@ export type Database = {
       is_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_group_owner: { Args: { _group_id: string }; Returns: boolean }
       is_round_responsible: { Args: { _round_id: string }; Returns: boolean }
+      join_family_group: { Args: never; Returns: string }
       lock_system_version: {
         Args: { _system_version_id: string }
         Returns: Json

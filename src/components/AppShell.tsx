@@ -101,7 +101,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
 
             <div className="border-t border-sidebar-border px-4 py-4">
-              <p className="truncate text-xs text-sidebar-foreground/70">{user?.email}</p>
+              <p className="truncate text-xs text-sidebar-foreground/70">
+                {(user?.user_metadata as any)?.display_name ?? user?.email}
+              </p>
               <Button
                 variant="ghost"
                 size="sm"
@@ -109,9 +111,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() => supabase.auth.signOut()}
               >
                 <LogOut className="mr-2 h-4 w-4" aria-hidden />
-                Logga ut
+                Byt användare
               </Button>
             </div>
+
           </div>
         </aside>
 
