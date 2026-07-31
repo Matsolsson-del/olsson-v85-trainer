@@ -207,7 +207,12 @@ function OmgangarPage() {
           })}
         </div>
       )}
+
+      <div className="mt-8">
+        <HistoryChartCard />
+      </div>
     </>
+
   );
 }
 
