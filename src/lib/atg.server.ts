@@ -11,7 +11,10 @@ export type AtgUpcomingGame = {
   tracks: { id: number; name: string }[];
 };
 
+export type AtgShoeSide = { hasShoe?: boolean; changed?: boolean };
+
 export type AtgStart = {
+  id?: string;
   number: number;
   postPosition?: number;
   distance?: number;
@@ -22,10 +25,21 @@ export type AtgStart = {
     age?: number;
     sex?: string;
     money?: number;
+    record?: { code?: string; time?: { minutes?: number; seconds?: number; tenths?: number } };
+    shoes?: { reported?: boolean; front?: AtgShoeSide; back?: AtgShoeSide };
+    sulky?: {
+      reported?: boolean;
+      type?: { code?: string; text?: string; changed?: boolean };
+      colour?: { text?: string };
+    };
+    statistics?: { life?: { starts?: number; earnings?: number; winPercentage?: number } };
     trainer?: { id: number; firstName?: string; lastName?: string };
   };
   driver?: { id: number; firstName?: string; lastName?: string };
-  pools?: { V85?: { betDistribution?: number } };
+  pools?: {
+    V85?: { betDistribution?: number };
+    vinnare?: { odds?: number };
+  };
 };
 
 export type AtgRace = {
@@ -35,9 +49,13 @@ export type AtgRace = {
   distance?: number;
   startMethod?: string;
   startTime?: string;
+  scheduledStartTime?: string;
+  status?: string;
+  terms?: string[];
   track?: { id: number; name: string };
   starts: AtgStart[];
 };
+
 
 export type AtgGame = {
   id: string;
