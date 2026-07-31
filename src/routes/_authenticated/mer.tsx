@@ -168,7 +168,7 @@ function MerPage() {
       {isOwner && (
         <section className="mt-10">
           <h2 className="mb-1 font-serif text-2xl font-semibold">Avancerat</h2>
-          <p className="mb-4 text-base text-muted-foreground">
+          <p className="mb-4 text-base text-foreground/80">
             Tekniska verktyg. Visas bara för dig som äger gruppen.
           </p>
           <div className="grid gap-4 md:grid-cols-2">
