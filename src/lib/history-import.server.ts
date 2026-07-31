@@ -402,11 +402,17 @@ export async function processHistoryImport(
   let imported = 0;
   let skipped = 0;
   let overwritten = 0;
+  let failed = 0;
+  const batchId = options.batchId ?? crypto.randomUUID();
+  const importedAt = new Date().toISOString();
+  const results: NonNullable<HistoryImportOutcome["results"]> = [];
 
   for (const b of built) {
-    const existingId = existing.get(b.row.idempotency_key);
+    const existingRow: any = existing.get(b.row.idempotency_key);
+    const existingId: string | undefined = existingRow?.id;
     if (existingId && !input.overwrite_existing) {
       skipped += 1;
+      results.push({ idempotency_key: b.row.idempotency_key, action: "skipped", id: existingId });
       continue;
     }
     if (existingId) {
@@ -416,47 +422,73 @@ export async function processHistoryImport(
         .update(updateRow)
         .eq("id", existingId);
       if (error) {
-        return {
-          ok: false,
-          mode: "import",
-          message: `Kunde inte skriva över ${b.row.idempotency_key}: ${error.message}`,
-          errors: [],
-          preview,
-          imported,
-          skipped,
-          overwritten,
-          economy_note: economyNote,
-        };
+        failed += 1;
+        results.push({
+          idempotency_key: b.row.idempotency_key,
+          action: "failed",
+          id: existingId,
+          message: error.message,
+        });
+        continue;
       }
       overwritten += 1;
+      results.push({ idempotency_key: b.row.idempotency_key, action: "overwritten", id: existingId });
       continue;
     }
-    const { error } = await supabase.from("imported_history_rounds").insert(b.row);
+    const { data: insertedRow, error } = await supabase
+      .from("imported_history_rounds")
+      .insert(b.row)
+      .select("id")
+      .maybeSingle();
     if (error) {
-      return {
-        ok: false,
-        mode: "import",
-        message: `Kunde inte importera ${b.row.idempotency_key}: ${error.message}`,
-        errors: [],
-        preview,
-        imported,
-        skipped,
-        overwritten,
-        economy_note: economyNote,
-      };
+      failed += 1;
+      results.push({
+        idempotency_key: b.row.idempotency_key,
+        action: "failed",
+        id: null,
+        message: error.message,
+      });
+      continue;
     }
     imported += 1;
+    results.push({
+      idempotency_key: b.row.idempotency_key,
+      action: "created",
+      id: (insertedRow?.id as string) ?? null,
+    });
   }
 
+  // Revisionslogg – spårbar via import_batch_id. Innehåller aldrig hemligheter.
+  await supabase.from("activity_log").insert({
+    group_id: groupId,
+    user_id: userId,
+    event_type: "history_import",
+    description: `Historikimport: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade, ${failed} misslyckade.`,
+    after_value: {
+      import_batch_id: batchId,
+      imported_at: importedAt,
+      overwrite_existing: input.overwrite_existing,
+      reason: options.reason ?? null,
+      results,
+    },
+  });
+
   return {
-    ok: true,
+    ok: failed === 0,
     mode: "import",
-    message: `Klart: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade (fanns redan). Status: Importerad historik.`,
+    message:
+      failed === 0
+        ? `Klart: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade (fanns redan). Status: Importerad historik.`
+        : `Delvis lyckad import: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade, ${failed} misslyckade.`,
     errors: [],
     preview,
     imported,
     skipped,
     overwritten,
     economy_note: economyNote,
+    import_batch_id: batchId,
+    imported_at: importedAt,
+    results,
   };
 }
+
