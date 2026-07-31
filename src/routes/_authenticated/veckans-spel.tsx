@@ -19,8 +19,8 @@ import {
   useInvalidateRound,
   useMyProfile,
   useRoundData,
-  useRounds,
 } from "@/lib/travhub-queries";
+import { useCurrentRound } from "@/lib/current-round-queries";
 import { useRoundResponsibility } from "@/lib/responsibility-queries";
 import {
   evaluateReadiness,
@@ -165,7 +165,7 @@ function ExpertTipsSection({ groupId }: { groupId: string | null }) {
 
 function VeckansSpel() {
   const { groupId } = useActiveGroupId();
-  const { data: rounds, isLoading, error } = useRounds(groupId);
+  const { data: active, isLoading, error } = useCurrentRound(groupId);
 
   if (isLoading) {
     return (
@@ -175,8 +175,6 @@ function VeckansSpel() {
       </>
     );
   }
-
-  const active = rounds?.find((r) => r.status !== "completed" && !r.is_demo) ?? null;
 
   if (error) {
     return (
@@ -373,7 +371,7 @@ function Workflow({ roundId }: { roundId: string }) {
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Button asChild size="lg" className="h-14 text-lg">
-              <Link to="/kommentera">Skriv en kommentar</Link>
+              <Link to="/kommentera" search={{ omgang: roundId }}>Skriv en kommentar</Link>
             </Button>
             <span className="inline-flex items-center rounded-md bg-surface px-4 py-2 text-base text-surface-foreground">
               Steg {currentStep} av 8: {next.title}
@@ -466,7 +464,7 @@ function Workflow({ roundId }: { roundId: string }) {
             </ul>
           )}
           <Button asChild size="lg" variant="secondary" className="h-14 w-full text-lg sm:w-auto">
-            <Link to="/kommentera">Läs och kommentera</Link>
+            <Link to="/kommentera" search={{ omgang: roundId }}>Läs och kommentera</Link>
           </Button>
         </Step>
 

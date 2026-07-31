@@ -5,6 +5,8 @@ import { PageHeader } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useActiveGroupId } from "@/lib/travhub-queries";
 import { getDashboard } from "@/lib/dashboard.functions";
+import { getResultsOverview } from "@/lib/results-overview.functions";
+
 
 export const Route = createFileRoute("/_authenticated/resultat")({
   beforeLoad: () => {
@@ -53,12 +55,22 @@ function BigStat({ label, value, tone }: { label: string; value: string; tone?: 
 export function ResultatDashboard() {
   const { groupId } = useActiveGroupId();
   const run = useServerFn(getDashboard);
+  const runOverview = useServerFn(getResultsOverview);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["dashboard", groupId],
     enabled: !!groupId,
     queryFn: () => run({ data: { groupId: groupId! } }),
   });
+
+  const overview = useQuery({
+    queryKey: ["results-overview", groupId],
+    enabled: !!groupId,
+    queryFn: () => runOverview({ data: { groupId: groupId! } }) as Promise<any>,
+  });
+
+  const all = overview.data?.combined;
+  const history = overview.data?.history;
 
   return (
     <>
@@ -76,35 +88,82 @@ export function ResultatDashboard() {
       ) : !data ? null : (
         <div className="space-y-8">
           <section>
-            <h2 className="mb-3 text-lg font-semibold">Gruppen</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <BigStat label="Spelade omgångar" value={String(data.totals.rounds)} />
-              <BigStat label="Satsat totalt" value={kr(data.totals.cost)} />
-              <BigStat label="Vunnit totalt" value={kr(data.totals.winnings)} tone="good" />
-              <BigStat
-                label="Netto"
-                value={kr(data.totals.net)}
-                tone={data.totals.net >= 0 ? "good" : "bad"}
-              />
-              <BigStat
-                label="Omgångar med vinst"
-                value={`${data.totals.roundsWithWin} av ${data.totals.rounds}`}
-              />
-              <BigStat
-                label="Rätt avdelningar i snitt"
-                value={data.totals.avgCorrectLegs === null ? "–" : `${data.totals.avgCorrectLegs} av 8`}
-              />
-              <BigStat
-                label="Bästa omgång, rätt"
-                value={data.totals.bestCorrectLegs === null ? "–" : `${data.totals.bestCorrectLegs} av 8`}
-              />
-              <BigStat
-                label="Bästa omgång, netto"
-                value={data.totals.bestRound ? kr(data.totals.bestRound.net) : "–"}
-                tone="good"
-              />
-            </div>
+            <h2 className="mb-1 text-lg font-semibold">Samtliga registrerade spel</h2>
+            <p className="mb-3 text-base text-muted-foreground">
+              Importerad spelhistorik och avslutade omgångar i Travhubben tillsammans.
+            </p>
+            {overview.isPending ? (
+              <p className="text-base text-foreground/80">Hämtar…</p>
+            ) : overview.isError || !all ? (
+              <p className="text-base font-medium text-destructive">
+                Totalsiffrorna kunde inte hämtas just nu. Ladda om sidan och försök igen.
+              </p>
+            ) : (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <BigStat label="Tävlingsdagar" value={String(all.raceDays)} />
+                  <BigStat label="Total insats" value={kr(all.cost)} />
+                  <BigStat label="Total utbetalning" value={kr(all.payout)} tone="good" />
+                  <BigStat label="Netto" value={kr(all.net)} tone={all.net >= 0 ? "good" : "bad"} />
+                  <BigStat
+                    label="Omgångar med utdelning"
+                    value={`${all.roundsWithPayout} av ${all.raceDays}`}
+                  />
+                  <BigStat
+                    label="Rätt i genomsnitt"
+                    value={all.avgCorrect === null ? "–" : `${all.avgCorrect} av 8`}
+                  />
+                  <BigStat
+                    label="Bästa resultat, rätt"
+                    value={all.bestCorrect === null ? "–" : `${all.bestCorrect} av 8`}
+                  />
+                  <BigStat
+                    label="Bästa resultat, netto"
+                    value={all.bestNet === null ? "–" : kr(all.bestNet)}
+                    tone={all.bestNet && all.bestNet > 0 ? "good" : undefined}
+                  />
+                </div>
+                <p className="mt-3 text-base text-muted-foreground">
+                  Statistiken bygger på {history?.counts?.raceDaysInStats ?? 0} tävlingsdagar
+                  {history?.counts?.reviewNeededDays
+                    ? `. För ${history.counts.reviewNeededDays} dagar används tills vidare en preliminärt vald post i väntan på granskning.`
+                    : "."}
+                </p>
+              </>
+            )}
           </section>
+
+          <section>
+            <h2 className="mb-1 text-lg font-semibold">Spel genomförda i Travhubben</h2>
+            {data.totals.rounds === 0 ? (
+              <Card>
+                <CardContent className="p-6 text-base text-muted-foreground">
+                  Inga omgångar har ännu avslutats genom Travhubben. Den importerade spelhistoriken
+                  visas ovan.
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <BigStat label="Avslutade omgångar" value={String(data.totals.rounds)} />
+                <BigStat label="Satsat" value={kr(data.totals.cost)} />
+                <BigStat label="Vunnit" value={kr(data.totals.winnings)} tone="good" />
+                <BigStat
+                  label="Netto"
+                  value={kr(data.totals.net)}
+                  tone={data.totals.net >= 0 ? "good" : "bad"}
+                />
+                <BigStat
+                  label="Omgångar med vinst"
+                  value={`${data.totals.roundsWithWin} av ${data.totals.rounds}`}
+                />
+                <BigStat
+                  label="Rätt avdelningar i snitt"
+                  value={data.totals.avgCorrectLegs === null ? "–" : `${data.totals.avgCorrectLegs} av 8`}
+                />
+              </div>
+            )}
+          </section>
+
 
           <section>
             <h2 className="mb-3 text-lg font-semibold">Varje spelare</h2>

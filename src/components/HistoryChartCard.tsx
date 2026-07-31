@@ -60,8 +60,8 @@ export function HistoryChartCard({ showCorrect = true }: { showCorrect?: boolean
   const dupNotice = stats?.preliminary ? (
     <div className="rounded-lg border border-primary/40 bg-primary/10 p-4 text-base">
       <p>
-        {stats.unresolvedDuplicates} tävlingsdag
-        {stats.unresolvedDuplicates === 1 ? "" : "ar"} har två poster som säger olika saker. Vi
+        {stats.counts.reviewNeededDays} tävlingsdag
+        {stats.counts.reviewNeededDays === 1 ? "" : "ar"} har två motstridiga systemposter. Vi
         räknar preliminärt med en av dem tills Mats har granskat dagarna. Inget är raderat.
       </p>
       <ul className="mt-2 list-disc pl-5">
@@ -72,7 +72,10 @@ export function HistoryChartCard({ showCorrect = true }: { showCorrect?: boolean
         ))}
       </ul>
       <Button variant="secondary" className="mt-3 h-12" asChild>
-        <Link to="/historik-dubbletter">Granska dubbletterna</Link>
+        <Link to="/historik-dubbletter">
+          Granska {stats.counts.reviewNeededDays} tävlingsdag
+          {stats.counts.reviewNeededDays === 1 ? "" : "ar"}
+        </Link>
       </Button>
     </div>
   ) : null;
@@ -101,10 +104,18 @@ export function HistoryChartCard({ showCorrect = true }: { showCorrect?: boolean
       <CardContent className="space-y-5">
         {dupNotice}
 
+        <p className="text-base text-muted-foreground">
+          Historiken innehåller totalt {stats.counts.importedRecords} importerade systemposter
+          fördelade på {stats.counts.raceDays} tävlingsdagar.
+          {stats.counts.reviewNeededDays
+            ? ` ${stats.counts.reviewNeededDays} tävlingsdagar har två motstridiga poster som Mats behöver granska.`
+            : ""}
+        </p>
+
         <div className="grid gap-3 sm:grid-cols-4">
           <div>
-            <p className="text-sm text-muted-foreground">Omgångar</p>
-            <p className="text-2xl font-bold">{s.rounds}</p>
+            <p className="text-sm text-muted-foreground">Tävlingsdagar</p>
+            <p className="text-2xl font-bold">{stats.counts.raceDaysInStats}</p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Rätt i snitt</p>

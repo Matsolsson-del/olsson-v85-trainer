@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useActiveGroupId, useMyProfile, useRoundData, useRounds } from "@/lib/travhub-queries";
+import { useCurrentRound } from "@/lib/current-round-queries";
 import { useRoundResponsibility } from "@/lib/responsibility-queries";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useAuth } from "@/lib/auth";
@@ -48,6 +49,7 @@ function BigCard({
 function OversiktPage() {
   const { groupId, groups } = useActiveGroupId();
   const { data: rounds, isLoading, error } = useRounds(groupId);
+  const { data: current } = useCurrentRound(groupId);
 
   if (isLoading) {
     return (
@@ -80,19 +82,18 @@ function OversiktPage() {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  // Spelbara omgångar = ej avgjorda, sorterade med närmast tävlingsdag först.
+  // Veckans omgång bestäms av samma serverregel som Veckans spel och Kommentera.
   const upcoming = (rounds ?? [])
     .filter((r) => r.status !== "completed")
     .sort((a, b) => String(a.race_date).localeCompare(String(b.race_date)));
   const playable = upcoming.filter((r) => String(r.race_date) >= today);
-  // Den aktuella omgången är den vi faktiskt spelar nu; helst en riktig (ej demo).
-  const active =
-    playable.find((r) => !(r as any).is_demo) ?? playable[0] ?? upcoming[upcoming.length - 1] ?? null;
+  const active = current ?? null;
   const next = playable.find((r) => r.id !== active?.id) ?? null;
   const latest =
     (rounds ?? [])
       .filter((r) => r.status === "completed")
       .sort((a, b) => String(b.race_date).localeCompare(String(a.race_date)))[0] ?? null;
+
 
   return (
     <>
@@ -252,7 +253,7 @@ function ActiveRound({ roundId, latestId }: { roundId: string; latestId: string 
       </BigCard>
 
       <Button asChild size="lg" className="h-16 w-full text-xl">
-        <Link to="/kommentera">
+        <Link to="/kommentera" search={{ omgang: roundId }}>
           Läs och kommentera <ArrowRight className="ml-2 h-5 w-5" aria-hidden />
         </Link>
       </Button>

@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { useActiveGroupId, useRoundData, useRounds } from "@/lib/travhub-queries";
+import { useActiveGroupId, useRoundData } from "@/lib/travhub-queries";
+import { useCurrentRound } from "@/lib/current-round-queries";
 import { formatDate } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/kommentera")({
@@ -24,12 +25,15 @@ export const Route = createFileRoute("/_authenticated/kommentera")({
       { property: "og:description", content: "Läs analysen och tyck till – inget måste godkännas." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { omgang?: string } =>
+    typeof search.omgang === "string" && search.omgang ? { omgang: search.omgang } : {},
   component: KommenteraPage,
 });
 
 function KommenteraPage() {
   const { groupId } = useActiveGroupId();
-  const { data: rounds, isLoading, error } = useRounds(groupId);
+  const { omgang } = Route.useSearch();
+  const { data: active, isLoading, error } = useCurrentRound(groupId, omgang ?? null);
 
   if (isLoading) {
     return (
@@ -39,8 +43,6 @@ function KommenteraPage() {
       </>
     );
   }
-
-  const active = rounds?.find((r) => r.status !== "completed") ?? null;
 
   if (error || !active) {
     return (
@@ -56,8 +58,9 @@ function KommenteraPage() {
     );
   }
 
-  return <Kommentarer roundId={active.id} groupId={groupId!} />;
+  return <Kommentarer key={active.id} roundId={active.id} groupId={groupId!} />;
 }
+
 
 function Kommentarer({ roundId, groupId }: { roundId: string; groupId: string }) {
   const { data, isLoading, error } = useRoundData(roundId);
