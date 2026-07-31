@@ -75,7 +75,8 @@ export const previewHistoryImport = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     await assertOwner(context, data.groupId);
-    const payload = parseJson(data.json);
+    const { payload, error: parseError } = parseJson(data.json);
+    if (parseError) return failure("preview", parseError);
     const { processHistoryImport } = await import("@/lib/history-import.server");
     return processHistoryImport(context.supabase, data.groupId, context.userId, {
       ...payload,
