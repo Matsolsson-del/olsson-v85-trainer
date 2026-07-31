@@ -74,7 +74,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "go
   );
 }
 
-function OmgangarPage() {
+export function OmgangarPage() {
   const { groupId } = useActiveGroupId();
   const { data: rounds, isLoading, error: roundsError, refetch } = useRounds(groupId);
   const roundsLoading = !groupId || isLoading;

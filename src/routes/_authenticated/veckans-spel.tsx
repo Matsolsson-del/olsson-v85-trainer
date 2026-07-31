@@ -17,6 +17,7 @@ import { formatCurrency, formatDate, formatDateTime, formatPercent } from "@/lib
 import {
   useActiveGroupId,
   useInvalidateRound,
+  useMyProfile,
   useRoundData,
   useRounds,
 } from "@/lib/travhub-queries";
@@ -36,6 +37,7 @@ import {
   importResultsNow,
 } from "@/lib/automation.functions";
 import { markBetSubmitted, runFinalCheckNow } from "@/lib/workflow.functions";
+import { listExpertTips } from "@/lib/expert-tips.functions";
 
 export const Route = createFileRoute("/_authenticated/veckans-spel")({
   head: () => ({
@@ -56,45 +58,109 @@ export const Route = createFileRoute("/_authenticated/veckans-spel")({
   component: VeckansSpel,
 });
 
+type StepState = "klar" | "pagar" | "vantar" | "atgard";
+
 function Step({
   number,
   title,
   state,
+  open,
   children,
 }: {
   number: number;
   title: string;
-  state: "klar" | "pagar" | "vantar";
+  state: StepState;
+  open?: boolean;
   children: React.ReactNode;
 }) {
-  const Icon = state === "klar" ? CheckCircle2 : state === "pagar" ? AlertTriangle : Circle;
-  const stateLabel = state === "klar" ? "Klar" : state === "pagar" ? "Pågår" : "Väntar";
+  const Icon = state === "klar" ? CheckCircle2 : state === "vantar" ? Circle : AlertTriangle;
+  const stateLabel =
+    state === "klar"
+      ? "Klart"
+      : state === "pagar"
+        ? "Pågår"
+        : state === "atgard"
+          ? "Behöver åtgärdas"
+          : "Väntar";
   const stateClass =
     state === "klar"
       ? "text-primary"
-      : state === "pagar"
-        ? "text-warning"
-        : "text-muted-foreground";
+      : state === "vantar"
+        ? "text-muted-foreground"
+        : "text-warning";
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 text-xl">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-base font-semibold text-primary">
-            {number}
+      <details open={open}>
+        <summary className="cursor-pointer list-none px-6 py-4">
+          <span className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 text-base font-semibold text-primary">
+              {number}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-xl font-semibold">{title}</span>
+              <span className={`flex items-center gap-2 text-base font-medium ${stateClass}`}>
+                <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                {stateLabel}
+              </span>
+            </span>
           </span>
-          <span className="min-w-0">{title}</span>
-          <span
-            className={`col-span-2 flex items-center gap-2 text-base font-medium ${stateClass}`}
-          >
-            <Icon className="h-5 w-5 shrink-0" aria-hidden />
-            {stateLabel}
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3 text-base leading-relaxed">{children}</CardContent>
+        </summary>
+        <CardContent className="space-y-3 pt-0 text-base leading-relaxed">{children}</CardContent>
+      </details>
     </Card>
   );
 }
+
+function ExpertTipsSection({ groupId }: { groupId: string | null }) {
+  const fetchTips = useServerFn(listExpertTips);
+  const { data } = useQuery({
+    queryKey: ["expert-tips", groupId],
+    enabled: Boolean(groupId),
+    queryFn: () => fetchTips({ data: { groupId: groupId! } }) as Promise<any[]>,
+  });
+  const latest = data?.[0];
+
+  return (
+    <Card>
+      <details>
+        <summary className="cursor-pointer list-none px-6 py-4 text-xl font-semibold">
+          Vad säger experterna?
+        </summary>
+        <CardContent className="space-y-3 pt-0 text-base">
+          {!latest ? (
+            <p className="text-muted-foreground">
+              Inga experttips är insamlade ännu. De hämtas automatiskt på torsdagar.
+            </p>
+          ) : (
+            <>
+              <p className="text-muted-foreground">
+                {latest.track_name ?? "Bana"} · {formatDate(latest.race_date)}
+              </p>
+              <p>{latest.summary ?? "Ingen sammanfattning."}</p>
+              {(latest.consensus ?? []).length > 0 && (
+                <div>
+                  <p className="font-medium">Experterna är eniga om:</p>
+                  <ul className="mt-1 list-disc space-y-1 pl-6 text-muted-foreground">
+                    {(latest.consensus as any[]).slice(0, 5).map((c, i) => (
+                      <li key={i}>
+                        {c.leg ? `Avd ${c.leg}: ` : ""}
+                        {c.horse ?? ""} {c.note ?? ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </>
+          )}
+          <Button asChild size="lg" variant="secondary" className="h-14 w-full text-lg sm:w-auto">
+            <Link to="/experttips">Se alla experttips</Link>
+          </Button>
+        </CardContent>
+      </details>
+    </Card>
+  );
+}
+
 
 function VeckansSpel() {
   const { groupId } = useActiveGroupId();
@@ -132,7 +198,7 @@ function VeckansSpel() {
           description="Omgången hämtas automatiskt på torsdagar."
           action={
             <Button asChild size="lg" className="h-14 text-lg">
-              <Link to="/omgangar">Se tidigare omgångar</Link>
+              <Link to="/historik">Se tidigare omgångar</Link>
             </Button>
           }
         />
@@ -154,6 +220,7 @@ function Workflow({ roundId }: { roundId: string }) {
   const { data: finalCheck } = useFinalCheck(roundId);
   const { data: snapshot } = useBetSnapshot(roundId);
   const [busy, setBusy] = useState<string | null>(null);
+  const { data: myProfile } = useMyProfile();
 
   const comments = useQuery({
     queryKey: ["round-comments", roundId],
@@ -218,7 +285,8 @@ function Workflow({ roundId }: { roundId: string }) {
 
   const { round, races, systems: roundSystems, roundResult, postmortem } = data as any;
   const responsibleName = (responsibility as any)?.profiles?.display_name ?? "Ingen utsedd ännu";
-  const isResponsible = !!responsibility && !!(responsibility as any).user_id;
+  const isResponsible =
+    !!responsibility && !!myProfile?.id && (responsibility as any).user_id === myProfile.id;
 
   const aiNotes = (races as any[])
     .map((r) => ({ leg: r.leg_number, note: r.group_race_assessments?.[0]?.notes ?? null }))
@@ -232,6 +300,32 @@ function Workflow({ roundId }: { roundId: string }) {
 
   const latestImport = origin?.imports?.[0] as any;
   const quality = origin?.quality as any;
+
+  const stepStates: StepState[] = [
+    readiness.ready ? "klar" : "atgard",
+    aiNotes.length ? "klar" : "vantar",
+    (comments.data?.length ?? 0) > 0 ? "klar" : "vantar",
+    (candidates?.length ?? 0) > 0 ? "klar" : "vantar",
+    responsibility ? "klar" : "vantar",
+    finalCheck ? "klar" : "vantar",
+    snapshot ? "klar" : "vantar",
+    roundResult ? "klar" : "vantar",
+  ];
+  const currentStep = stepStates.findIndex((st) => st !== "klar") + 1 || 8;
+  const stepState = (n: number): StepState =>
+    stepStates[n - 1] === "klar" ? "klar" : n === currentStep ? (stepStates[n - 1] === "atgard" ? "atgard" : "pagar") : "vantar";
+
+  const NEXT_TASK: Record<number, { title: string; hint: string }> = {
+    1: { title: "Vänta på underlaget", hint: "Underlaget hämtas automatiskt från ATG." },
+    2: { title: "Läs analysen", hint: "AI:n gör ett utkast som ni sedan tittar på." },
+    3: { title: "Skriv en kommentar", hint: "Lämna din egen bedömning per avdelning." },
+    4: { title: "Granska systemförslag", hint: "Tre förslag inom budget." },
+    5: { title: "Utse veckans ansvarige", hint: "Ansvaret roterar mellan Mats, Bosse och Olle." },
+    6: { title: "Kör slutkontroll", hint: "Strykningar, kuskbyten och stora förändringar." },
+    7: { title: "Markera som inlämnat", hint: "Spelet lämnas alltid in manuellt hos ATG." },
+    8: { title: "Hämta resultat", hint: "Sedan skriver ni efterrapporten." },
+  };
+  const next = NEXT_TASK[currentStep];
 
   function entryLabel(id: string) {
     const e = entryById.get(id);
@@ -255,9 +349,36 @@ function Workflow({ roundId }: { roundId: string }) {
         }
       />
 
-      <div className="space-y-5 pb-10">
+      <Card className="mb-5 border-2 border-primary">
+        <CardContent className="space-y-2 p-5">
+          <p className="text-2xl font-semibold">
+            {isResponsible
+              ? "Du ansvarar denna vecka."
+              : snapshot
+                ? "Veckans spel är inlämnat."
+                : "Veckans system är inte klart ännu."}
+          </p>
+          <p className="text-lg text-muted-foreground">
+            {isResponsible
+              ? `Nästa steg: ${next.title.toLowerCase()}. ${next.hint}`
+              : `Veckans ansvarige är ${responsibleName}. Läs analysen och lämna gärna en kommentar.`}
+          </p>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button asChild size="lg" className="h-14 text-lg">
+              <Link to="/kommentera">Skriv en kommentar</Link>
+            </Button>
+            <span className="inline-flex items-center rounded-md bg-surface px-4 py-2 text-base text-surface-foreground">
+              Steg {currentStep} av 8: {next.title}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      <ExpertTipsSection groupId={groupId} />
+
+      <div className="mt-5 space-y-5 pb-10">
         {/* 1. Underlaget */}
-        <Step number={1} title="Underlaget" state={readiness.ready ? "klar" : "pagar"}>
+        <Step number={1} title="Underlaget" open={currentStep === 1} state={stepState(1)}>
           <p className="text-muted-foreground">
             Källa: {latestImport?.data_sources?.name ?? "ATG:s öppna API"} ·{" "}
             {freshnessLabel(latestImport?.created_at ?? readiness.latestMarketAt)}
@@ -288,7 +409,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 2. AI-analys */}
-        <Step number={2} title="AI:ns analys" state={aiNotes.length ? "klar" : "vantar"}>
+        <Step number={2} title="AI:ns analys" open={currentStep === 2} state={stepState(2)}>
           <AiImportCard roundId={roundId} />
           {aiNotes.length === 0 ? (
             <p className="text-muted-foreground">Ingen analys är gjord ännu.</p>
@@ -320,11 +441,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 3. Kommentarer */}
-        <Step
-          number={3}
-          title="Familjens kommentarer"
-          state={(comments.data?.length ?? 0) > 0 ? "klar" : "vantar"}
-        >
+        <Step number={3} title="Familjens kommentarer" open={currentStep === 3} state={stepState(3)}>
           {(comments.data?.length ?? 0) === 0 ? (
             <p className="text-muted-foreground">Ingen har kommenterat ännu.</p>
           ) : (
@@ -342,7 +459,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 4. Systemförslag */}
-        <Step number={4} title="Tre systemförslag" state={(candidates?.length ?? 0) > 0 ? "klar" : "vantar"}>
+        <Step number={4} title="Tre systemförslag" open={currentStep === 4} state={stepState(4)}>
           {(candidates?.length ?? 0) === 0 ? (
             <p className="text-muted-foreground">Inga förslag är skapade ännu.</p>
           ) : (
@@ -407,7 +524,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 5. Veckans ansvarige */}
-        <Step number={5} title="Veckans ansvarige" state={responsibility ? "klar" : "vantar"}>
+        <Step number={5} title="Veckans ansvarige" open={currentStep === 5} state={stepState(5)}>
           <p className="text-2xl font-semibold">{responsibleName}</p>
           <p className="text-muted-foreground">
             Ansvarig väljer system, gör eventuella justeringar och lämnar in spelet hos ATG.
@@ -416,7 +533,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 6. Slutkontroll */}
-        <Step number={6} title="Slutkontroll före spelstopp" state={finalCheck ? "klar" : "vantar"}>
+        <Step number={6} title="Slutkontroll före spelstopp" open={currentStep === 6} state={stepState(6)}>
           <p className="text-muted-foreground">
             Kontrollerar strykningar, kuskbyten, balans och utrustning, bana, väder samt större
             odds- och streckförändringar. Kontrollen föreslår bara ändringar – den ändrar aldrig
@@ -464,7 +581,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 7. Slutligt system och inlämning */}
-        <Step number={7} title="Slutligt system och inlämning" state={snapshot ? "klar" : "vantar"}>
+        <Step number={7} title="Slutligt system och inlämning" open={currentStep === 7} state={stepState(7)}>
           {!currentVersion ? (
             <p className="text-muted-foreground">Inget system är valt ännu.</p>
           ) : (
@@ -506,7 +623,7 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 8. Resultat och efterrapport */}
-        <Step number={8} title="Resultat och efterrapport" state={roundResult ? "klar" : "vantar"}>
+        <Step number={8} title="Resultat och efterrapport" open={currentStep === 8} state={stepState(8)}>
           {roundResult ? (
             <p className="text-xl font-semibold">
               Vinst {formatCurrency(Number(roundResult.group_winnings ?? 0))}
@@ -532,7 +649,7 @@ function Workflow({ roundId }: { roundId: string }) {
               {busy === "resultat" ? "Hämtar…" : "Hämta resultat"}
             </Button>
             <Button asChild size="lg" variant="secondary" className="h-14 text-lg">
-              <Link to="/efterrapporter">Till efterrapporten</Link>
+              <Link to="/omgangar/$roundId" params={{ roundId }}>Till efterrapporten</Link>
             </Button>
           </div>
         </Step>

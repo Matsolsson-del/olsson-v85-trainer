@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PageHeader } from "@/components/AppShell";
@@ -7,6 +7,9 @@ import { useActiveGroupId } from "@/lib/travhub-queries";
 import { getDashboard } from "@/lib/dashboard.functions";
 
 export const Route = createFileRoute("/_authenticated/resultat")({
+  beforeLoad: () => {
+    throw redirect({ to: "/historik", search: { vy: "resultat" } });
+  },
   head: () => ({
     meta: [
       { title: "Resultat – Familjen Olssons Travhub" },
@@ -47,7 +50,7 @@ function BigStat({ label, value, tone }: { label: string; value: string; tone?: 
   );
 }
 
-function ResultatDashboard() {
+export function ResultatDashboard() {
   const { groupId } = useActiveGroupId();
   const run = useServerFn(getDashboard);
 

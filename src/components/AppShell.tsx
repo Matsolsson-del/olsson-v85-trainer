@@ -1,194 +1,104 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import {
-  BarChart3,
-  CalendarDays,
-  ClipboardList,
-  Coins,
-  FileText,
-  History,
-  LayoutDashboard,
-  LogOut,
-  MessageSquare,
-  Menu,
-  Newspaper,
-  Settings,
-  Grid3x3,
-  Sparkles,
-  Trophy,
-  Users,
-  Workflow,
-} from "lucide-react";
-import { useState, type ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useActiveGroupId, useMyProfile, useOwnerStatus } from "@/lib/travhub-queries";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { CalendarDays, History, MessageSquare, MoreHorizontal, Users } from "lucide-react";
+import { type ReactNode } from "react";
+import { useMyProfile } from "@/lib/travhub-queries";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { lockFamily } from "@/lib/gate.functions";
-import { forgetPerson } from "@/lib/person-memory";
 
-const SIMPLE_NAV = [
+const MAIN_NAV = [
   { to: "/veckans-spel", label: "Veckans spel", icon: CalendarDays },
-  { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
-  { to: "/experttips", label: "Experttips", icon: Newspaper },
   { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
-  { to: "/resultat", label: "Resultat", icon: Trophy },
   { to: "/historik", label: "Historik", icon: History },
-] as const;
-
-const ADVANCED_NAV = [
-  { to: "/omgangar", label: "Omgångar i hubben", icon: History },
-  { to: "/analysera", label: "Analysera", icon: ClipboardList },
-  { to: "/system", label: "System", icon: Grid3x3 },
-  { to: "/efterrapporter", label: "Efterrapporter", icon: FileText },
-  { to: "/larande", label: "Lärande", icon: BarChart3 },
-  { to: "/mina-rad", label: "Mina råd", icon: Sparkles },
-  { to: "/automation", label: "Automation", icon: Workflow },
-  { to: "/ai-import", label: "AI-import", icon: Sparkles },
-  { to: "/historikimport", label: "Historikimport", icon: History },
-  { to: "/historik-dubbletter", label: "Granska dubbletter", icon: ClipboardList },
-  { to: "/ekonomi", label: "Ekonomi", icon: Coins },
-  { to: "/installningar", label: "Inställningar", icon: Settings },
+  { to: "/mer", label: "Mer", icon: MoreHorizontal },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useMyProfile();
-  const { groupId } = useActiveGroupId();
-  const { isOwner } = useOwnerStatus(groupId);
-  const [open, setOpen] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const navigate = useNavigate();
-  const qc = useQueryClient();
-  const lockFn = useServerFn(lockFamily);
 
-  // Avancerade och administrativa val visas bara för gruppens ägare (Mats).
-  const advancedVisible = isOwner && showAdvanced;
-  const items = [...SIMPLE_NAV, ...(advancedVisible ? ADVANCED_NAV : [])];
-
-  async function switchPerson() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", search: { byt: true }, replace: true });
-  }
-
-  async function signOutCompletely() {
-    await qc.cancelQueries();
-    qc.clear();
-    forgetPerson();
-    await supabase.auth.signOut();
-    try {
-      await lockFn();
-    } catch {
-      /* sessionen rensas ändå på klienten */
-    }
-    navigate({ to: "/auth", replace: true });
-  }
+  const isActive = (to: string) =>
+    to === "/mer"
+      ? !MAIN_NAV.slice(0, 3).some((n) => pathname.startsWith(n.to))
+      : pathname.startsWith(to);
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
       <div className="flex min-h-dvh">
-        <aside
-          className={cn(
-            "fixed inset-y-0 left-0 z-40 w-64 shrink-0 overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0",
-            open ? "translate-x-0" : "-translate-x-full",
-          )}
-        >
-          <div className="flex min-h-full flex-col">
+        {/* Sidomeny på dator */}
+        <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:block">
+          <div className="sticky top-0 flex min-h-dvh flex-col">
             <div className="border-b border-sidebar-border px-5 py-5">
               <p className="font-serif text-lg font-semibold text-primary">
                 Familjen Olssons Travhub
               </p>
-              <p className="mt-0.5 text-sm text-sidebar-foreground/80">V85-analys och lärande</p>
+              <p className="mt-0.5 text-sm text-sidebar-foreground/80">V85 tillsammans</p>
             </div>
 
             <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Huvudnavigation">
-              {items.map(({ to, label, icon: Icon }) => {
-                const active = pathname.startsWith(to);
-                return (
-                  <Link
-                    key={to}
-                    to={to}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-3 text-base transition-colors",
-                      active
-                        ? "bg-sidebar-accent font-medium text-primary"
-                        : "text-sidebar-foreground/85 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    )}
-                  >
-                    <Icon className="h-5 w-5" aria-hidden />
-                    {label}
-                  </Link>
-                );
-              })}
-
-              {isOwner && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 w-full justify-start px-3 text-sidebar-foreground/70"
-                  onClick={() => setShowAdvanced((v) => !v)}
+              {MAIN_NAV.map(({ to, label, icon: Icon }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-3 text-lg transition-colors",
+                    isActive(to)
+                      ? "bg-sidebar-accent font-semibold text-primary"
+                      : "text-sidebar-foreground/85 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  )}
                 >
-                  {showAdvanced ? "Dölj avancerat" : "Avancerat"}
-                </Button>
-              )}
+                  <Icon className="h-6 w-6" aria-hidden />
+                  {label}
+                </Link>
+              ))}
             </nav>
 
-            <div className="border-t border-sidebar-border px-4 py-4">
-              <p className="flex items-center gap-2 truncate text-sm font-medium">
-                <Users className="h-4 w-4 text-primary" aria-hidden />
+            <div className="border-t border-sidebar-border px-5 py-4">
+              <p className="flex items-center gap-2 truncate text-base font-medium">
+                <Users className="h-5 w-5 text-primary" aria-hidden />
                 {profile?.display_name ?? "Välj person"}
               </p>
-              <Button
-                variant="secondary"
-                className="mt-3 w-full justify-start"
-                onClick={switchPerson}
-              >
-                Byt person
-              </Button>
-              <Button
-                variant="ghost"
-                className="mt-2 w-full justify-start px-2 text-sidebar-foreground/85 hover:bg-sidebar-accent"
-                onClick={signOutCompletely}
-              >
-                <LogOut className="mr-2 h-4 w-4" aria-hidden />
-                Logga ut från Travhubben
-              </Button>
+              <p className="mt-1 text-sm text-sidebar-foreground/70">
+                Byt person under <Link to="/mer" className="underline">Mer</Link>.
+              </p>
             </div>
           </div>
         </aside>
 
-        {open && (
-          <button
-            aria-label="Stäng meny"
-            className="fixed inset-0 z-30 bg-foreground/50 lg:hidden"
-            onClick={() => setOpen(false)}
-          />
-        )}
-
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-background px-4 py-3 lg:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="min-h-11 min-w-11"
-              onClick={() => setOpen(true)}
-              aria-label="Öppna meny"
-              aria-expanded={open}
-            >
-              <Menu className="h-6 w-6" aria-hidden />
-            </Button>
-            <span className="font-serif font-semibold text-primary">Familjen Olssons Travhub</span>
+          <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-background px-4 py-3 lg:hidden">
+            <span className="font-serif text-base font-semibold text-primary">
+              Familjen Olssons Travhub
+            </span>
+            <span className="truncate text-sm text-foreground/70">
+              {profile?.display_name ?? ""}
+            </span>
           </header>
-          <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8">
+
+          <main className="min-w-0 flex-1 px-4 py-6 pb-28 sm:px-6 lg:px-8 lg:pb-10">
             <ErrorBoundary>{children}</ErrorBoundary>
           </main>
         </div>
       </div>
+
+      {/* Nederkantsmeny på mobil */}
+      <nav
+        aria-label="Huvudnavigation"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
+      >
+        {MAIN_NAV.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            className={cn(
+              "flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-center text-xs font-medium",
+              isActive(to) ? "text-primary" : "text-foreground/70",
+            )}
+          >
+            <Icon className="h-6 w-6" aria-hidden />
+            <span className="leading-tight">{label}</span>
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }
