@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { HistoryChartCard } from "@/components/HistoryChartCard";
@@ -11,6 +11,9 @@ import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/oversikt")({
+  beforeLoad: () => {
+    throw redirect({ to: "/veckans-spel" });
+  },
   head: () => ({
     meta: [
       { title: "Översikt – Familjen Olssons Travhub" },

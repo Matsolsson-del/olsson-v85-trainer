@@ -11,6 +11,11 @@ import { useMemo, useState } from "react";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useIsOwner } from "@/lib/travhub-queries";
 import { listImportedHistory } from "@/lib/history-import.functions";
+import { ResultatDashboard } from "@/routes/_authenticated/resultat";
+import { LarandePage } from "@/routes/_authenticated/larande";
+import { OmgangarPage } from "@/routes/_authenticated/omgangar/index";
+
+type HistorikVy = "oversikt" | "resultat" | "larande" | "hubben";
 
 export const Route = createFileRoute("/_authenticated/historik")({
   head: () => ({
@@ -30,8 +35,53 @@ export const Route = createFileRoute("/_authenticated/historik")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { vy?: HistorikVy } =>
+    (["oversikt", "resultat", "larande", "hubben"] as const).includes(search.vy as HistorikVy)
+      ? { vy: search.vy as HistorikVy }
+      : {},
   component: HistorikPage,
 });
+
+const VYER = [
+  { key: "oversikt", label: "Våra omgångar" },
+  { key: "resultat", label: "Resultat" },
+  { key: "larande", label: "Vad har vi lärt oss?" },
+  { key: "hubben", label: "Omgångar i hubben" },
+] as const;
+
+function HistorikPage() {
+  const { vy = "oversikt" } = Route.useSearch();
+  return (
+    <>
+      <nav aria-label="Delar av historiken" className="mb-6 flex flex-wrap gap-2">
+        {VYER.map((v) => (
+          <Link
+            key={v.key}
+            to="/historik"
+            search={{ vy: v.key }}
+            className={
+              "min-h-12 rounded-full border px-4 py-3 text-base font-medium " +
+              (vy === v.key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card text-card-foreground")
+            }
+          >
+            {v.label}
+          </Link>
+        ))}
+      </nav>
+      {vy === "resultat" ? (
+        <ResultatDashboard />
+      ) : vy === "larande" ? (
+        <LarandePage />
+      ) : vy === "hubben" ? (
+        <OmgangarPage />
+      ) : (
+        <HistorikOversikt />
+      )}
+    </>
+  );
+}
 
 const QUALITY_LABEL: Record<string, string> = {
   verified: "Verifierad",
@@ -48,7 +98,7 @@ const SORTS: Array<{ key: SortKey; label: string }> = [
   { key: "bast-netto", label: "Bäst netto först" },
 ];
 
-function HistorikPage() {
+function HistorikOversikt() {
   const { groupId } = useActiveGroupId();
   const isOwner = useIsOwner(groupId);
   const fetchRows = useServerFn(listImportedHistory);

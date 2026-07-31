@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +6,9 @@ import { useActiveGroupId, useRounds } from "@/lib/travhub-queries";
 import { ROUND_STATUS_LABELS, formatDate } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/analysera")({
+  beforeLoad: () => {
+    throw redirect({ to: "/veckans-spel" });
+  },
   head: () => ({
     meta: [
       { title: "Analysera – Familjen Olssons Travhub" },

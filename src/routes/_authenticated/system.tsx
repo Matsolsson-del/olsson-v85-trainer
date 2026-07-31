@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,9 @@ import { useActiveGroupId, useRounds } from "@/lib/travhub-queries";
 import { formatDate } from "@/lib/labels";
 
 export const Route = createFileRoute("/_authenticated/system")({
+  beforeLoad: () => {
+    throw redirect({ to: "/veckans-spel" });
+  },
   head: () => ({
     meta: [
       { title: "System – Familjen Olssons Travhub" },
