@@ -57,33 +57,26 @@ export function HistoryChartCard({ showCorrect = true }: { showCorrect?: boolean
     );
   }
 
-  if (stats?.blocked) {
-    return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl">Statistiken är pausad</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-base">
-          <p>
-            Historiken innehåller {stats.unresolvedDuplicates} tävlingsdag
-            {stats.unresolvedDuplicates === 1 ? "" : "ar"} med två poster som säger olika saker.
-            Statistik och automatiskt lärande är pausade tills Mats har granskat dem. Inget är
-            raderat.
-          </p>
-          <ul className="list-disc pl-5">
-            {stats.unresolvedDates.map((d) => (
-              <li key={`${d.track}-${d.date}`}>
-                {d.track} {d.date} ({d.count} poster)
-              </li>
-            ))}
-          </ul>
-          <Button variant="secondary" className="h-12" asChild>
-            <Link to="/historik-dubbletter">Granska dubbletterna</Link>
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  const dupNotice = stats?.preliminary ? (
+    <div className="rounded-lg border border-primary/40 bg-primary/10 p-4 text-base">
+      <p>
+        {stats.unresolvedDuplicates} tävlingsdag
+        {stats.unresolvedDuplicates === 1 ? "" : "ar"} har två poster som säger olika saker. Vi
+        räknar preliminärt med en av dem tills Mats har granskat dagarna. Inget är raderat.
+      </p>
+      <ul className="mt-2 list-disc pl-5">
+        {stats.unresolvedDates.map((d) => (
+          <li key={`${d.track}-${d.date}`}>
+            {d.track} {d.date}
+          </li>
+        ))}
+      </ul>
+      <Button variant="secondary" className="mt-3 h-12" asChild>
+        <Link to="/historik-dubbletter">Granska dubbletterna</Link>
+      </Button>
+    </div>
+  ) : null;
+
 
   if (!stats?.hasData) {
     return (
