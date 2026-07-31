@@ -200,6 +200,7 @@ type ExecuteResult = {
   changes?: number;
   sources?: SourceState[];
   summary?: ReturnType<typeof summarizeSources>;
+  accounting?: RunAccounting;
   error?: string | null;
 };
 
