@@ -20,6 +20,7 @@ import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
+import { Route as AuthenticatedExperttipsRouteImport } from './routes/_authenticated/experttips'
 import { Route as AuthenticatedHistorikRouteImport } from './routes/_authenticated/historik'
 import { Route as AuthenticatedHistorikimportRouteImport } from './routes/_authenticated/historikimport'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
@@ -94,6 +95,11 @@ const AuthenticatedEfterrapporterRoute =
 const AuthenticatedEkonomiRoute = AuthenticatedEkonomiRouteImport.update({
   id: '/ekonomi',
   path: '/ekonomi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExperttipsRoute = AuthenticatedExperttipsRouteImport.update({
+  id: '/experttips',
+  path: '/experttips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHistorikRoute = AuthenticatedHistorikRouteImport.update({
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/experttips': typeof AuthenticatedExperttipsRoute
   '/historik': typeof AuthenticatedHistorikRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/experttips': typeof AuthenticatedExperttipsRoute
   '/historik': typeof AuthenticatedHistorikRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   '/_authenticated/automation': typeof AuthenticatedAutomationRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/_authenticated/experttips': typeof AuthenticatedExperttipsRoute
   '/_authenticated/historik': typeof AuthenticatedHistorikRoute
   '/_authenticated/historikimport': typeof AuthenticatedHistorikimportRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
@@ -301,6 +310,7 @@ export interface FileRouteTypes {
     | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/experttips'
     | '/historik'
     | '/historikimport'
     | '/installningar'
@@ -331,6 +341,7 @@ export interface FileRouteTypes {
     | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/experttips'
     | '/historik'
     | '/historikimport'
     | '/installningar'
@@ -362,6 +373,7 @@ export interface FileRouteTypes {
     | '/_authenticated/automation'
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
+    | '/_authenticated/experttips'
     | '/_authenticated/historik'
     | '/_authenticated/historikimport'
     | '/_authenticated/installningar'
@@ -474,6 +486,13 @@ declare module '@tanstack/react-router' {
       path: '/ekonomi'
       fullPath: '/ekonomi'
       preLoaderRoute: typeof AuthenticatedEkonomiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/experttips': {
+      id: '/_authenticated/experttips'
+      path: '/experttips'
+      fullPath: '/experttips'
+      preLoaderRoute: typeof AuthenticatedExperttipsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historik': {
@@ -611,6 +630,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAutomationRoute: typeof AuthenticatedAutomationRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
+  AuthenticatedExperttipsRoute: typeof AuthenticatedExperttipsRoute
   AuthenticatedHistorikRoute: typeof AuthenticatedHistorikRoute
   AuthenticatedHistorikimportRoute: typeof AuthenticatedHistorikimportRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
@@ -631,6 +651,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAutomationRoute: AuthenticatedAutomationRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
+  AuthenticatedExperttipsRoute: AuthenticatedExperttipsRoute,
   AuthenticatedHistorikRoute: AuthenticatedHistorikRoute,
   AuthenticatedHistorikimportRoute: AuthenticatedHistorikimportRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
