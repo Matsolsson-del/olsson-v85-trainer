@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AlertTriangle, CheckCircle2, Circle } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { AiImportCard } from "@/components/round/AiImportCard";
+import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,24 +67,27 @@ function Step({
   children: React.ReactNode;
 }) {
   const Icon = state === "klar" ? CheckCircle2 : state === "pagar" ? AlertTriangle : Circle;
+  const stateLabel = state === "klar" ? "Klar" : state === "pagar" ? "Pågår" : "Väntar";
+  const stateClass =
+    state === "klar"
+      ? "text-primary"
+      : state === "pagar"
+        ? "text-warning"
+        : "text-muted-foreground";
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-3 text-xl">
+        <CardTitle className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 text-xl">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-base font-semibold text-primary">
             {number}
           </span>
-          <span className="flex-1">{title}</span>
-          <Icon
-            className={
-              state === "klar"
-                ? "h-6 w-6 text-primary"
-                : state === "pagar"
-                  ? "h-6 w-6 text-amber-400"
-                  : "h-6 w-6 text-muted-foreground"
-            }
-            aria-hidden
-          />
+          <span className="min-w-0">{title}</span>
+          <span
+            className={`col-span-2 flex items-center gap-2 text-base font-medium ${stateClass}`}
+          >
+            <Icon className="h-5 w-5 shrink-0" aria-hidden />
+            {stateLabel}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-base leading-relaxed">{children}</CardContent>
@@ -140,6 +144,7 @@ function VeckansSpel() {
 
 function Workflow({ roundId }: { roundId: string }) {
   const qc = useQueryClient();
+  const { groupId } = useActiveGroupId();
   const invalidateRound = useInvalidateRound(roundId);
   const { data, isLoading } = useRoundData(roundId);
   const { data: responsibility } = useRoundResponsibility(roundId);
@@ -269,7 +274,7 @@ function Workflow({ roundId }: { roundId: string }) {
           {readiness.ready ? (
             <p className="font-medium text-primary">Underlaget är komplett och analysklart.</p>
           ) : (
-            <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 p-4">
+            <div className="rounded-lg border border-warning/50 bg-warning/15 p-4">
               <p className="text-lg font-semibold">Underlaget är inte komplett</p>
               <p className="mt-1 text-muted-foreground">Det här saknas:</p>
               <ul className="mt-2 list-disc space-y-1 pl-6">
@@ -347,7 +352,7 @@ function Workflow({ roundId }: { roundId: string }) {
                   <div
                     key={c.id}
                     className={`rounded-lg border p-4 ${
-                      c.recommended ? "border-primary bg-primary/5" : "border-white/10"
+                      c.recommended ? "border-primary bg-primary/5" : "border-border"
                     }`}
                   >
                     <div className="flex flex-wrap items-center gap-2">
@@ -378,7 +383,7 @@ function Workflow({ roundId }: { roundId: string }) {
                             .join(" · ")}
                     </p>
                     {c.weakest_assumption && (
-                      <p className="mt-2 rounded-md bg-amber-400/10 p-3">
+                      <p className="mt-2 rounded-md bg-warning/15 p-3">
                         <span className="font-medium">Svagaste antagande: </span>
                         {c.weakest_assumption}
                       </p>
@@ -409,11 +414,12 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 5. Veckans ansvarige */}
-        <Step number={5} title="Veckans ansvarige" state={isResponsible ? "klar" : "vantar"}>
+        <Step number={5} title="Veckans ansvarige" state={responsibility ? "klar" : "vantar"}>
           <p className="text-2xl font-semibold">{responsibleName}</p>
           <p className="text-muted-foreground">
             Ansvarig väljer system, gör eventuella justeringar och lämnar in spelet hos ATG.
           </p>
+          <ResponsibilityCard roundId={roundId} groupId={groupId} />
         </Step>
 
         {/* 6. Slutkontroll */}
@@ -438,7 +444,7 @@ function Workflow({ roundId }: { roundId: string }) {
                 ))}
               </ul>
               {((finalCheck as any).suggestions ?? []).length > 0 && (
-                <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 p-4">
+                <div className="rounded-lg border border-warning/50 bg-warning/15 p-4">
                   <p className="font-semibold">Förslag till ansvarig</p>
                   <ul className="mt-2 list-disc space-y-1 pl-6">
                     {((finalCheck as any).suggestions as string[]).map((s, i) => (
@@ -544,19 +550,19 @@ function Workflow({ roundId }: { roundId: string }) {
             <CardTitle className="text-xl">Så här hänger det ihop</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 text-base md:grid-cols-3">
-            <div className="rounded-lg border border-white/10 p-4">
+            <div className="rounded-lg border border-border p-4">
               <p className="font-semibold">Verifierade fakta</p>
               <p className="text-muted-foreground">
                 Startfält, kuskar, utrustning och streckprocent, hämtat från ATG.
               </p>
             </div>
-            <div className="rounded-lg border border-white/10 p-4">
+            <div className="rounded-lg border border-border p-4">
               <p className="font-semibold">AI:ns bedömning</p>
               <p className="text-muted-foreground">
                 Vinstchanser och systemförslag. Alltid förslag – aldrig beslut.
               </p>
             </div>
-            <div className="rounded-lg border border-white/10 p-4">
+            <div className="rounded-lg border border-border p-4">
               <p className="font-semibold">Gruppens beslut</p>
               <p className="text-muted-foreground">
                 Det system ni valde och lämnade in. Sparas separat så efterrapporten kan se om ett

@@ -57,6 +57,7 @@ function AuthPage() {
   } = useQuery({ queryKey: ["gate"], queryFn: () => gateFn(), retry: false });
 
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const autoTried = useRef(false);
@@ -135,12 +136,15 @@ function AuthPage() {
   const unlocked = gate?.unlocked === true;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="font-serif text-3xl font-semibold text-primary">
             Välkommen till Familjen Olssons Travhub
           </h1>
+          <p className="mt-2 text-base text-muted-foreground">
+            Två steg: skriv familjens lösenord och tryck sedan på ditt namn.
+          </p>
         </div>
 
         <div className="space-y-4 rounded-lg bg-card p-6 text-card-foreground shadow-lg">
@@ -149,23 +153,39 @@ function AuthPage() {
           ) : !unlocked ? (
             <form onSubmit={submitPassword} className="space-y-4">
               <label htmlFor="familypw" className="block text-lg font-medium">
-                Ange familjens lösenord
+                Steg 1: Ange familjens lösenord
               </label>
-              <Input
-                id="familypw"
-                type="password"
-                autoComplete="current-password"
-                className="h-14 text-lg"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <Button type="submit" size="lg" className="h-14 w-full text-lg" disabled={busy !== null}>
+              <div className="flex gap-2">
+                <Input
+                  id="familypw"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  className="h-14 flex-1 text-lg"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="h-14 px-4 text-base"
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword ? "Dölj" : "Visa"}
+                </Button>
+              </div>
+              <Button
+                type="submit"
+                size="lg"
+                className="h-14 w-full text-lg"
+                disabled={busy !== null || password.trim() === ""}
+              >
                 {busy === "password" ? "Kontrollerar …" : "Fortsätt"}
               </Button>
             </form>
           ) : (
             <>
-              <p className="text-lg font-medium">Vem är du?</p>
+              <p className="text-lg font-medium">Steg 2: Vem är du?</p>
               {SLOTS.map((slot) => (
                 <Button
                   key={slot.slug}

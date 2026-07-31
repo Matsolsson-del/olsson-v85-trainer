@@ -64,12 +64,25 @@ export function formatPercent(value: number | null | undefined, decimals = 1): s
 
 export function formatDate(value: string | null | undefined): string {
   if (!value) return "–";
-  return new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium" }).format(new Date(value));
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "–";
+  // Rena datum (YYYY-MM-DD) ska inte tidszonsjusteras.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium", timeZone: "UTC" }).format(d);
+  }
+  return new Intl.DateTimeFormat("sv-SE", {
+    dateStyle: "medium",
+    timeZone: "Europe/Stockholm",
+  }).format(d);
 }
 
 export function formatDateTime(value: string | null | undefined): string {
   if (!value) return "–";
-  return new Intl.DateTimeFormat("sv-SE", { dateStyle: "medium", timeStyle: "short" }).format(
-    new Date(value),
-  );
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "–";
+  return new Intl.DateTimeFormat("sv-SE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Europe/Stockholm",
+  }).format(d);
 }

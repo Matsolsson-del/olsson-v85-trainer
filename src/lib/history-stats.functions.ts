@@ -10,6 +10,14 @@ export const getHistoryStats = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }): Promise<HistoryStats> => {
+    const { data: member, error: memberError } = await context.supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", data.groupId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (memberError) throw memberError;
+    if (!member) throw new Error("Du är inte med i den här gruppen.");
     const { data: rows, error } = await context.supabase
       .from("imported_history_rounds")
       .select(

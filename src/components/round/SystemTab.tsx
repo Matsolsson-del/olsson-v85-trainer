@@ -64,7 +64,7 @@ export function SystemTab({ data, roundId }: { data: RoundData; roundId: string 
     return (
       <div className="rounded-lg border border-dashed border-white/20 px-6 py-12 text-center">
         <p className="font-medium">Inget system byggt ännu</p>
-        <p className="mt-1 text-sm text-white/70">
+        <p className="mt-1 text-base text-muted-foreground">
           Skapa ett system för att markera hästar per avdelning inom budget.
         </p>
         <Button className="mt-4" onClick={createSystem} disabled={busy}>

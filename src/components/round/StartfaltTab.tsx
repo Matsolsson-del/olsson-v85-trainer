@@ -23,7 +23,7 @@ export function StartfaltTab({ data, roundId }: { data: RoundData; roundId: stri
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-white/70">
+      <p className="text-base text-muted-foreground">
         Registrera startfältet per avdelning. Markera strukna hästar – de exkluderas automatiskt ur
         analys och system.
       </p>

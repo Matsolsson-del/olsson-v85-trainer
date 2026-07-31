@@ -16,6 +16,17 @@ async function assertOwner(context: any, groupId: string) {
   if (data.role !== "owner") throw new Error("Bara gruppens ägare kan importera historik.");
 }
 
+async function assertMember(context: any, groupId: string) {
+  const { data, error } = await context.supabase
+    .from("group_members")
+    .select("user_id")
+    .eq("group_id", groupId)
+    .eq("user_id", context.userId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) throw new Error("Du är inte med i den här gruppen.");
+}
+
 function failure(mode: "preview" | "import", message: string) {
   return {
     ok: false as const,
@@ -125,6 +136,7 @@ export const listImportedHistory = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
+    await assertMember(context, data.groupId);
     const { data: rows, error } = await context.supabase
       .from("imported_history_rounds")
       .select("*")
