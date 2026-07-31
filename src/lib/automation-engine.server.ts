@@ -14,6 +14,13 @@ import {
   tipKey,
   type SourceState,
 } from "./automation-core";
+import {
+  accountingSummary,
+  emptyAccounting,
+  type CandidateVerification,
+  type ExpectedRound,
+  type RunAccounting,
+} from "./tip-validation";
 import { matchSlot, nextRetryAt, nextRun, targetSaturday } from "./v85-schedule";
 import { SOURCE_REGISTRY, fetchSources, type SourceDefinition } from "./expert-tips-sources.server";
 
