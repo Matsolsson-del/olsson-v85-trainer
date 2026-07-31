@@ -142,7 +142,7 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
 
 
     const entries = (race.race_entries ?? []).filter((e: any) => !e.scratched);
-    if (entries.length === 0) continue;
+    if (entries.length === 0) return false;
 
     const lines = entries
       .slice()
