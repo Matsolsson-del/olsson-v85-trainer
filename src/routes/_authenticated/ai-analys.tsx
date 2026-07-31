@@ -180,8 +180,39 @@ function Redovisning({ roundId }: { roundId: string }) {
                       </p>
                     )}
                     {assessment?.notes && (
-                      <p className="text-muted-foreground">{assessment.notes}</p>
+                      <p className="whitespace-pre-line text-muted-foreground">{assessment.notes}</p>
                     )}
+
+                    {(tipsByLeg.get(Number(race.leg_number)) ?? []).length > 0 && (
+                      <div className="rounded-lg border border-border bg-muted/40 p-4">
+                        <p className="font-semibold">Experternas tips för avdelningen</p>
+                        <ul className="mt-2 space-y-2">
+                          {(tipsByLeg.get(Number(race.leg_number)) ?? []).map((tip: any) => {
+                            const alts = Array.isArray(tip.alternatives)
+                              ? tip.alternatives.filter(Boolean)
+                              : [];
+                            return (
+                              <li key={tip.id}>
+                                <span className="font-medium">
+                                  {[tip.source_name, tip.expert].filter(Boolean).join(" / ")}:
+                                </span>{" "}
+                                {[
+                                  tip.top_pick ? `Förstaval ${tip.top_pick}` : null,
+                                  alts.length > 0 ? `Alternativ ${alts.join(", ")}` : null,
+                                  tip.longshot ? `Skräll ${tip.longshot}` : null,
+                                  tip.warning ? `Varning: ${tip.warning}` : null,
+                                  tip.note ?? null,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" · ") || "Inget tydligt tips"}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+
+
 
                     <ul className="space-y-3">
                       {rows.map((row: any) => {
