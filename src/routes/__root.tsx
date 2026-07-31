@@ -20,7 +20,7 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="font-serif text-7xl font-bold text-primary">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Sidan hittades inte</h2>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-2 text-base text-foreground/80">
           Sidan du letar efter finns inte eller har flyttats.
         </p>
         <div className="mt-6">
@@ -49,7 +49,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Sidan kunde inte laddas
         </h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-2 text-base text-foreground/80">
           Något gick fel. Försök igen eller gå tillbaka till startsidan.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">

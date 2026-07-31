@@ -34,7 +34,7 @@ function Index() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background px-4 text-center">
       <h1 className="font-serif text-3xl font-semibold text-primary">Familjen Olssons Travhub</h1>
-      <p className="text-base text-muted-foreground">Laddar din analyshubb …</p>
+      <p className="text-base text-foreground/80">Laddar din analyshubb …</p>
     </div>
   );
 }

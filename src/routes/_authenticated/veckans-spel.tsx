@@ -79,7 +79,7 @@ function Step({
               state === "klar"
                 ? "h-6 w-6 text-primary"
                 : state === "pagar"
-                  ? "h-6 w-6 text-amber-400"
+                  ? "h-6 w-6 text-warning"
                   : "h-6 w-6 text-muted-foreground"
             }
             aria-hidden
@@ -269,7 +269,7 @@ function Workflow({ roundId }: { roundId: string }) {
           {readiness.ready ? (
             <p className="font-medium text-primary">Underlaget är komplett och analysklart.</p>
           ) : (
-            <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 p-4">
+            <div className="rounded-lg border border-warning/50 bg-warning/15 p-4">
               <p className="text-lg font-semibold">Underlaget är inte komplett</p>
               <p className="mt-1 text-muted-foreground">Det här saknas:</p>
               <ul className="mt-2 list-disc space-y-1 pl-6">
@@ -347,7 +347,7 @@ function Workflow({ roundId }: { roundId: string }) {
                   <div
                     key={c.id}
                     className={`rounded-lg border p-4 ${
-                      c.recommended ? "border-primary bg-primary/5" : "border-white/10"
+                      c.recommended ? "border-primary bg-primary/5" : "border-border"
                     }`}
                   >
                     <div className="flex flex-wrap items-center gap-2">
@@ -378,7 +378,7 @@ function Workflow({ roundId }: { roundId: string }) {
                             .join(" · ")}
                     </p>
                     {c.weakest_assumption && (
-                      <p className="mt-2 rounded-md bg-amber-400/10 p-3">
+                      <p className="mt-2 rounded-md bg-warning/15 p-3">
                         <span className="font-medium">Svagaste antagande: </span>
                         {c.weakest_assumption}
                       </p>
@@ -438,7 +438,7 @@ function Workflow({ roundId }: { roundId: string }) {
                 ))}
               </ul>
               {((finalCheck as any).suggestions ?? []).length > 0 && (
-                <div className="rounded-lg border border-amber-400/40 bg-amber-400/10 p-4">
+                <div className="rounded-lg border border-warning/50 bg-warning/15 p-4">
                   <p className="font-semibold">Förslag till ansvarig</p>
                   <ul className="mt-2 list-disc space-y-1 pl-6">
                     {((finalCheck as any).suggestions as string[]).map((s, i) => (
@@ -544,19 +544,19 @@ function Workflow({ roundId }: { roundId: string }) {
             <CardTitle className="text-xl">Så här hänger det ihop</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 text-base md:grid-cols-3">
-            <div className="rounded-lg border border-white/10 p-4">
+            <div className="rounded-lg border border-border p-4">
               <p className="font-semibold">Verifierade fakta</p>
               <p className="text-muted-foreground">
                 Startfält, kuskar, utrustning och streckprocent, hämtat från ATG.
               </p>
             </div>
-            <div className="rounded-lg border border-white/10 p-4">
+            <div className="rounded-lg border border-border p-4">
               <p className="font-semibold">AI:ns bedömning</p>
               <p className="text-muted-foreground">
                 Vinstchanser och systemförslag. Alltid förslag – aldrig beslut.
               </p>
             </div>
-            <div className="rounded-lg border border-white/10 p-4">
+            <div className="rounded-lg border border-border p-4">
               <p className="font-semibold">Gruppens beslut</p>
               <p className="text-muted-foreground">
                 Det system ni valde och lämnade in. Sparas separat så efterrapporten kan se om ett
