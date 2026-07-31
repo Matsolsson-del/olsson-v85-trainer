@@ -178,7 +178,7 @@ function AutomationPage() {
                   <div className="min-w-0">
                     <p className="font-medium">{s.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {SOURCE_STATUS_LABEL[s.status] ?? s.status}
+                      {SOURCE_STATUS_LABEL[s.status as keyof typeof SOURCE_STATUS_LABEL] ?? s.status}
                       {s.tips > 0 ? ` – ${s.tips} tips` : ""}
                       {s.lastCheckedAt ? ` – ${formatDateTime(s.lastCheckedAt)}` : ""}
                     </p>
