@@ -521,10 +521,18 @@ async function saveTips(
     raceDate: string;
     sourceId: string | null;
     tips: import("./automation-core").TipRecord[];
+    candidates: CandidateVerification[];
   },
-): Promise<number> {
-  let saved = 0;
+): Promise<{ saved: number; created: number; updated: number; unchanged: number }> {
+  let created = 0;
+  let updated = 0;
+  let unchanged = 0;
+
   for (const tip of params.tips) {
+    // Varje sparat tips måste kunna spåras till en verifierad kandidatsida.
+    const verification = params.candidates.find((c) => c.accepted && c.url === tip.url);
+    if (!verification) continue;
+
     const key = tipKey({
       raceDate: params.raceDate,
       sourceKey: tip.sourceKey,
@@ -550,7 +558,10 @@ async function saveTips(
       .maybeSingle();
 
     // Exakt samma tips igen: hoppa över helt (idempotens).
-    if (existing?.content_hash === hash) continue;
+    if (existing?.content_hash === hash) {
+      unchanged++;
+      continue;
+    }
 
     if (existing) {
       // Tidigare version bevaras, men är inte längre den aktuella.
@@ -576,11 +587,21 @@ async function saveTips(
       longshot: tip.longshot ?? null,
       warning: tip.warning ?? null,
       note: tip.note ?? null,
+      classification: verification.classification,
+      verification_code: verification.code,
+      game_type_verified: verification.gameTypeVerified,
+      date_verified: verification.dateVerified,
+      track_verified: verification.trackVerified,
+      verification_reasons: verification.reasons,
     });
-    if (!error) saved++;
+    if (!error) {
+      if (existing) updated++;
+      else created++;
+    }
   }
-  return saved;
+  return { saved: created + updated, created, updated, unchanged };
 }
+
 
 async function logActivity(
   db: any,
