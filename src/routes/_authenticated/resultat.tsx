@@ -158,55 +158,87 @@ function ResultatDashboard() {
 
           <section>
             <h2 className="mb-3 text-lg font-semibold">Omgång för omgång</h2>
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="text-left text-muted-foreground">
-                      <tr className="border-b border-border">
-                        <th className="px-4 py-3 font-medium">Datum</th>
-                        <th className="px-4 py-3 font-medium">Bana</th>
-                        <th className="px-4 py-3 font-medium">Rätt</th>
-                        <th className="px-4 py-3 text-right font-medium">Insats</th>
-                        <th className="px-4 py-3 text-right font-medium">Vinst</th>
-                        <th className="px-4 py-3 text-right font-medium">Netto</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.rounds.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="px-4 py-6 text-muted-foreground">
-                            Inga omgångar ännu.
-                          </td>
-                        </tr>
-                      ) : (
-                        data.rounds.map((r: any) => (
-                          <tr key={r.roundId} className="border-b border-border/60 last:border-0">
-                            <td className="px-4 py-3">
-                              {new Date(r.date).toLocaleDateString("sv-SE")}
-                            </td>
-                            <td className="px-4 py-3">{r.track ?? "–"}</td>
-                            <td className="px-4 py-3">
-                              {r.correctLegs === null ? "–" : `${r.correctLegs} av ${r.legs || 8}`}
-                            </td>
-                            <td className="px-4 py-3 text-right">{r.cost ? kr(r.cost) : "–"}</td>
-                            <td className="px-4 py-3 text-right">{r.winnings ? kr(r.winnings) : "–"}</td>
-                            <td
-                              className={
-                                "px-4 py-3 text-right font-semibold " +
-                                (r.net > 0 ? "text-emerald-500" : r.net < 0 ? "text-destructive" : "")
-                              }
-                            >
-                              {r.cost || r.winnings ? kr(r.net) : "–"}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+            {data.rounds.length === 0 ? (
+              <Card>
+                <CardContent className="p-6 text-base text-muted-foreground">
+                  Inga omgångar ännu.
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Mobil: ett kort per omgång */}
+                <div className="space-y-3 sm:hidden">
+                  {data.rounds.map((r: any) => (
+                    <Card key={r.roundId}>
+                      <CardContent className="space-y-1 py-4 text-base">
+                        <p className="text-lg font-semibold">
+                          {new Date(r.date).toLocaleDateString("sv-SE")} · {r.track ?? "Okänd bana"}
+                        </p>
+                        <p>
+                          Rätt: {r.correctLegs === null ? "–" : `${r.correctLegs} av ${r.legs || 8}`}
+                        </p>
+                        <p>Insats: {r.cost ? kr(r.cost) : "–"}</p>
+                        <p>Vinst: {r.winnings ? kr(r.winnings) : "–"}</p>
+                        <p
+                          className={
+                            "font-semibold " +
+                            (r.net > 0 ? "text-success" : r.net < 0 ? "text-destructive" : "")
+                          }
+                        >
+                          Netto: {r.cost || r.winnings ? kr(r.net) : "–"}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+
+                {/* Dator: tabell */}
+                <Card className="hidden sm:block">
+                  <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-base">
+                        <caption className="sr-only">Resultat per spelad omgång</caption>
+                        <thead className="text-left text-muted-foreground">
+                          <tr className="border-b border-border">
+                            <th scope="col" className="px-4 py-3 font-medium">Datum</th>
+                            <th scope="col" className="px-4 py-3 font-medium">Bana</th>
+                            <th scope="col" className="px-4 py-3 font-medium">Rätt</th>
+                            <th scope="col" className="px-4 py-3 text-right font-medium">Insats</th>
+                            <th scope="col" className="px-4 py-3 text-right font-medium">Vinst</th>
+                            <th scope="col" className="px-4 py-3 text-right font-medium">Netto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {data.rounds.map((r: any) => (
+                            <tr key={r.roundId} className="border-b border-border/60 last:border-0">
+                              <td className="px-4 py-3">
+                                {new Date(r.date).toLocaleDateString("sv-SE")}
+                              </td>
+                              <td className="px-4 py-3">{r.track ?? "–"}</td>
+                              <td className="px-4 py-3">
+                                {r.correctLegs === null ? "–" : `${r.correctLegs} av ${r.legs || 8}`}
+                              </td>
+                              <td className="px-4 py-3 text-right">{r.cost ? kr(r.cost) : "–"}</td>
+                              <td className="px-4 py-3 text-right">
+                                {r.winnings ? kr(r.winnings) : "–"}
+                              </td>
+                              <td
+                                className={
+                                  "px-4 py-3 text-right font-semibold " +
+                                  (r.net > 0 ? "text-success" : r.net < 0 ? "text-destructive" : "")
+                                }
+                              >
+                                {r.cost || r.winnings ? kr(r.net) : "–"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </section>
         </div>
       )}
