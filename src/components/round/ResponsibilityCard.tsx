@@ -50,9 +50,9 @@ export function ResponsibilityCard({ roundId, groupId }: Props) {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Veckans spelansvarig</CardTitle>
+        <CardTitle className="text-lg">Veckans spelansvarig</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 text-sm">
+      <CardContent className="space-y-3 text-base">
         {isLoading ? (
           <p className="text-muted-foreground">Laddar…</p>
         ) : !responsibility ? (
@@ -61,7 +61,7 @@ export function ResponsibilityCard({ roundId, groupId }: Props) {
               Ingen spelansvarig är tilldelad för omgången ännu.
             </p>
             <Button
-              size="sm"
+              className="h-12 text-base"
               disabled={assign.isPending}
               onClick={() =>
                 run(() => assign.mutateAsync(), "Spelansvarig tilldelad enligt turordningen.")
@@ -85,7 +85,7 @@ export function ResponsibilityCard({ roundId, groupId }: Props) {
                 Byte: {responsibility.change_reason}
               </p>
             )}
-            <p className="text-xs text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Endast spelansvarig låser systemet. Spelet lämnas alltid in hos ATG – appen
               lämnar aldrig in något åt er.
             </p>
@@ -93,14 +93,14 @@ export function ResponsibilityCard({ roundId, groupId }: Props) {
             <div className="flex flex-wrap gap-2">
               {isResponsible && !responsibility.confirmed_at && (
                 <Button
-                  size="sm"
+                  className="h-12 text-base"
                   disabled={confirm.isPending}
                   onClick={() => run(() => confirm.mutateAsync(), "Uppdraget är bekräftat.")}
                 >
                   Bekräfta uppdraget
                 </Button>
               )}
-              <Button size="sm" variant="secondary" onClick={() => setShowChange((v) => !v)}>
+              <Button className="h-12 text-base" variant="secondary" onClick={() => setShowChange((v) => !v)}>
                 Byt ansvarig
               </Button>
             </div>
@@ -139,7 +139,7 @@ export function ResponsibilityCard({ roundId, groupId }: Props) {
                   </Select>
                 </div>
                 <Button
-                  size="sm"
+                  className="h-12 text-base"
                   disabled={change.isPending || !newUser || !reason.trim()}
                   onClick={async () => {
                     await run(
