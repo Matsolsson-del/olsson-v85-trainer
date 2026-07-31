@@ -20,6 +20,7 @@ import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
+import { Route as AuthenticatedExperttipsRouteImport } from './routes/_authenticated/experttips'
 import { Route as AuthenticatedHistorikRouteImport } from './routes/_authenticated/historik'
 import { Route as AuthenticatedHistorikimportRouteImport } from './routes/_authenticated/historikimport'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
@@ -35,6 +36,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 import { Route as ApiPublicAiImportRouteImport } from './routes/api/public/ai-import'
+import { Route as ApiPublicHooksExperttipsRouteImport } from './routes/api/public/hooks/experttips'
 import { Route as ApiPublicHooksResultatV85RouteImport } from './routes/api/public/hooks/resultat-v85'
 import { Route as ApiPublicHooksVeckansV85RouteImport } from './routes/api/public/hooks/veckans-v85'
 
@@ -93,6 +95,11 @@ const AuthenticatedEfterrapporterRoute =
 const AuthenticatedEkonomiRoute = AuthenticatedEkonomiRouteImport.update({
   id: '/ekonomi',
   path: '/ekonomi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExperttipsRoute = AuthenticatedExperttipsRouteImport.update({
+  id: '/experttips',
+  path: '/experttips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHistorikRoute = AuthenticatedHistorikRouteImport.update({
@@ -176,6 +183,12 @@ const ApiPublicAiImportRoute = ApiPublicAiImportRouteImport.update({
   path: '/api/public/ai-import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksExperttipsRoute =
+  ApiPublicHooksExperttipsRouteImport.update({
+    id: '/api/public/hooks/experttips',
+    path: '/api/public/hooks/experttips',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksResultatV85Route =
   ApiPublicHooksResultatV85RouteImport.update({
     id: '/api/public/hooks/resultat-v85',
@@ -200,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/experttips': typeof AuthenticatedExperttipsRoute
   '/historik': typeof AuthenticatedHistorikRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
@@ -215,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/api/public/ai-import': typeof ApiPublicAiImportRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/experttips': typeof ApiPublicHooksExperttipsRoute
   '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
@@ -229,6 +244,7 @@ export interface FileRoutesByTo {
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/experttips': typeof AuthenticatedExperttipsRoute
   '/historik': typeof AuthenticatedHistorikRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
@@ -244,6 +260,7 @@ export interface FileRoutesByTo {
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/api/public/ai-import': typeof ApiPublicAiImportRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/experttips': typeof ApiPublicHooksExperttipsRoute
   '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
@@ -260,6 +277,7 @@ export interface FileRoutesById {
   '/_authenticated/automation': typeof AuthenticatedAutomationRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/_authenticated/experttips': typeof AuthenticatedExperttipsRoute
   '/_authenticated/historik': typeof AuthenticatedHistorikRoute
   '/_authenticated/historikimport': typeof AuthenticatedHistorikimportRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
@@ -275,6 +293,7 @@ export interface FileRoutesById {
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/api/public/ai-import': typeof ApiPublicAiImportRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/experttips': typeof ApiPublicHooksExperttipsRoute
   '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
@@ -291,6 +310,7 @@ export interface FileRouteTypes {
     | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/experttips'
     | '/historik'
     | '/historikimport'
     | '/installningar'
@@ -306,6 +326,7 @@ export interface FileRouteTypes {
     | '/omgangar/$roundId'
     | '/api/public/ai-import'
     | '/omgangar/'
+    | '/api/public/hooks/experttips'
     | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   fileRoutesByTo: FileRoutesByTo
@@ -320,6 +341,7 @@ export interface FileRouteTypes {
     | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/experttips'
     | '/historik'
     | '/historikimport'
     | '/installningar'
@@ -335,6 +357,7 @@ export interface FileRouteTypes {
     | '/omgangar/$roundId'
     | '/api/public/ai-import'
     | '/omgangar'
+    | '/api/public/hooks/experttips'
     | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   id:
@@ -350,6 +373,7 @@ export interface FileRouteTypes {
     | '/_authenticated/automation'
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
+    | '/_authenticated/experttips'
     | '/_authenticated/historik'
     | '/_authenticated/historikimport'
     | '/_authenticated/installningar'
@@ -365,6 +389,7 @@ export interface FileRouteTypes {
     | '/_authenticated/omgangar/$roundId'
     | '/api/public/ai-import'
     | '/_authenticated/omgangar/'
+    | '/api/public/hooks/experttips'
     | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   fileRoutesById: FileRoutesById
@@ -379,6 +404,7 @@ export interface RootRouteChildren {
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicAiImportRoute: typeof ApiPublicAiImportRoute
+  ApiPublicHooksExperttipsRoute: typeof ApiPublicHooksExperttipsRoute
   ApiPublicHooksResultatV85Route: typeof ApiPublicHooksResultatV85Route
   ApiPublicHooksVeckansV85Route: typeof ApiPublicHooksVeckansV85Route
 }
@@ -460,6 +486,13 @@ declare module '@tanstack/react-router' {
       path: '/ekonomi'
       fullPath: '/ekonomi'
       preLoaderRoute: typeof AuthenticatedEkonomiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/experttips': {
+      id: '/_authenticated/experttips'
+      path: '/experttips'
+      fullPath: '/experttips'
+      preLoaderRoute: typeof AuthenticatedExperttipsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historik': {
@@ -567,6 +600,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAiImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/experttips': {
+      id: '/api/public/hooks/experttips'
+      path: '/api/public/hooks/experttips'
+      fullPath: '/api/public/hooks/experttips'
+      preLoaderRoute: typeof ApiPublicHooksExperttipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/resultat-v85': {
       id: '/api/public/hooks/resultat-v85'
       path: '/api/public/hooks/resultat-v85'
@@ -590,6 +630,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAutomationRoute: typeof AuthenticatedAutomationRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
+  AuthenticatedExperttipsRoute: typeof AuthenticatedExperttipsRoute
   AuthenticatedHistorikRoute: typeof AuthenticatedHistorikRoute
   AuthenticatedHistorikimportRoute: typeof AuthenticatedHistorikimportRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
@@ -610,6 +651,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAutomationRoute: AuthenticatedAutomationRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
+  AuthenticatedExperttipsRoute: AuthenticatedExperttipsRoute,
   AuthenticatedHistorikRoute: AuthenticatedHistorikRoute,
   AuthenticatedHistorikimportRoute: AuthenticatedHistorikimportRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
@@ -638,6 +680,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicAiImportRoute: ApiPublicAiImportRoute,
+  ApiPublicHooksExperttipsRoute: ApiPublicHooksExperttipsRoute,
   ApiPublicHooksResultatV85Route: ApiPublicHooksResultatV85Route,
   ApiPublicHooksVeckansV85Route: ApiPublicHooksVeckansV85Route,
 }

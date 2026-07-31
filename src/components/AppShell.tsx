@@ -12,6 +12,7 @@ import {
   LogOut,
   MessageSquare,
   Menu,
+  Newspaper,
   Settings,
   Grid3x3,
   Sparkles,
@@ -31,7 +32,7 @@ import { forgetPerson } from "@/lib/person-memory";
 const SIMPLE_NAV = [
   { to: "/veckans-spel", label: "Veckans spel", icon: CalendarDays },
   { to: "/oversikt", label: "Översikt", icon: LayoutDashboard },
-
+  { to: "/experttips", label: "Experttips", icon: Newspaper },
   { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
   { to: "/resultat", label: "Resultat", icon: Trophy },
   { to: "/historik", label: "Historik", icon: History },
