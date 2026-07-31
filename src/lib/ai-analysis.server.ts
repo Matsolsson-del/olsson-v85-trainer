@@ -184,21 +184,30 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
       })
       .join("\n");
 
+    const legTips = tipsByLeg.get(Number(race.leg_number)) ?? [];
+    const expertBlock = formatExpertTips(legTips);
+
     const prompt = `V85 avdelning ${race.leg_number}, ${round.race_date}. Startsätt: ${
       race.start_method === "volt" ? "volt" : "auto"
     }, distans ${race.distance_m ?? "okänd"} m.
 
 Startfält:
 ${lines}
-
+${
+  expertBlock
+    ? `\nExperternas tips för den här avdelningen:\n${expertBlock}\n`
+    : "\nInga experttips finns insamlade för den här avdelningen.\n"
+}
 Uppgift:
 1. Bedöm varje ostruken hästs vinstchans i procent. Summan ska bli 100.
 2. Sätt nivå: A = huvudchans, B = utmanare, C = skräll, D = liten chans.
-3. Skriv en mening per häst om varför.
+3. Skriv en mening per häst om varför. Nämn i kommentaren när experterna tydligt håller med eller när du avviker från dem.
 4. Beskriv troligt tempo-/loppupplägg och en kort sammanfattning.
-Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
+5. Skriv i expert_agreement en kort text (1–3 meningar) om var du håller med experterna och var du gör en annan bedömning. Om inga tips finns skriver du "Inga experttips fanns tillgängliga."
+Experttipsen är en datapunkt, inte facit. Låt varken streckprocenten eller experterna styra – motivera avvikelser.`;
 
     const draft = await askModel(prompt);
+
     const byNumber = new Map<number, any>(entries.map((e: any) => [e.start_number, e]));
     const valid = (draft.entries ?? []).filter((d) => byNumber.has(Number(d.start_number)));
     if (valid.length === 0) return false;
