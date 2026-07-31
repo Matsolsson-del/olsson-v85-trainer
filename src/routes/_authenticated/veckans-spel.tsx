@@ -299,6 +299,33 @@ function Workflow({ roundId }: { roundId: string }) {
     .map((r) => ({ leg: r.leg_number, note: r.group_race_assessments?.[0]?.notes ?? null }))
     .filter((r) => r.note);
 
+  const aiLegs = (races as any[]).map((race: any) => {
+    const assessment = race.group_race_assessments?.[0] ?? null;
+    const entryById = new Map<string, any>((race.race_entries ?? []).map((e: any) => [e.id, e]));
+    const rows = [...(assessment?.group_entry_assessments ?? [])]
+      .map((a: any) => ({
+        prob: Number(a.group_win_probability ?? 0),
+        entry: entryById.get(a.race_entry_id),
+      }))
+      .filter((a) => a.entry)
+      .sort((a, b) => b.prob - a.prob);
+    const top = rows[0] ?? null;
+    return {
+      leg: race.leg_number,
+      note: assessment?.notes ?? null,
+      top: top
+        ? {
+            name: `${top.entry.program_number ?? "?"} ${top.entry.horses?.name ?? "Häst"}`,
+            prob: Math.round(top.prob * 10) / 10,
+          }
+        : null,
+      second: rows[1] ? Math.round(rows[1].prob * 10) / 10 : null,
+    };
+  });
+  const aiAnalysed = aiLegs.filter((l) => l.top);
+  const aiSpikes = aiAnalysed.filter((l) => (l.top?.prob ?? 0) >= 50);
+
+
   const versions = (roundSystems as any[]).flatMap((s) => s.system_versions ?? []);
   const currentVersion =
     versions.filter((v: any) => v.locked_at).sort((a: any, b: any) => b.version_number - a.version_number)[0] ??
