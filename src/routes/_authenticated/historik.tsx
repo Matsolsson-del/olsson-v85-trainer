@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { EmptyState, PageHeader } from "@/components/AppShell";
+import { HistoryChartCard } from "@/components/HistoryChartCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useIsOwner } from "@/lib/travhub-queries";
 import { listImportedHistory } from "@/lib/history-import.functions";
-import { getHistoryStats } from "@/lib/history-stats.functions";
-import type { HistoryStats } from "@/lib/history-stats";
 
 export const Route = createFileRoute("/_authenticated/historik")({
   head: () => ({
@@ -43,7 +42,6 @@ function HistorikPage() {
   const { groupId } = useActiveGroupId();
   const isOwner = useIsOwner(groupId);
   const fetchRows = useServerFn(listImportedHistory);
-  const fetchStats = useServerFn(getHistoryStats);
 
   const query = useQuery({
     queryKey: ["imported-history", groupId],
@@ -51,53 +49,16 @@ function HistorikPage() {
     queryFn: () => fetchRows({ data: { groupId: groupId! } }) as Promise<any[]>,
   });
 
-  const statsQuery = useQuery({
-    queryKey: ["history-stats", groupId],
-    enabled: Boolean(groupId),
-    queryFn: () => fetchStats({ data: { groupId: groupId! } }) as Promise<HistoryStats>,
-  });
-  const stats = statsQuery.data;
-
   return (
     <>
       <PageHeader
-        title="Importerad historik"
-        description="Gamla spel som lagts in i efterhand. De blandas aldrig ihop med omgångar som spelats via Travhubben och påverkar inte ekonomin."
+        title="Historik"
+        description="Alla V85-omgångar vi har spelat, med system, spikar, utfall och lärdomar."
       />
 
-      {stats?.hasData ? (
-        <Card className="mb-4">
-          <CardContent className="p-4">
-            <div className="grid gap-3 sm:grid-cols-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Omgångar</p>
-                <p className="text-2xl font-bold">{stats.summary.rounds}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Rätt i snitt</p>
-                <p className="text-2xl font-bold">{stats.summary.avgCorrect ?? "–"} av 8</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Netto totalt</p>
-                <p
-                  className={`text-2xl font-bold ${
-                    stats.summary.net >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
-                  }`}
-                >
-                  {new Intl.NumberFormat("sv-SE").format(stats.summary.net)} kr
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Spikar som vann</p>
-                <p className="text-2xl font-bold">{stats.spikes.hitRate ?? "–"} %</p>
-              </div>
-            </div>
-            <Button variant="secondary" className="mt-4 h-12" asChild>
-              <Link to="/larande">Se hela statistiken</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : null}
+      <div className="mb-4">
+        <HistoryChartCard />
+      </div>
 
       {isOwner ? (
         <div className="mb-4">

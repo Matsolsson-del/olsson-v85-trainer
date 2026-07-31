@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
+import { HistoryChartCard } from "@/components/HistoryChartCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -94,6 +95,9 @@ function OversiktPage() {
           {latest && <SenasteResultat roundId={latest.id} />}
         </div>
       )}
+      <div className="mt-5">
+        <HistoryChartCard />
+      </div>
     </>
   );
 }
