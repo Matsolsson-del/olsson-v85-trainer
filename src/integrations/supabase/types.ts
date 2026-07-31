@@ -675,6 +675,81 @@ export type Database = {
           },
         ]
       }
+      expert_tips_reports: {
+        Row: {
+          consensus: Json
+          created_at: string
+          created_by: string | null
+          disagreements: Json
+          error_message: string | null
+          group_id: string
+          id: string
+          legs: Json
+          model_used: string | null
+          race_date: string
+          round_id: string | null
+          sources: Json
+          status: string
+          summary: string | null
+          track_name: string | null
+          trends: Json
+          updated_at: string
+        }
+        Insert: {
+          consensus?: Json
+          created_at?: string
+          created_by?: string | null
+          disagreements?: Json
+          error_message?: string | null
+          group_id: string
+          id?: string
+          legs?: Json
+          model_used?: string | null
+          race_date: string
+          round_id?: string | null
+          sources?: Json
+          status?: string
+          summary?: string | null
+          track_name?: string | null
+          trends?: Json
+          updated_at?: string
+        }
+        Update: {
+          consensus?: Json
+          created_at?: string
+          created_by?: string | null
+          disagreements?: Json
+          error_message?: string | null
+          group_id?: string
+          id?: string
+          legs?: Json
+          model_used?: string | null
+          race_date?: string
+          round_id?: string | null
+          sources?: Json
+          status?: string
+          summary?: string | null
+          track_name?: string | null
+          trends?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_tips_reports_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_tips_reports_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       final_checks: {
         Row: {
           created_at: string
