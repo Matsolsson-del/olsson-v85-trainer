@@ -157,7 +157,22 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
     .order("leg_number", { ascending: true });
   if (racesError) throw racesError;
 
+  // Aktuella experttips per avdelning – används som extra underlag i analysen.
+  const tipsByLeg = new Map<number, any[]>();
+  const { data: tipRows } = await db
+    .from("expert_tips")
+    .select("leg_number, source_name, expert, top_pick, alternatives, longshot, warning, note")
+    .eq("group_id", round.group_id)
+    .eq("race_date", round.race_date)
+    .eq("is_current", true);
+  for (const tip of tipRows ?? []) {
+    const leg = Number(tip.leg_number);
+    if (!Number.isFinite(leg)) continue;
+    tipsByLeg.set(leg, [...(tipsByLeg.get(leg) ?? []), tip]);
+  }
+
   const failures: string[] = [];
+
 
   async function processRace(race: any): Promise<boolean> {
     const assessment = Array.isArray(race.group_race_assessments)
