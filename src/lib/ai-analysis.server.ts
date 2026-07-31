@@ -21,8 +21,29 @@ type DraftEntry = {
 type DraftRace = {
   pace_scenario: string;
   notes: string;
+  expert_agreement?: string;
   entries: DraftEntry[];
 };
+
+/** Kort textsammanfattning av experternas tips för en avdelning. */
+export function formatExpertTips(tips: any[]): string {
+  if (!tips || tips.length === 0) return "";
+  return tips
+    .map((t) => {
+      const alts = Array.isArray(t.alternatives) ? t.alternatives.filter(Boolean) : [];
+      const parts = [
+        t.top_pick ? `spik/förstaval ${t.top_pick}` : null,
+        alts.length > 0 ? `alternativ ${alts.join(", ")}` : null,
+        t.longshot ? `skräll ${t.longshot}` : null,
+        t.warning ? `varning: ${t.warning}` : null,
+        t.note ? `kommentar: ${t.note}` : null,
+      ].filter(Boolean);
+      const who = [t.source_name, t.expert].filter(Boolean).join(" / ") || "Okänd källa";
+      return `- ${who}: ${parts.length > 0 ? parts.join("; ") : "inget tydligt tips"}`;
+    })
+    .join("\n");
+}
+
 
 function latestShare(entry: any): number | null {
   const snaps = [...(entry.market_snapshots ?? [])].sort((a: any, b: any) =>
@@ -76,11 +97,13 @@ async function askModel(prompt: string): Promise<DraftRace> {
           schema: {
             type: "object",
             additionalProperties: false,
-            required: ["pace_scenario", "notes", "entries"],
+            required: ["pace_scenario", "notes", "expert_agreement", "entries"],
             properties: {
               pace_scenario: { type: "string" },
+              expert_agreement: { type: "string" },
               notes: { type: "string" },
               entries: {
+
                 type: "array",
                 items: {
                   type: "object",
@@ -134,7 +157,22 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
     .order("leg_number", { ascending: true });
   if (racesError) throw racesError;
 
+  // Aktuella experttips per avdelning – används som extra underlag i analysen.
+  const tipsByLeg = new Map<number, any[]>();
+  const { data: tipRows } = await db
+    .from("expert_tips")
+    .select("leg_number, source_name, expert, top_pick, alternatives, longshot, warning, note")
+    .eq("group_id", round.group_id)
+    .eq("race_date", round.race_date)
+    .eq("is_current", true);
+  for (const tip of tipRows ?? []) {
+    const leg = Number(tip.leg_number);
+    if (!Number.isFinite(leg)) continue;
+    tipsByLeg.set(leg, [...(tipsByLeg.get(leg) ?? []), tip]);
+  }
+
   const failures: string[] = [];
+
 
   async function processRace(race: any): Promise<boolean> {
     const assessment = Array.isArray(race.group_race_assessments)
@@ -161,21 +199,30 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
       })
       .join("\n");
 
+    const legTips = tipsByLeg.get(Number(race.leg_number)) ?? [];
+    const expertBlock = formatExpertTips(legTips);
+
     const prompt = `V85 avdelning ${race.leg_number}, ${round.race_date}. Startsätt: ${
       race.start_method === "volt" ? "volt" : "auto"
     }, distans ${race.distance_m ?? "okänd"} m.
 
 Startfält:
 ${lines}
-
+${
+  expertBlock
+    ? `\nExperternas tips för den här avdelningen:\n${expertBlock}\n`
+    : "\nInga experttips finns insamlade för den här avdelningen.\n"
+}
 Uppgift:
 1. Bedöm varje ostruken hästs vinstchans i procent. Summan ska bli 100.
 2. Sätt nivå: A = huvudchans, B = utmanare, C = skräll, D = liten chans.
-3. Skriv en mening per häst om varför.
+3. Skriv en mening per häst om varför. Nämn i kommentaren när experterna tydligt håller med eller när du avviker från dem.
 4. Beskriv troligt tempo-/loppupplägg och en kort sammanfattning.
-Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
+5. Skriv i expert_agreement en kort text (1–3 meningar) om var du håller med experterna och var du gör en annan bedömning. Om inga tips finns skriver du "Inga experttips fanns tillgängliga."
+Experttipsen är en datapunkt, inte facit. Låt varken streckprocenten eller experterna styra – motivera avvikelser.`;
 
     const draft = await askModel(prompt);
+
     const byNumber = new Map<number, any>(entries.map((e: any) => [e.start_number, e]));
     const valid = (draft.entries ?? []).filter((d) => byNumber.has(Number(d.start_number)));
     if (valid.length === 0) return false;
@@ -193,10 +240,15 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
       assessmentId = found?.id as string | undefined;
     }
 
+    const agreement = (draft.expert_agreement ?? "").trim();
+    const notesText = [draft.notes ?? "", agreement ? `Experterna: ${agreement}` : ""]
+      .filter(Boolean)
+      .join("\n\n");
+
     if (assessmentId) {
       await db
         .from("group_race_assessments")
-        .update({ pace_scenario: draft.pace_scenario ?? null, notes: draft.notes ?? null })
+        .update({ pace_scenario: draft.pace_scenario ?? null, notes: notesText || null })
         .eq("id", assessmentId);
     } else {
       const { data: inserted, error } = await db
@@ -206,8 +258,9 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
             race_id: race.id,
             status: "draft",
             pace_scenario: draft.pace_scenario ?? null,
-            notes: draft.notes ?? null,
+            notes: notesText || null,
           },
+
           { onConflict: "race_id" },
         )
         .select("id")
