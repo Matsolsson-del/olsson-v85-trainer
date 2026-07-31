@@ -146,9 +146,21 @@ export async function runAutomationForGroup(params: {
         sources_with_tips: outcome.summary?.withTips ?? 0,
         sources_waiting: outcome.summary?.waiting ?? 0,
         tips_imported: outcome.tips ?? 0,
+        candidates_found: outcome.accounting?.candidates ?? 0,
+        candidates_rejected: outcome.accounting?.rejected ?? 0,
+        candidates_reclassified: outcome.accounting?.reclassified ?? 0,
+        tips_new: outcome.accounting?.newTips ?? 0,
+        tips_updated: outcome.accounting?.updatedTips ?? 0,
+        tips_unchanged: outcome.accounting?.unchangedTips ?? 0,
+        tips_duplicates: outcome.accounting?.duplicates ?? 0,
+        tips_verified_total: outcome.accounting?.verifiedTotal ?? 0,
+        accounting_note: outcome.accounting ? accountingSummary(outcome.accounting) : null,
+        scheduled_for: now.toISOString(),
+        next_run_at: nextRun(now)?.at?.toISOString() ?? null,
         error_message: outcome.error ?? null,
         log: JSON.parse(JSON.stringify(log)),
       })
+
       .eq("id", runId);
 
     return {
