@@ -373,6 +373,120 @@ export type Database = {
           },
         ]
       }
+      automation_locks: {
+        Row: {
+          acquired_at: string
+          lock_key: string
+          run_id: string | null
+        }
+        Insert: {
+          acquired_at?: string
+          lock_key: string
+          run_id?: string | null
+        }
+        Update: {
+          acquired_at?: string
+          lock_key?: string
+          run_id?: string | null
+        }
+        Relationships: []
+      }
+      automation_runs: {
+        Row: {
+          ai_draft_created: boolean
+          created_at: string
+          entries_imported: number
+          error_message: string | null
+          finished_at: string | null
+          game_id: string | null
+          group_id: string
+          id: string
+          log: Json
+          mode: string
+          races_imported: number
+          retries: number
+          round_id: string | null
+          run_type: string
+          slot_key: string | null
+          sources_checked: number
+          sources_waiting: number
+          sources_with_tips: number
+          started_at: string
+          status: string
+          target_race_date: string | null
+          tips_imported: number
+          track_name: string | null
+          triggered_by: string | null
+        }
+        Insert: {
+          ai_draft_created?: boolean
+          created_at?: string
+          entries_imported?: number
+          error_message?: string | null
+          finished_at?: string | null
+          game_id?: string | null
+          group_id: string
+          id?: string
+          log?: Json
+          mode?: string
+          races_imported?: number
+          retries?: number
+          round_id?: string | null
+          run_type: string
+          slot_key?: string | null
+          sources_checked?: number
+          sources_waiting?: number
+          sources_with_tips?: number
+          started_at?: string
+          status?: string
+          target_race_date?: string | null
+          tips_imported?: number
+          track_name?: string | null
+          triggered_by?: string | null
+        }
+        Update: {
+          ai_draft_created?: boolean
+          created_at?: string
+          entries_imported?: number
+          error_message?: string | null
+          finished_at?: string | null
+          game_id?: string | null
+          group_id?: string
+          id?: string
+          log?: Json
+          mode?: string
+          races_imported?: number
+          retries?: number
+          round_id?: string | null
+          run_type?: string
+          slot_key?: string | null
+          sources_checked?: number
+          sources_waiting?: number
+          sources_with_tips?: number
+          started_at?: string
+          status?: string
+          target_race_date?: string | null
+          tips_imported?: number
+          track_name?: string | null
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_runs_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_runs_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bet_snapshots: {
         Row: {
           cost: number | null
@@ -671,6 +785,174 @@ export type Database = {
             columns: ["race_result_id"]
             isOneToOne: false
             referencedRelation: "race_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expert_tip_sources: {
+        Row: {
+          access_note: string | null
+          created_at: string
+          domain: string | null
+          enabled: boolean
+          failure_count: number
+          group_id: string
+          id: string
+          kind: string
+          last_checked_at: string | null
+          last_message: string | null
+          last_status: string
+          name: string
+          next_attempt_at: string | null
+          source_key: string
+          updated_at: string
+        }
+        Insert: {
+          access_note?: string | null
+          created_at?: string
+          domain?: string | null
+          enabled?: boolean
+          failure_count?: number
+          group_id: string
+          id?: string
+          kind?: string
+          last_checked_at?: string | null
+          last_message?: string | null
+          last_status?: string
+          name: string
+          next_attempt_at?: string | null
+          source_key: string
+          updated_at?: string
+        }
+        Update: {
+          access_note?: string | null
+          created_at?: string
+          domain?: string | null
+          enabled?: boolean
+          failure_count?: number
+          group_id?: string
+          id?: string
+          kind?: string
+          last_checked_at?: string | null
+          last_message?: string | null
+          last_status?: string
+          name?: string
+          next_attempt_at?: string | null
+          source_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_tip_sources_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      expert_tips: {
+        Row: {
+          alternatives: Json
+          content_hash: string
+          created_at: string
+          expert: string | null
+          fetched_at: string
+          group_id: string
+          hedges: Json
+          id: string
+          is_current: boolean
+          leg_number: number | null
+          longshot: string | null
+          note: string | null
+          published_at: string | null
+          race_date: string
+          ranking: Json
+          round_id: string | null
+          source_id: string | null
+          source_key: string
+          source_name: string
+          system_row: string | null
+          tip_key: string
+          top_pick: string | null
+          url: string | null
+          version: number
+          warning: string | null
+        }
+        Insert: {
+          alternatives?: Json
+          content_hash: string
+          created_at?: string
+          expert?: string | null
+          fetched_at?: string
+          group_id: string
+          hedges?: Json
+          id?: string
+          is_current?: boolean
+          leg_number?: number | null
+          longshot?: string | null
+          note?: string | null
+          published_at?: string | null
+          race_date: string
+          ranking?: Json
+          round_id?: string | null
+          source_id?: string | null
+          source_key: string
+          source_name: string
+          system_row?: string | null
+          tip_key: string
+          top_pick?: string | null
+          url?: string | null
+          version?: number
+          warning?: string | null
+        }
+        Update: {
+          alternatives?: Json
+          content_hash?: string
+          created_at?: string
+          expert?: string | null
+          fetched_at?: string
+          group_id?: string
+          hedges?: Json
+          id?: string
+          is_current?: boolean
+          leg_number?: number | null
+          longshot?: string | null
+          note?: string | null
+          published_at?: string | null
+          race_date?: string
+          ranking?: Json
+          round_id?: string | null
+          source_id?: string | null
+          source_key?: string
+          source_name?: string
+          system_row?: string | null
+          tip_key?: string
+          top_pick?: string | null
+          url?: string | null
+          version?: number
+          warning?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_tips_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_tips_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_tips_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "expert_tip_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -1879,6 +2161,93 @@ export type Database = {
             columns: ["trainer_id"]
             isOneToOne: false
             referencedRelation: "trainers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      race_fact_changes: {
+        Row: {
+          after_value: Json | null
+          automation_run_id: string | null
+          before_value: Json | null
+          description: string
+          detected_at: string
+          field: string
+          group_id: string
+          horse_name: string | null
+          id: string
+          important: boolean
+          leg_number: number | null
+          race_entry_id: string | null
+          race_id: string | null
+          round_id: string
+        }
+        Insert: {
+          after_value?: Json | null
+          automation_run_id?: string | null
+          before_value?: Json | null
+          description: string
+          detected_at?: string
+          field: string
+          group_id: string
+          horse_name?: string | null
+          id?: string
+          important?: boolean
+          leg_number?: number | null
+          race_entry_id?: string | null
+          race_id?: string | null
+          round_id: string
+        }
+        Update: {
+          after_value?: Json | null
+          automation_run_id?: string | null
+          before_value?: Json | null
+          description?: string
+          detected_at?: string
+          field?: string
+          group_id?: string
+          horse_name?: string | null
+          id?: string
+          important?: boolean
+          leg_number?: number | null
+          race_entry_id?: string | null
+          race_id?: string | null
+          round_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "race_fact_changes_automation_run_id_fkey"
+            columns: ["automation_run_id"]
+            isOneToOne: false
+            referencedRelation: "automation_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_fact_changes_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_fact_changes_race_entry_id_fkey"
+            columns: ["race_entry_id"]
+            isOneToOne: false
+            referencedRelation: "race_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_fact_changes_race_id_fkey"
+            columns: ["race_id"]
+            isOneToOne: false
+            referencedRelation: "races"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "race_fact_changes_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
             referencedColumns: ["id"]
           },
         ]

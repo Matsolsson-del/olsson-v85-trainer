@@ -1,120 +1,196 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { importV85Now } from "@/lib/atg.functions";
 import { PageHeader } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/labels";
-import { useActiveGroupId } from "@/lib/travhub-queries";
-import { useJobRuns, useJobs } from "@/lib/responsibility-queries";
+import {
+  getAutomationOverview,
+  runAutomationNow,
+  setSourceEnabled,
+} from "@/lib/automation-admin.functions";
+import { FACTS_STATUS_LABEL, SOURCE_STATUS_LABEL } from "@/lib/automation-core";
 
 export const Route = createFileRoute("/_authenticated/automation")({
   head: () => ({
     meta: [
-      { title: "Automation – Familjen Olssons Travhub" },
+      { title: "Automatisk hämtning – Familjen Olssons Travhub" },
       {
         name: "description",
-        content: "Veckans körningsplan, jobbstatus, fel och manuella uppgifter.",
+        content:
+          "Se om veckans V85-underlag och experttipsen har hämtats, vilka källor som svarat och vad som ändrats.",
       },
-      { property: "og:title", content: "Automation – Familjen Olssons Travhub" },
+      { property: "og:title", content: "Automatisk hämtning – Familjen Olssons Travhub" },
       {
         property: "og:description",
-        content: "Övervaka automatiska körningar för V85-omgångarna.",
+        content: "Status för torsdagens automatiska hämtning av V85-underlag och experttips.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AutomationPage,
 });
 
-const STATUS_LABELS: Record<string, string> = {
+const RUN_STATUS: Record<string, string> = {
   running: "Pågår",
   success: "Klar",
-  failed: "Misslyckad",
-  needs_manual: "Kräver manuell åtgärd",
+  partial: "Delvis klar",
+  waiting: "Väntar på underlag",
+  failed: "Misslyckades",
+  skipped: "Hoppades över",
 };
 
+const MODE_LABEL: Record<string, string> = {
+  full: "Full hämtning",
+  followup: "Efterhämtning av tips",
+  facts: "Bara tävlingsfakta",
+  tips: "Bara experttips",
+};
+
+function statusTone(status: string) {
+  if (status === "ok" || status === "ready" || status === "success") return "default";
+  if (status === "temporary_error" || status === "permanent_error" || status === "failed")
+    return "destructive";
+  return "secondary";
+}
+
 function AutomationPage() {
-  const { groupId } = useActiveGroupId();
-  const { data: jobs, refetch: refetchJobs } = useJobs(groupId);
-  const { data: runs, refetch: refetchRuns } = useJobRuns(groupId);
-  const runImport = useServerFn(importV85Now);
-  const [busy, setBusy] = useState(false);
+  const load = useServerFn(getAutomationOverview);
+  const run = useServerFn(runAutomationNow);
+  const toggle = useServerFn(setSourceEnabled);
+  const [busy, setBusy] = useState<string | null>(null);
 
-  const failed = (runs ?? []).filter(
-    (r) => r.status === "failed" || r.status === "needs_manual",
-  );
+  const { data, refetch, isLoading } = useQuery({
+    queryKey: ["automation-overview"],
+    queryFn: () => load({}),
+    refetchInterval: 30_000,
+  });
 
-  async function handleImport() {
-    if (!groupId) return;
-    setBusy(true);
+  async function handleRun(mode: "full" | "facts" | "tips") {
+    setBusy(mode);
+    const id = toast.loading("Hämtar underlag … det kan ta någon minut.");
     try {
-      const res: any = await runImport({ data: { groupId } });
-      toast.success(
-        `${res.created ? "Ny omgång skapad" : "Omgången uppdaterad"}: ${res.trackName} ${res.raceDate} – ${res.races} avdelningar, ${res.entries} startande.`,
-      );
-      refetchJobs();
-      refetchRuns();
+      const res: any = await run({ data: { mode } });
+      toast.success(res.message ?? "Hämtningen är klar.", { id });
+      refetch();
     } catch (e: any) {
-      toast.error(e?.message ?? "Importen misslyckades.");
+      toast.error(e?.message ?? "Hämtningen misslyckades.", { id });
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
+
+  async function handleToggle(sourceKey: string, enabled: boolean) {
+    try {
+      await toggle({ data: { sourceKey, enabled } });
+      refetch();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Kunde inte ändra källan.");
+    }
+  }
+
+  const changes = data?.changes ?? [];
+  const importantChanges = changes.filter((c: any) => c.important);
 
   return (
     <>
       <PageHeader
-        title="Automation"
-        description="Körningsplan, senaste jobb och manuella uppgifter."
+        title="Automatisk hämtning"
+        description="Varje torsdag klockan 07:00 hämtas lördagens V85 och experttipsen automatiskt."
         actions={
-          <Button onClick={handleImport} disabled={!groupId || busy}>
-            {busy ? "Hämtar från ATG …" : "Importera veckans V85 nu"}
+          <Button
+            onClick={() => handleRun("full")}
+            disabled={busy !== null}
+            className="h-12"
+          >
+            {busy === "full" ? "Hämtar …" : "Hämta allt nu"}
           </Button>
         }
       />
 
-
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">AI-import</CardTitle>
+            <CardTitle className="text-base">Status för lördagens omgång</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <p className="text-muted-foreground">
-              Låt din AI skicka in veckans färdiga underlag automatiskt. Här finns adress,
-              API-nyckel, senaste försök och exempelfil.
-            </p>
-            <Button asChild variant="secondary" className="h-12">
-              <Link to="/ai-import">Öppna AI-import</Link>
-            </Button>
+          <CardContent className="space-y-3 text-sm">
+            {isLoading ? (
+              <p className="text-muted-foreground">Hämtar status …</p>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={statusTone(data?.factsStatus ?? "") as any}>
+                    {FACTS_STATUS_LABEL[data?.factsStatus ?? "waiting"]}
+                  </Badge>
+                  <span className="text-muted-foreground">
+                    {data?.round
+                      ? `${data.round.trackName ?? "Okänd bana"} ${data.saturday} – ${data.round.races} avdelningar, ${data.round.entries} startande.`
+                      : `Ingen omgång hämtad för ${data?.saturday} ännu.`}
+                  </span>
+                </div>
+                <p className="text-muted-foreground">
+                  {data?.sourceSummary?.withTips ?? 0} av {data?.sourceSummary?.checked ?? 0}{" "}
+                  källor har publicerat tips. Nästa automatiska körning:{" "}
+                  {data?.nextRun ? formatDateTime(data.nextRun) : "–"}.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="secondary"
+                    className="h-11"
+                    onClick={() => handleRun("facts")}
+                    disabled={busy !== null}
+                  >
+                    {busy === "facts" ? "Hämtar …" : "Hämta bara tävlingsfakta"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="h-11"
+                    onClick={() => handleRun("tips")}
+                    disabled={busy !== null}
+                  >
+                    {busy === "tips" ? "Hämtar …" : "Hämta bara experttips"}
+                  </Button>
+                  <Button asChild variant="outline" className="h-11">
+                    <Link to="/ai-import">Öppna AI-import</Link>
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Veckans körningsplan</CardTitle>
+            <CardTitle className="text-base">Experttipskällor</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {(jobs ?? []).length === 0 ? (
-              <p className="text-muted-foreground">
-                Inga automationsjobb är konfigurerade ännu. Jobben aktiveras i nästa etapp
-                (källadaptrar och AI-analys).
-              </p>
+          <CardContent className="space-y-3 text-sm">
+            {(data?.sources ?? []).length === 0 ? (
+              <p className="text-muted-foreground">Källorna registreras vid första körningen.</p>
             ) : (
-              (jobs ?? []).map((j) => (
-                <div key={j.id} className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="font-medium">{j.job_type}</p>
+              (data?.sources ?? []).map((s: any) => (
+                <div key={s.key} className="flex items-start justify-between gap-3 border-b pb-2 last:border-0">
+                  <div className="min-w-0">
+                    <p className="font-medium">{s.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {j.schedule_cron ?? "Manuell körning"}
+                      {SOURCE_STATUS_LABEL[s.status as keyof typeof SOURCE_STATUS_LABEL] ?? s.status}
+                      {s.tips > 0 ? ` – ${s.tips} tips` : ""}
+                      {s.lastCheckedAt ? ` – ${formatDateTime(s.lastCheckedAt)}` : ""}
                     </p>
+                    {s.message ? (
+                      <p className="text-xs text-muted-foreground">{s.message}</p>
+                    ) : null}
                   </div>
-                  <Badge variant={j.active ? "secondary" : "outline"}>
-                    {j.active ? "Aktivt" : "Pausat"}
-                  </Badge>
+                  <Switch
+                    checked={s.status !== "access_denied"}
+                    onCheckedChange={(v) => handleToggle(s.key, v)}
+                    aria-label={`Slå på eller av ${s.name}`}
+                  />
                 </div>
               ))
             )}
@@ -123,21 +199,28 @@ function AutomationPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Manuella uppgifter och fel</CardTitle>
+            <CardTitle className="text-base">Ändringar i underlaget</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {failed.length === 0 ? (
-              <p className="text-muted-foreground">Inga misslyckade körningar.</p>
+            {changes.length === 0 ? (
+              <p className="text-muted-foreground">Inga ändringar sedan förra hämtningen.</p>
             ) : (
-              failed.map((r) => (
-                <div key={r.id} className="rounded-md border p-2">
-                  <p className="font-medium">{r.job_type}</p>
-                  <p className="text-xs text-destructive">{r.error_message ?? "Okänt fel"}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatDateTime(r.started_at)}
+              <>
+                {importantChanges.length > 0 ? (
+                  <p className="rounded-md bg-muted p-2 text-xs">
+                    {importantChanges.length} viktig(a) ändring(ar) – kontrollera systemet innan
+                    spelstopp.
                   </p>
-                </div>
-              ))
+                ) : null}
+                {changes.slice(0, 12).map((c: any) => (
+                  <div key={c.id} className="flex items-start justify-between gap-2">
+                    <span>{c.description}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {formatDateTime(c.created_at)}
+                    </span>
+                  </div>
+                ))}
+              </>
             )}
           </CardContent>
         </Card>
@@ -147,16 +230,22 @@ function AutomationPage() {
             <CardTitle className="text-base">Senaste körningar</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {(runs ?? []).length === 0 ? (
+            {(data?.runs ?? []).length === 0 ? (
               <p className="text-muted-foreground">Inga körningar loggade ännu.</p>
             ) : (
-              (runs ?? []).map((r) => (
-                <div key={r.id} className="flex items-center justify-between gap-3">
-                  <span>{r.job_type}</span>
+              (data?.runs ?? []).map((r: any) => (
+                <div
+                  key={r.id}
+                  className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 last:border-0"
+                >
+                  <span>{MODE_LABEL[r.mode] ?? r.mode}</span>
                   <span className="text-xs text-muted-foreground">
-                    {formatDateTime(r.started_at)}
+                    {formatDateTime(r.started_at)} – {r.races_imported} avd, {r.entries_imported}{" "}
+                    startande, {r.tips_imported} tips
                   </span>
-                  <Badge variant="outline">{STATUS_LABELS[r.status] ?? r.status}</Badge>
+                  <Badge variant={statusTone(r.status) as any}>
+                    {RUN_STATUS[r.status] ?? r.status}
+                  </Badge>
                 </div>
               ))
             )}
