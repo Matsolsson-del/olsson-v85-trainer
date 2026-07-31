@@ -88,18 +88,16 @@ function OmgangarPage() {
   return (
     <>
       <PageHeader
-        title="Historik"
-        description="Alla omgångar vi spelat – med insats, vinst och hur många avdelningar vi hade rätt på."
+        title="Omgångar i hubben"
+        description="Omgångar som skapats här i Travhubben. Längst ned ser du hur alla våra spel har gått."
         actions={groupId ? <NewRoundDialog groupId={groupId} onCreated={refetch} /> : null}
       />
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold">Sammanlagt</h2>
-        {dashLoading ? (
-          <Skeleton className="h-28 w-full" />
-        ) : !dash ? (
-          <p className="text-sm text-muted-foreground">Ingen historik att visa ännu.</p>
-        ) : (
+      {dashLoading ? (
+        <Skeleton className="mb-8 h-28 w-full" />
+      ) : dash && dash.totals.rounds > 0 ? (
+        <section className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold">Sammanlagt i hubben</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Spelade omgångar" value={String(dash.totals.rounds)} />
             <Stat label="Satsat totalt" value={kr(dash.totals.cost)} />
@@ -127,8 +125,18 @@ function OmgangarPage() {
               tone="good"
             />
           </div>
-        )}
-      </section>
+        </section>
+      ) : (
+        <p className="mb-8 text-sm text-muted-foreground">
+          Ingen omgång i hubben har fått resultat inlagt ännu. Alla tidigare spel finns under{" "}
+          <Link to="/historik" className="underline">
+            Historik
+          </Link>
+          .
+        </p>
+      )}
+
+
 
       <h2 className="mb-3 text-lg font-semibold">Omgång för omgång</h2>
       {isLoading ? (
