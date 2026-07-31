@@ -23,10 +23,10 @@ export const getAutomationOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const groupId = await firstGroupId(context);
-    const { targetSaturday, nextRun, SLOT_PLAN } = await import("@/lib/v85-schedule");
+    const { targetSaturday, nextRun, SCHEDULE } = await import("@/lib/v85-schedule");
     const { factsStatus, summarizeSources } = await import("@/lib/automation-core");
 
-    const saturday = targetSaturday();
+    const saturday = targetSaturday(new Date());
 
     const [runsRes, sourcesRes, roundRes, changesRes] = await Promise.all([
       context.supabase
@@ -96,8 +96,8 @@ export const getAutomationOverview = createServerFn({ method: "GET" })
       sources,
       runs: runsRes.data ?? [],
       changes: changesRes.data ?? [],
-      nextRun: nextRun().at.toISOString(),
-      plan: SLOT_PLAN,
+      nextRun: nextRun(new Date()).at.toISOString(),
+      plan: SCHEDULE,
     };
   });
 
