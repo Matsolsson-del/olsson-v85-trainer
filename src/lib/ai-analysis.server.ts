@@ -176,7 +176,7 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
     const draft = await askModel(prompt);
     const byNumber = new Map<number, any>(entries.map((e: any) => [e.start_number, e]));
     const valid = (draft.entries ?? []).filter((d) => byNumber.has(Number(d.start_number)));
-    if (valid.length === 0) continue;
+    if (valid.length === 0) return false;
     const normalized = normalize(valid);
 
     let assessmentId = assessment?.id as string | undefined;
