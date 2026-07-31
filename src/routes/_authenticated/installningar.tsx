@@ -33,7 +33,12 @@ export const Route = createFileRoute("/_authenticated/installningar")({
 function InstallningarPage() {
   const { user } = useAuth();
   const { groupId, groups, refetchGroups } = useActiveGroupId();
-  const { data: members, refetch: refetchMembers } = useMembers(groupId);
+  const {
+    data: members,
+    refetch: refetchMembers,
+    isLoading: membersLoading,
+    error: membersError,
+  } = useMembers(groupId);
   const isOwner = useIsOwner(groupId);
   const [groupName, setGroupName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
@@ -77,16 +82,27 @@ function InstallningarPage() {
             <CardTitle className="text-base">Medlemmar</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            {(members ?? []).map((m: any) => (
-              <div key={m.id} className="flex items-center justify-between gap-3">
-                <span>{m.profiles?.display_name ?? m.profiles?.email ?? "Medlem"}</span>
-                <Badge variant="secondary">{m.role === "owner" ? "Ägare" : "Medlem"}</Badge>
+            {!groupId || membersLoading ? (
+              <p className="text-muted-foreground">Hämtar medlemmar …</p>
+            ) : membersError ? (
+              <div className="space-y-2">
+                <p>Vi kunde inte hämta medlemmarna. Kontrollera anslutningen och försök igen.</p>
+                <Button size="sm" onClick={() => refetchMembers()}>
+                  Försök igen
+                </Button>
               </div>
-            ))}
-            {(members ?? []).length === 0 && (
+            ) : (members ?? []).length === 0 ? (
               <p className="text-muted-foreground">Inga medlemmar ännu.</p>
+            ) : (
+              (members ?? []).map((m: any) => (
+                <div key={m.id} className="flex items-center justify-between gap-3">
+                  <span>{m.profiles?.display_name ?? m.profiles?.email ?? "Medlem"}</span>
+                  <Badge variant="secondary">{m.role === "owner" ? "Ägare" : "Medlem"}</Badge>
+                </div>
+              ))
             )}
           </CardContent>
+
         </Card>
 
         <Card>
