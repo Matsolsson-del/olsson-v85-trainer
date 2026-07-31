@@ -97,10 +97,11 @@ async function askModel(prompt: string): Promise<DraftRace> {
           schema: {
             type: "object",
             additionalProperties: false,
-            required: ["pace_scenario", "notes", "entries"],
+            required: ["pace_scenario", "notes", "expert_agreement", "entries"],
             properties: {
               pace_scenario: { type: "string" },
-              notes: { type: "string" },
+              expert_agreement: { type: "string" },
+
               entries: {
                 type: "array",
                 items: {
