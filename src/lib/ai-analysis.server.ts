@@ -134,10 +134,12 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
     .order("leg_number", { ascending: true });
   if (racesError) throw racesError;
 
-  let updated = 0;
-  for (const race of races ?? []) {
+  const failures: string[] = [];
+
+  async function processRace(race: any): Promise<boolean> {
     const assessment = race.group_race_assessments?.[0];
-    if (assessment?.status === "locked") continue;
+    if (assessment?.status === "locked") return false;
+
 
     const entries = (race.race_entries ?? []).filter((e: any) => !e.scratched);
     if (entries.length === 0) continue;
