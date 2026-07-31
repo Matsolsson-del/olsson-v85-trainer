@@ -12,6 +12,7 @@ import {
   LogOut,
   MessageSquare,
   Menu,
+  Newspaper,
   Settings,
   Grid3x3,
   Sparkles,
