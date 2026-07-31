@@ -20,6 +20,7 @@ import { Route as AuthenticatedAnalyseraRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAutomationRouteImport } from './routes/_authenticated/automation'
 import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authenticated/efterrapporter'
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
+import { Route as AuthenticatedHistorikRouteImport } from './routes/_authenticated/historik'
 import { Route as AuthenticatedHistorikimportRouteImport } from './routes/_authenticated/historikimport'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
 import { Route as AuthenticatedKommenteraRouteImport } from './routes/_authenticated/kommentera'
@@ -92,6 +93,11 @@ const AuthenticatedEfterrapporterRoute =
 const AuthenticatedEkonomiRoute = AuthenticatedEkonomiRouteImport.update({
   id: '/ekonomi',
   path: '/ekonomi',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistorikRoute = AuthenticatedHistorikRouteImport.update({
+  id: '/historik',
+  path: '/historik',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHistorikimportRoute =
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/historik': typeof AuthenticatedHistorikRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
   '/kommentera': typeof AuthenticatedKommenteraRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/automation': typeof AuthenticatedAutomationRoute
   '/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/historik': typeof AuthenticatedHistorikRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
   '/kommentera': typeof AuthenticatedKommenteraRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/_authenticated/automation': typeof AuthenticatedAutomationRoute
   '/_authenticated/efterrapporter': typeof AuthenticatedEfterrapporterRoute
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
+  '/_authenticated/historik': typeof AuthenticatedHistorikRoute
   '/_authenticated/historikimport': typeof AuthenticatedHistorikimportRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
   '/_authenticated/kommentera': typeof AuthenticatedKommenteraRoute
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/historik'
     | '/historikimport'
     | '/installningar'
     | '/kommentera'
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/automation'
     | '/efterrapporter'
     | '/ekonomi'
+    | '/historik'
     | '/historikimport'
     | '/installningar'
     | '/kommentera'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/_authenticated/automation'
     | '/_authenticated/efterrapporter'
     | '/_authenticated/ekonomi'
+    | '/_authenticated/historik'
     | '/_authenticated/historikimport'
     | '/_authenticated/installningar'
     | '/_authenticated/kommentera'
@@ -448,6 +460,13 @@ declare module '@tanstack/react-router' {
       path: '/ekonomi'
       fullPath: '/ekonomi'
       preLoaderRoute: typeof AuthenticatedEkonomiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historik': {
+      id: '/_authenticated/historik'
+      path: '/historik'
+      fullPath: '/historik'
+      preLoaderRoute: typeof AuthenticatedHistorikRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historikimport': {
@@ -571,6 +590,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAutomationRoute: typeof AuthenticatedAutomationRoute
   AuthenticatedEfterrapporterRoute: typeof AuthenticatedEfterrapporterRoute
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
+  AuthenticatedHistorikRoute: typeof AuthenticatedHistorikRoute
   AuthenticatedHistorikimportRoute: typeof AuthenticatedHistorikimportRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
   AuthenticatedKommenteraRoute: typeof AuthenticatedKommenteraRoute
@@ -590,6 +610,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAutomationRoute: AuthenticatedAutomationRoute,
   AuthenticatedEfterrapporterRoute: AuthenticatedEfterrapporterRoute,
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
+  AuthenticatedHistorikRoute: AuthenticatedHistorikRoute,
   AuthenticatedHistorikimportRoute: AuthenticatedHistorikimportRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
   AuthenticatedKommenteraRoute: AuthenticatedKommenteraRoute,
