@@ -213,6 +213,46 @@
         "outputSchema": null
       },
       {
+        "name": "get_history_import_format",
+        "title": "Hämta format för historikimport",
+        "description": "Returnerar ett strikt JSON-schema plus ett komplett exempel för import av historiska V85-spel med import_betting_history. Innehåller bana, datum, budget, radpris, angivet och beräknat radantal/kostnad, valda hästar per avdelning, spikar, verifierade vinnare, antal rätt, utbetalning, nettoresultat, analys, lärdomar, datakvalitet, källa, osäkerhetsnotering samt ursprungligt och reviderade system. Anropa detta först.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "import_betting_history",
+        "title": "Importera historiska V85-spel",
+        "description": "Importerar en eller flera historiska V85-omgångar som avslutade historikposter med statusen 'Importerad historik'. Kör alltid mode='preview' först – då returneras förhandsgranskning och valideringsfel utan att något sparas. Importen är idempotent, skriver aldrig över befintliga poster utan overwrite_existing=true, importerar aldrig osäkra uppgifter som verifierade och påverkar aldrig gruppens ekonomi. Hämta formatet med get_history_import_format.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "history_json": {
+              "type": "string",
+              "description": "Hela historiken som en JSON-sträng enligt get_history_import_format: { mode, overwrite_existing, rounds: [...] }."
+            }
+          },
+          "required": [
+            "history_json"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "create_risk_flag",
         "title": "Skapa riskflagga",
         "description": "Lägg en riskflagga (varning eller observation) på en omgång, eventuellt kopplad till en avdelning.",
