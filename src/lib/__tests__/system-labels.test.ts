@@ -37,12 +37,11 @@ describe("formatHedges", () => {
     { leg_number: 1 },
   ];
 
-  it.each(broken.map((v, i) => [i, v] as const))(
-    "innehåller aldrig undefined/null/NaN (fall %i)",
-    (_i, value) => {
+  broken.forEach((value, i) => {
+    it(`innehåller aldrig undefined/null/NaN (fall ${i})`, () => {
       expect(formatHedges(value)).not.toMatch(FORBIDDEN);
-    },
-  );
+    });
+  });
 });
 
 describe("hedgeHorseCount", () => {
@@ -71,12 +70,11 @@ describe("formatSpikes", () => {
     [{ leg_number: NaN, entry_id: undefined }],
   ];
 
-  it.each(broken.map((v, i) => [i, v] as const))(
-    "innehåller aldrig undefined/null/NaN (fall %i)",
-    (_i, value) => {
+  broken.forEach((value, i) => {
+    it(`innehåller aldrig undefined/null/NaN (fall ${i})`, () => {
       expect(formatSpikes(value, label)).not.toMatch(FORBIDDEN);
-    },
-  );
+    });
+  });
 
   it("tål att etikettfunktionen kastar", () => {
     const text = formatSpikes([{ leg_number: 1, entry_id: "x" }], () => {
