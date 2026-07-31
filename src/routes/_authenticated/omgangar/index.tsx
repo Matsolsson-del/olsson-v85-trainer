@@ -76,7 +76,8 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "go
 
 function OmgangarPage() {
   const { groupId } = useActiveGroupId();
-  const { data: rounds, isLoading, refetch } = useRounds(groupId);
+  const { data: rounds, isLoading, error: roundsError, refetch } = useRounds(groupId);
+  const roundsLoading = !groupId || isLoading;
   const run = useServerFn(getDashboard);
 
   const { data: dash, isLoading: dashLoading } = useQuery({
@@ -141,12 +142,22 @@ function OmgangarPage() {
 
 
       <h2 className="mb-3 text-lg font-semibold">Omgång för omgång</h2>
-      {isLoading ? (
+      {roundsLoading ? (
         <Skeleton className="h-40 w-full" />
+      ) : roundsError ? (
+        <Card>
+          <CardContent className="space-y-3 py-6">
+            <p className="text-base font-medium">Vi kunde inte hämta omgångarna.</p>
+            <p className="text-sm text-muted-foreground">
+              Kontrollera anslutningen och försök igen.
+            </p>
+            <Button onClick={() => refetch()}>Försök igen</Button>
+          </CardContent>
+        </Card>
       ) : !rounds || rounds.length === 0 ? (
         <EmptyState
           title="Inga omgångar ännu"
-          description="Skapa den första V85-omgången för gruppen."
+          description="Det finns ännu ingen V85-omgång här. Mats kan skapa eller importera nästa omgång."
         />
       ) : (
         <div className="space-y-3">
