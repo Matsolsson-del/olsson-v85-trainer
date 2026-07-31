@@ -40,12 +40,23 @@ export type HistoryStats = ReturnType<typeof computeHistoryStats>;
 
 export function computeHistoryStats(rowsInput: HistoryRow[]) {
   const all = [...(rowsInput ?? [])];
-  // Spärr: så länge en dubblett är ogranskad får statistiken inte användas alls.
+  // Dubbletter stoppar inte längre statistiken. Så länge en tävlingsdag har två
+  // ogranskade poster räknar vi preliminärt med en av dem (den mest kompletta)
+  // och visar en tydlig notis om att Mats behöver granska dagarna.
   const unresolved = unresolvedDuplicateGroups(all);
-  const blocked = unresolved.length > 0;
-  const rows = (blocked ? [] : statsRows(all))
+  const preliminary = unresolved.length > 0;
+  const score = (r: HistoryRow) =>
+    (r.winners_verified ? 4 : 0) +
+    (r.usable_for_learning !== false ? 2 : 0) +
+    (r.correct_count != null ? 1 : 0);
+  const pickedFromDuplicates = unresolved.map(
+    (g) => [...g.rows].sort((a, b) => score(b) - score(a))[0] as HistoryRow,
+  );
+  const unresolvedIds = new Set(unresolved.flatMap((g) => g.rows.map((r) => r.id)));
+  const rows = [...statsRows(all).filter((r) => !unresolvedIds.has(r.id)), ...pickedFromDuplicates]
     .filter((r) => r.usable_for_learning !== false)
     .sort((a, b) => String(a.race_date).localeCompare(String(b.race_date)));
+
 
   let totalCost = 0;
   let totalPayout = 0;
@@ -235,14 +246,15 @@ export function computeHistoryStats(rowsInput: HistoryRow[]) {
   }
 
   return {
-    blocked,
+    blocked: false,
+    preliminary,
     unresolvedDuplicates: unresolved.length,
     unresolvedDates: unresolved.map((g) => ({
       track: g.rows[0].track_name ?? "Okänd bana",
       date: String(g.rows[0].race_date),
       count: g.rows.length,
     })),
-    hasData: !blocked && rows.length > 0,
+    hasData: rows.length > 0,
     summary: {
       rounds: rows.length,
       totalCost: Math.round(totalCost),
