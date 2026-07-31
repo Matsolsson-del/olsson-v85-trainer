@@ -77,6 +77,13 @@ export type HistoryRoundPreview = {
   idempotency_key: string;
   track_name: string | null;
   race_date: string;
+  legs_count: number;
+  legs: any[];
+  systems_count: number;
+  winners: any[];
+  source: string | null;
+  uncertainty_note: string | null;
+  missing_fields: string[];
   computed_rows: number;
   stated_rows: number | null;
   rows_mismatch: boolean;
@@ -92,7 +99,11 @@ export type HistoryRoundPreview = {
   winners_verified: boolean;
   usable_for_learning: boolean;
   status: "new" | "duplicate_skipped" | "will_overwrite";
+  existing_id: string | null;
+  existing_snapshot: any;
+  differences: { field: string; existing: any; incoming: any }[];
   warnings: string[];
+
 };
 
 function buildRow(input: HistoryRoundInput, groupId: string, userId: string | null) {
@@ -208,6 +219,16 @@ export type HistoryImportOutcome = {
   skipped: number;
   overwritten: number;
   economy_note: string;
+  import_batch_id?: string | null;
+  imported_at?: string | null;
+  results?: { idempotency_key: string; action: "created" | "overwritten" | "skipped" | "failed"; id: string | null; message?: string }[];
+};
+
+export type HistoryImportOptions = {
+  /** Spårbarhet: samma id sparas i revisionsloggen för hela importen. */
+  batchId?: string | null;
+  /** Obligatorisk motivering vid överskrivning. */
+  reason?: string | null;
 };
 
 export async function processHistoryImport(
@@ -215,8 +236,10 @@ export async function processHistoryImport(
   groupId: string,
   userId: string | null,
   raw: unknown,
+  options: HistoryImportOptions = {},
 ): Promise<HistoryImportOutcome> {
   const parsed = historyImportSchemaZod.safeParse(raw);
+
   const economyNote =
     "Historikposter är helt åtskilda från gruppens ekonomi – ingen insats eller transaktion har bokförts.";
 
@@ -259,7 +282,7 @@ export async function processHistoryImport(
 
   const { data: existingRows, error: existingError } = await supabase
     .from("imported_history_rounds")
-    .select("id, idempotency_key")
+    .select("*")
     .eq("group_id", groupId)
     .in("idempotency_key", keys);
   if (existingError) {
@@ -276,11 +299,30 @@ export async function processHistoryImport(
     };
   }
 
-  const existing = new Map((existingRows ?? []).map((r) => [r.idempotency_key as string, r.id as string]));
+  const existing = new Map(
+    (existingRows ?? []).map((r: any) => [r.idempotency_key as string, r]),
+  );
+
+  const DIFF_FIELDS = [
+    "track_name",
+    "race_date",
+    "row_price",
+    "stated_rows",
+    "computed_rows",
+    "stated_cost",
+    "computed_cost",
+    "payout",
+    "net_result",
+    "correct_count",
+    "spike_hits",
+    "data_quality",
+    "winners_verified",
+    "source",
+  ] as const;
 
   const preview: HistoryRoundPreview[] = built.map((b) => {
-    const exists = existing.has(b.row.idempotency_key);
-    const status: HistoryRoundPreview["status"] = !exists
+    const existingRow = existing.get(b.row.idempotency_key) ?? null;
+    const status: HistoryRoundPreview["status"] = !existingRow
       ? "new"
       : input.overwrite_existing
         ? "will_overwrite"
@@ -289,10 +331,36 @@ export async function processHistoryImport(
     if (status === "duplicate_skipped") {
       warnings.push("Omgången finns redan importerad. Sätt overwrite_existing=true för att skriva över.");
     }
+
+    const missing: string[] = [];
+    if (b.row.track_name == null) missing.push("bana");
+    if (b.row.row_price == null) missing.push("radpris");
+    if (b.row.payout == null) missing.push("vinst");
+    if (b.row.correct_count == null) missing.push("antal rätt");
+    if (!b.row.winners_verified) missing.push("verifierade vinnare");
+    if (b.row.source == null) missing.push("informationskälla");
+
+    const differences = existingRow
+      ? DIFF_FIELDS.map((f) => ({
+          field: f,
+          existing: (existingRow as any)[f] ?? null,
+          incoming: (b.row as any)[f] ?? null,
+        })).filter(
+          (d) => JSON.stringify(d.existing ?? null) !== JSON.stringify(d.incoming ?? null),
+        )
+      : [];
+
     return {
       idempotency_key: b.row.idempotency_key,
       track_name: b.row.track_name,
       race_date: b.row.race_date,
+      legs_count: b.row.legs.length,
+      legs: b.row.legs,
+      systems_count: b.row.systems.length,
+      winners: b.row.winners,
+      source: b.row.source,
+      uncertainty_note: b.row.uncertainty_note,
+      missing_fields: missing,
       computed_rows: b.computedRows,
       stated_rows: b.row.stated_rows,
       rows_mismatch: b.rowsMismatch,
@@ -308,9 +376,13 @@ export async function processHistoryImport(
       winners_verified: b.row.winners_verified,
       usable_for_learning: b.usableForLearning,
       status,
+      existing_id: existingRow ? (existingRow.id as string) : null,
+      existing_snapshot: existingRow,
+      differences,
       warnings,
     };
   });
+
 
   if (input.mode === "preview") {
     return {
@@ -330,11 +402,17 @@ export async function processHistoryImport(
   let imported = 0;
   let skipped = 0;
   let overwritten = 0;
+  let failed = 0;
+  const batchId = options.batchId ?? crypto.randomUUID();
+  const importedAt = new Date().toISOString();
+  const results: NonNullable<HistoryImportOutcome["results"]> = [];
 
   for (const b of built) {
-    const existingId = existing.get(b.row.idempotency_key);
+    const existingRow: any = existing.get(b.row.idempotency_key);
+    const existingId: string | undefined = existingRow?.id;
     if (existingId && !input.overwrite_existing) {
       skipped += 1;
+      results.push({ idempotency_key: b.row.idempotency_key, action: "skipped", id: existingId });
       continue;
     }
     if (existingId) {
@@ -344,47 +422,73 @@ export async function processHistoryImport(
         .update(updateRow)
         .eq("id", existingId);
       if (error) {
-        return {
-          ok: false,
-          mode: "import",
-          message: `Kunde inte skriva över ${b.row.idempotency_key}: ${error.message}`,
-          errors: [],
-          preview,
-          imported,
-          skipped,
-          overwritten,
-          economy_note: economyNote,
-        };
+        failed += 1;
+        results.push({
+          idempotency_key: b.row.idempotency_key,
+          action: "failed",
+          id: existingId,
+          message: error.message,
+        });
+        continue;
       }
       overwritten += 1;
+      results.push({ idempotency_key: b.row.idempotency_key, action: "overwritten", id: existingId });
       continue;
     }
-    const { error } = await supabase.from("imported_history_rounds").insert(b.row);
+    const { data: insertedRow, error } = await supabase
+      .from("imported_history_rounds")
+      .insert(b.row)
+      .select("id")
+      .maybeSingle();
     if (error) {
-      return {
-        ok: false,
-        mode: "import",
-        message: `Kunde inte importera ${b.row.idempotency_key}: ${error.message}`,
-        errors: [],
-        preview,
-        imported,
-        skipped,
-        overwritten,
-        economy_note: economyNote,
-      };
+      failed += 1;
+      results.push({
+        idempotency_key: b.row.idempotency_key,
+        action: "failed",
+        id: null,
+        message: error.message,
+      });
+      continue;
     }
     imported += 1;
+    results.push({
+      idempotency_key: b.row.idempotency_key,
+      action: "created",
+      id: (insertedRow?.id as string) ?? null,
+    });
   }
 
+  // Revisionslogg – spårbar via import_batch_id. Innehåller aldrig hemligheter.
+  await supabase.from("activity_log").insert({
+    group_id: groupId,
+    user_id: userId,
+    event_type: "history_import",
+    description: `Historikimport: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade, ${failed} misslyckade.`,
+    after_value: {
+      import_batch_id: batchId,
+      imported_at: importedAt,
+      overwrite_existing: input.overwrite_existing,
+      reason: options.reason ?? null,
+      results,
+    },
+  });
+
   return {
-    ok: true,
+    ok: failed === 0,
     mode: "import",
-    message: `Klart: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade (fanns redan). Status: Importerad historik.`,
+    message:
+      failed === 0
+        ? `Klart: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade (fanns redan). Status: Importerad historik.`
+        : `Delvis lyckad import: ${imported} nya, ${overwritten} överskrivna, ${skipped} överhoppade, ${failed} misslyckade.`,
     errors: [],
     preview,
     imported,
     skipped,
     overwritten,
     economy_note: economyNote,
+    import_batch_id: batchId,
+    imported_at: importedAt,
+    results,
   };
 }
+
