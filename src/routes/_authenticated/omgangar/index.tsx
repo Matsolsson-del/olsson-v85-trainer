@@ -211,7 +211,7 @@ function NewRoundDialog({ groupId, onCreated }: { groupId: string; onCreated: ()
   const [trackName, setTrackName] = useState("");
   const [raceDate, setRaceDate] = useState("");
   const [betStop, setBetStop] = useState("");
-  const [budget, setBudget] = useState("500");
+  const [budget, setBudget] = useState("450");
 
   async function create() {
     if (!raceDate || !betStop) return toast.error("Fyll i datum och spelstopp.");

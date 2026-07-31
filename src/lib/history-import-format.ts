@@ -161,7 +161,7 @@ export function exampleHistoryImportPayload() {
         track_name: "Solvalla",
         race_date: "2025-11-15",
         bet_stop_at: "2025-11-15T16:20:00+01:00",
-        budget: 1000,
+        budget: 450,
         row_price: 0.5,
         stated_cost: 960,
         stated_rows: 1920,
