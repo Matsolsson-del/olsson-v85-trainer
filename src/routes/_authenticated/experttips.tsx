@@ -253,8 +253,10 @@ function ExperttipsPage() {
                   <div key={i} className="rounded-lg border border-border bg-surface p-3">
                     <p className="text-base font-semibold text-foreground">{legLabel(l.leg)}</p>
                     <p className="text-base text-muted-foreground">{l.text}</p>
+                    <SourceRefs urls={l.sourceUrls} />
                   </div>
                 ))}
+
               </CardContent>
             </Card>
           )}
