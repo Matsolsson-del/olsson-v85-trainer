@@ -121,6 +121,18 @@ function HistorikOversikt() {
     [rows],
   );
 
+  const conflictKeys = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const r of rows as any[]) {
+      const key = `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`;
+      map.set(key, (map.get(key) ?? 0) + 1);
+    }
+    return map;
+  }, [rows]);
+
+  const dayCount = conflictKeys.size;
+  const conflictDays = [...conflictKeys.values()].filter((n) => n > 1).length;
+
   const visible = useMemo(() => {
     const filtered = track === "alla" ? rows : rows.filter((r: any) => r.track_name === track);
     const num = (v: any) => (v === null || v === undefined ? Number.NEGATIVE_INFINITY : Number(v));
@@ -215,7 +227,11 @@ function HistorikOversikt() {
       ) : (
         <div className="space-y-4">
           <p className="text-base text-foreground/80">
-            Visar {visible.length} av {rows.length} omgångar.
+            {dayCount} tävlingsdagar och totalt {rows.length} importerade systemposter. Visar{" "}
+            {visible.length} systemposter.
+            {conflictDays
+              ? ` ${conflictDays} tävlingsdagar har flera motstridiga poster och är märkta nedan.`
+              : ""}
           </p>
           {visible.map((r: any) => (
             <Card key={r.id}>
@@ -225,6 +241,13 @@ function HistorikOversikt() {
                     {r.track_name ?? "Okänd bana"} · {formatDate(r.race_date)}
                   </CardTitle>
                   <Badge variant="secondary">Importerad historik</Badge>
+                  {(conflictKeys.get(
+                    `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`,
+                  ) ?? 1) > 1 ? (
+                    <Badge variant="destructive">
+                      Behöver granskas – flera systemposter samma dag
+                    </Badge>
+                  ) : null}
                   <Badge variant="secondary">
                     Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
                   </Badge>

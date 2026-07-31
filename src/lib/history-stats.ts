@@ -1,4 +1,4 @@
-import { statsRows, unresolvedDuplicateGroups } from "@/lib/history-review";
+import { duplicateKey, findDuplicateGroups, statsRows, unresolvedDuplicateGroups } from "@/lib/history-review";
 
 /**
  * Räknar ut statistik från importerad spelhistorik.
@@ -56,6 +56,34 @@ export function computeHistoryStats(rowsInput: HistoryRow[]) {
   const rows = [...statsRows(all).filter((r) => !unresolvedIds.has(r.id)), ...pickedFromDuplicates]
     .filter((r) => r.usable_for_learning !== false)
     .sort((a, b) => String(a.race_date).localeCompare(String(b.race_date)));
+
+  // Tävlingsdagar = unika kombinationer av bana och tävlingsdatum.
+  // Systemposter = alla importerade poster. Konfliktdagar = dagar med flera poster.
+  const usedIds = new Set(rows.map((r) => r.id));
+  const conflictKeys = new Set(findDuplicateGroups(all).map((g) => g.key));
+  const dayMap = new Map<string, HistoryRow[]>();
+  for (const r of all) dayMap.set(duplicateKey(r), [...(dayMap.get(duplicateKey(r)) ?? []), r]);
+  const days = [...dayMap.entries()]
+    .map(([key, list]) => ({
+      key,
+      date: String(list[0].race_date),
+      track: list[0].track_name ?? "Okänd bana",
+      records: list.length,
+      conflict: conflictKeys.has(key),
+      needsReview: unresolved.some((g) => g.key === key),
+      recordIds: list.map((r) => r.id),
+      usedRecordIds: list.filter((r) => usedIds.has(r.id)).map((r) => r.id),
+    }))
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const counts = {
+    raceDays: days.length,
+    importedRecords: all.length,
+    conflictDays: days.filter((d) => d.conflict).length,
+    reviewNeededDays: days.filter((d) => d.needsReview).length,
+    raceDaysInStats: new Set(rows.map((r) => duplicateKey(r))).size,
+  };
+
 
 
   let totalCost = 0;
@@ -248,6 +276,8 @@ export function computeHistoryStats(rowsInput: HistoryRow[]) {
   return {
     blocked: false,
     preliminary,
+    counts,
+    days,
     unresolvedDuplicates: unresolved.length,
     unresolvedDates: unresolved.map((g) => ({
       track: g.rows[0].track_name ?? "Okänd bana",
