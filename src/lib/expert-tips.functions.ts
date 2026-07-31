@@ -88,15 +88,52 @@ export const listRoundExpertTips = createServerFn({ method: "POST" })
     if (!round) return [];
     await assertMember(context, round.group_id);
 
+    // Endast verifierade experttips – nyheter och allmänna sidor visas aldrig som tips.
     const { data: rows, error } = await context.supabase
       .from("expert_tips")
       .select(
-        "id, leg_number, source_name, expert, top_pick, alternatives, longshot, warning, note, url, published_at",
+        "id, leg_number, source_name, expert, top_pick, alternatives, longshot, warning, note, url, published_at, classification, verification_code",
       )
       .eq("group_id", round.group_id)
       .eq("race_date", round.race_date)
       .eq("is_current", true)
+      .eq("classification", "expert_tip")
       .order("leg_number", { ascending: true });
     if (error) throw error;
     return rows ?? [];
   });
+
+/** Nyheter och annat material som granskats men inte är experttips. */
+export const listRoundTipContext = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { roundId: string }) => {
+    if (!data?.roundId) throw new Error("roundId saknas");
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: round, error: roundError } = await context.supabase
+      .from("rounds")
+      .select("id, group_id, race_date")
+      .eq("id", data.roundId)
+      .maybeSingle();
+    if (roundError) throw roundError;
+    if (!round) return { news: [], rejected: [] };
+    await assertMember(context, round.group_id);
+
+    const { data: rows, error } = await context.supabase
+      .from("expert_tip_candidates")
+      .select("id, source_name, url, title, classification, code, accepted, reasons, created_at")
+      .eq("group_id", round.group_id)
+      .eq("race_date", round.race_date)
+      .eq("accepted", false)
+      .order("created_at", { ascending: false })
+      .limit(40);
+    if (error) throw error;
+
+    const all = rows ?? [];
+    return {
+      news: all.filter((r: any) => ["race_news", "horse_news"].includes(r.classification)),
+      rejected: all.filter((r: any) => !["race_news", "horse_news"].includes(r.classification)),
+    };
+  });
+
