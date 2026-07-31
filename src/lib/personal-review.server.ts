@@ -265,7 +265,11 @@ export async function generatePersonalReview(groupId: string, userId: string, di
   }
 
   const recent = lines.slice(0, 40);
+  const { historyContextForGroup } = await import("@/lib/history-stats.server");
+  const historyText = await historyContextForGroup(groupId);
+
   const prompt = [
+    historyText ? `Gruppens spelhistorik (bakgrund, gäller alla tre spelarna):\n${historyText}\n` : "",
     `Spelare: ${displayName}.`,
     `Sammanställning över ${stats.races} avgjorda lopp i ${stats.rounds} omgångar:`,
     JSON.stringify(stats),
