@@ -94,6 +94,9 @@ function OversiktPage() {
           {latest && <SenasteResultat roundId={latest.id} />}
         </div>
       )}
+      <div className="mt-5">
+        <HistoryChartCard />
+      </div>
     </>
   );
 }
