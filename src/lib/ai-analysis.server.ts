@@ -187,7 +187,7 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
         .select("id, status")
         .eq("race_id", race.id)
         .maybeSingle();
-      if (found?.status === "locked") continue;
+      if (found?.status === "locked") return false;
       assessmentId = found?.id as string | undefined;
     }
 
