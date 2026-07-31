@@ -27,12 +27,12 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/_authenticated/omgangar/")({
   head: () => ({
     meta: [
-      { title: "Historik – Familjen Olssons Travhub" },
+      { title: "Omgångar i hubben – Familjen Olssons Travhub" },
       {
         name: "description",
-        content: "Alla V85-omgångar med insats, vinst, netto och antal rätt avdelningar.",
+        content: "Omgångar som skapats i Travhubben, plus familjens samlade V85-historik.",
       },
-      { property: "og:title", content: "Historik – Familjen Olssons Travhub" },
+      { property: "og:title", content: "Omgångar i hubben – Familjen Olssons Travhub" },
       {
         property: "og:description",
         content: "Följ hur familjens V85-spel gått omgång för omgång.",
@@ -41,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/omgangar/")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+
   component: OmgangarPage,
 });
 
