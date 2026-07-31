@@ -41,12 +41,20 @@ function HistorikPage() {
   const { groupId } = useActiveGroupId();
   const isOwner = useIsOwner(groupId);
   const fetchRows = useServerFn(listImportedHistory);
+  const fetchStats = useServerFn(getHistoryStats);
 
   const query = useQuery({
     queryKey: ["imported-history", groupId],
     enabled: Boolean(groupId),
     queryFn: () => fetchRows({ data: { groupId: groupId! } }) as Promise<any[]>,
   });
+
+  const statsQuery = useQuery({
+    queryKey: ["history-stats", groupId],
+    enabled: Boolean(groupId),
+    queryFn: () => fetchStats({ data: { groupId: groupId! } }) as Promise<HistoryStats>,
+  });
+  const stats = statsQuery.data;
 
   return (
     <>
