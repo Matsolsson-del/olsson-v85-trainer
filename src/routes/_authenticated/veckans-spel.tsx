@@ -412,11 +412,12 @@ function Workflow({ roundId }: { roundId: string }) {
         </Step>
 
         {/* 5. Veckans ansvarige */}
-        <Step number={5} title="Veckans ansvarige" state={isResponsible ? "klar" : "vantar"}>
+        <Step number={5} title="Veckans ansvarige" state={responsibility ? "klar" : "vantar"}>
           <p className="text-2xl font-semibold">{responsibleName}</p>
           <p className="text-muted-foreground">
             Ansvarig väljer system, gör eventuella justeringar och lämnar in spelet hos ATG.
           </p>
+          <ResponsibilityCard roundId={roundId} groupId={groupId} />
         </Step>
 
         {/* 6. Slutkontroll */}
