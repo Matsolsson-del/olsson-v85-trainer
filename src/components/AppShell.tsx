@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useActiveGroupId, useIsOwner, useMyProfile } from "@/lib/travhub-queries";
+import { useActiveGroupId, useMyProfile, useOwnerStatus } from "@/lib/travhub-queries";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -48,6 +48,7 @@ const ADVANCED_NAV = [
   { to: "/automation", label: "Automation", icon: Workflow },
   { to: "/ai-import", label: "AI-import", icon: Sparkles },
   { to: "/historikimport", label: "Historikimport", icon: History },
+  { to: "/historik-dubbletter", label: "Granska dubbletter", icon: ClipboardList },
   { to: "/ekonomi", label: "Ekonomi", icon: Coins },
   { to: "/installningar", label: "Inställningar", icon: Settings },
 ] as const;
@@ -55,7 +56,7 @@ const ADVANCED_NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useMyProfile();
   const { groupId } = useActiveGroupId();
-  const isOwner = useIsOwner(groupId);
+  const { isOwner } = useOwnerStatus(groupId);
   const [open, setOpen] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -63,7 +64,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
   const lockFn = useServerFn(lockFamily);
 
-  const advancedVisible = isOwner || showAdvanced;
+  // Avancerade och administrativa val visas bara för gruppens ägare (Mats).
+  const advancedVisible = isOwner && showAdvanced;
   const items = [...SIMPLE_NAV, ...(advancedVisible ? ADVANCED_NAV : [])];
 
   async function switchPerson() {
@@ -124,14 +126,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 );
               })}
 
-              {!isOwner && (
+              {isOwner && (
                 <Button
                   variant="ghost"
                   size="sm"
                   className="mt-2 w-full justify-start px-3 text-sidebar-foreground/70"
                   onClick={() => setShowAdvanced((v) => !v)}
                 >
-                  {showAdvanced ? "Dölj avancerat" : "Visa avancerat"}
+                  {showAdvanced ? "Dölj avancerat" : "Avancerat"}
                 </Button>
               )}
             </nav>

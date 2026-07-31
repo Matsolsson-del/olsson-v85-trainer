@@ -21,7 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
-import { useActiveGroupId, useIsOwner, useMyProfile } from "@/lib/travhub-queries";
+import { useActiveGroupId, useMyProfile, useOwnerStatus } from "@/lib/travhub-queries";
 import {
   commitHistoryImport,
   getHistoryImportFormat,
@@ -111,7 +111,7 @@ function StepHeader({ step, current, title, hint }: { step: StepState; current: 
 
 function HistorikImportPage() {
   const { groupId } = useActiveGroupId();
-  const isOwner = useIsOwner(groupId);
+  const { isOwner, isLoading: ownerLoading, isError: ownerError } = useOwnerStatus(groupId);
   const { data: profile } = useMyProfile();
 
   const runPreview = useServerFn(previewHistoryImport);
@@ -314,6 +314,28 @@ function HistorikImportPage() {
       `historikimport-kvitto-${stamp}.csv`,
       rows.map((r) => r.map((c: string) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n"),
       "text/csv",
+    );
+  }
+
+  if (ownerLoading) {
+    return (
+      <>
+        <PageHeader title="Historikimport" description="Hämtar din behörighet …" />
+        <Skeleton className="h-64 w-full" />
+      </>
+    );
+  }
+
+  if (ownerError) {
+    return (
+      <>
+        <PageHeader title="Historikimport" />
+        <Card>
+          <CardContent className="p-6 text-base">
+            Det gick inte att kontrollera behörigheten just nu. Ladda om sidan och försök igen.
+          </CardContent>
+        </Card>
+      </>
     );
   }
 
