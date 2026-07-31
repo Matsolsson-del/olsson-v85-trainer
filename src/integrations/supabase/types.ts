@@ -393,8 +393,13 @@ export type Database = {
       }
       automation_runs: {
         Row: {
+          accounting_note: string | null
           ai_draft_created: boolean
+          candidates_found: number
+          candidates_reclassified: number
+          candidates_rejected: number
           created_at: string
+          delay_seconds: number | null
           entries_imported: number
           error_message: string | null
           finished_at: string | null
@@ -403,10 +408,12 @@ export type Database = {
           id: string
           log: Json
           mode: string
+          next_run_at: string | null
           races_imported: number
           retries: number
           round_id: string | null
           run_type: string
+          scheduled_for: string | null
           slot_key: string | null
           sources_checked: number
           sources_waiting: number
@@ -414,13 +421,24 @@ export type Database = {
           started_at: string
           status: string
           target_race_date: string | null
+          timezone: string
+          tips_duplicates: number
           tips_imported: number
+          tips_new: number
+          tips_unchanged: number
+          tips_updated: number
+          tips_verified_total: number
           track_name: string | null
           triggered_by: string | null
         }
         Insert: {
+          accounting_note?: string | null
           ai_draft_created?: boolean
+          candidates_found?: number
+          candidates_reclassified?: number
+          candidates_rejected?: number
           created_at?: string
+          delay_seconds?: number | null
           entries_imported?: number
           error_message?: string | null
           finished_at?: string | null
@@ -429,10 +447,12 @@ export type Database = {
           id?: string
           log?: Json
           mode?: string
+          next_run_at?: string | null
           races_imported?: number
           retries?: number
           round_id?: string | null
           run_type: string
+          scheduled_for?: string | null
           slot_key?: string | null
           sources_checked?: number
           sources_waiting?: number
@@ -440,13 +460,24 @@ export type Database = {
           started_at?: string
           status?: string
           target_race_date?: string | null
+          timezone?: string
+          tips_duplicates?: number
           tips_imported?: number
+          tips_new?: number
+          tips_unchanged?: number
+          tips_updated?: number
+          tips_verified_total?: number
           track_name?: string | null
           triggered_by?: string | null
         }
         Update: {
+          accounting_note?: string | null
           ai_draft_created?: boolean
+          candidates_found?: number
+          candidates_reclassified?: number
+          candidates_rejected?: number
           created_at?: string
+          delay_seconds?: number | null
           entries_imported?: number
           error_message?: string | null
           finished_at?: string | null
@@ -455,10 +486,12 @@ export type Database = {
           id?: string
           log?: Json
           mode?: string
+          next_run_at?: string | null
           races_imported?: number
           retries?: number
           round_id?: string | null
           run_type?: string
+          scheduled_for?: string | null
           slot_key?: string | null
           sources_checked?: number
           sources_waiting?: number
@@ -466,7 +499,13 @@ export type Database = {
           started_at?: string
           status?: string
           target_race_date?: string | null
+          timezone?: string
+          tips_duplicates?: number
           tips_imported?: number
+          tips_new?: number
+          tips_unchanged?: number
+          tips_updated?: number
+          tips_verified_total?: number
           track_name?: string | null
           triggered_by?: string | null
         }
@@ -789,9 +828,73 @@ export type Database = {
           },
         ]
       }
+      expert_tip_candidates: {
+        Row: {
+          accepted: boolean
+          automation_run_id: string | null
+          classification: string
+          code: string
+          created_at: string
+          date_verified: boolean
+          game_type_verified: boolean
+          group_id: string
+          id: string
+          race_date: string
+          reasons: Json
+          round_id: string | null
+          source_key: string
+          source_name: string
+          tip_signals: Json
+          title: string | null
+          track_verified: boolean
+          url: string
+        }
+        Insert: {
+          accepted?: boolean
+          automation_run_id?: string | null
+          classification: string
+          code: string
+          created_at?: string
+          date_verified?: boolean
+          game_type_verified?: boolean
+          group_id: string
+          id?: string
+          race_date: string
+          reasons?: Json
+          round_id?: string | null
+          source_key: string
+          source_name: string
+          tip_signals?: Json
+          title?: string | null
+          track_verified?: boolean
+          url: string
+        }
+        Update: {
+          accepted?: boolean
+          automation_run_id?: string | null
+          classification?: string
+          code?: string
+          created_at?: string
+          date_verified?: boolean
+          game_type_verified?: boolean
+          group_id?: string
+          id?: string
+          race_date?: string
+          reasons?: Json
+          round_id?: string | null
+          source_key?: string
+          source_name?: string
+          tip_signals?: Json
+          title?: string | null
+          track_verified?: boolean
+          url?: string
+        }
+        Relationships: []
+      }
       expert_tip_sources: {
         Row: {
           access_note: string | null
+          allowed_url_patterns: Json
           created_at: string
           domain: string | null
           enabled: boolean
@@ -802,13 +905,20 @@ export type Database = {
           last_checked_at: string | null
           last_message: string | null
           last_status: string
+          last_verified_tip_at: string | null
+          min_interval_minutes: number
           name: string
           next_attempt_at: string | null
+          paywall: boolean
+          quality_status: string
+          reject_url_patterns: Json
           source_key: string
+          supported_games: Json
           updated_at: string
         }
         Insert: {
           access_note?: string | null
+          allowed_url_patterns?: Json
           created_at?: string
           domain?: string | null
           enabled?: boolean
@@ -819,13 +929,20 @@ export type Database = {
           last_checked_at?: string | null
           last_message?: string | null
           last_status?: string
+          last_verified_tip_at?: string | null
+          min_interval_minutes?: number
           name: string
           next_attempt_at?: string | null
+          paywall?: boolean
+          quality_status?: string
+          reject_url_patterns?: Json
           source_key: string
+          supported_games?: Json
           updated_at?: string
         }
         Update: {
           access_note?: string | null
+          allowed_url_patterns?: Json
           created_at?: string
           domain?: string | null
           enabled?: boolean
@@ -836,9 +953,15 @@ export type Database = {
           last_checked_at?: string | null
           last_message?: string | null
           last_status?: string
+          last_verified_tip_at?: string | null
+          min_interval_minutes?: number
           name?: string
           next_attempt_at?: string | null
+          paywall?: boolean
+          quality_status?: string
+          reject_url_patterns?: Json
           source_key?: string
+          supported_games?: Json
           updated_at?: string
         }
         Relationships: [
@@ -854,10 +977,13 @@ export type Database = {
       expert_tips: {
         Row: {
           alternatives: Json
+          classification: string
           content_hash: string
           created_at: string
+          date_verified: boolean
           expert: string | null
           fetched_at: string
+          game_type_verified: boolean
           group_id: string
           hedges: Json
           id: string
@@ -868,6 +994,7 @@ export type Database = {
           published_at: string | null
           race_date: string
           ranking: Json
+          reviewed_at: string | null
           round_id: string | null
           source_id: string | null
           source_key: string
@@ -875,16 +1002,22 @@ export type Database = {
           system_row: string | null
           tip_key: string
           top_pick: string | null
+          track_verified: boolean
           url: string | null
+          verification_code: string | null
+          verification_reasons: Json
           version: number
           warning: string | null
         }
         Insert: {
           alternatives?: Json
+          classification?: string
           content_hash: string
           created_at?: string
+          date_verified?: boolean
           expert?: string | null
           fetched_at?: string
+          game_type_verified?: boolean
           group_id: string
           hedges?: Json
           id?: string
@@ -895,6 +1028,7 @@ export type Database = {
           published_at?: string | null
           race_date: string
           ranking?: Json
+          reviewed_at?: string | null
           round_id?: string | null
           source_id?: string | null
           source_key: string
@@ -902,16 +1036,22 @@ export type Database = {
           system_row?: string | null
           tip_key: string
           top_pick?: string | null
+          track_verified?: boolean
           url?: string | null
+          verification_code?: string | null
+          verification_reasons?: Json
           version?: number
           warning?: string | null
         }
         Update: {
           alternatives?: Json
+          classification?: string
           content_hash?: string
           created_at?: string
+          date_verified?: boolean
           expert?: string | null
           fetched_at?: string
+          game_type_verified?: boolean
           group_id?: string
           hedges?: Json
           id?: string
@@ -922,6 +1062,7 @@ export type Database = {
           published_at?: string | null
           race_date?: string
           ranking?: Json
+          reviewed_at?: string | null
           round_id?: string | null
           source_id?: string | null
           source_key?: string
@@ -929,7 +1070,10 @@ export type Database = {
           system_row?: string | null
           tip_key?: string
           top_pick?: string | null
+          track_verified?: boolean
           url?: string | null
+          verification_code?: string | null
+          verification_reasons?: Json
           version?: number
           warning?: string | null
         }
