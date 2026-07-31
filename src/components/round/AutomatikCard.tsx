@@ -13,6 +13,7 @@ import {
   generateAiDraftNow,
   importResultsNow,
 } from "@/lib/automation.functions";
+import { runAiDraftReliably } from "@/lib/ai-analysis-client";
 
 export function AutomatikCard({ roundId }: { roundId: string }) {
   const qc = useQueryClient();
@@ -86,7 +87,7 @@ export function AutomatikCard({ roundId }: { roundId: string }) {
             onClick={() =>
               run(
                 "ai",
-                () => draft({ data: { roundId } }),
+                () => runAiDraftReliably(roundId, () => draft({ data: { roundId } })),
                 (r) => `Förslag klara för ${r.races} avdelningar.`,
               )
             }

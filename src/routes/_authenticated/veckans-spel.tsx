@@ -38,6 +38,7 @@ import {
 } from "@/lib/automation.functions";
 import { markBetSubmitted, runFinalCheckNow } from "@/lib/workflow.functions";
 import { listExpertTips } from "@/lib/expert-tips.functions";
+import { runAiDraftReliably } from "@/lib/ai-analysis-client";
 
 export const Route = createFileRoute("/_authenticated/veckans-spel")({
   head: () => ({
@@ -435,7 +436,11 @@ function Workflow({ roundId }: { roundId: string }) {
             className="h-14 w-full text-lg sm:w-auto"
             disabled={busy !== null || !readiness.ready}
             onClick={() =>
-              run("ai", () => draft({ data: { roundId } }), (r) => `Analys klar för ${r.races} avdelningar.`)
+              run(
+                "ai",
+                () => runAiDraftReliably(roundId, () => draft({ data: { roundId } })),
+                (r) => `Analys klar för ${r.races} avdelningar.`,
+              )
             }
           >
             {busy === "ai" ? "Analyserar…" : "Låt AI:n analysera"}
