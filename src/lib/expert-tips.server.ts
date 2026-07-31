@@ -110,7 +110,8 @@ const SITE_QUERIES = (track: string, dateLabel: string) => [
 
 /**
  * Samlar in och sammanfattar experttips för en omgång.
- * Sparar en rapport per grupp och speldag.
+ * Endast sidor som klarar valideringen får ingå – annars sparas en
+ * ärlig rapport om att inget verifierat underlag finns ännu.
  */
 export async function collectExpertTips(params: {
   groupId: string;
@@ -119,6 +120,7 @@ export async function collectExpertTips(params: {
   trackName?: string | null;
   userId?: string | null;
 }) {
+  const { verifyCandidate, consensusLevel, QUALITY_BLOCKED_TEXT } = await import("./tip-validation");
   const admin = await getAdmin();
   const track = params.trackName ?? "";
   const dateLabel = new Intl.DateTimeFormat("sv-SE", {
@@ -128,6 +130,8 @@ export async function collectExpertTips(params: {
 
   const seen = new Set<string>();
   const collected: FirecrawlResult[] = [];
+  const rejected: { url: string; reason: string }[] = [];
+
   for (const query of SITE_QUERIES(track, dateLabel)) {
     try {
       const hits = await searchTips(query, 4);
@@ -135,6 +139,21 @@ export async function collectExpertTips(params: {
         const url = hit.url ?? "";
         if (!url || seen.has(url)) continue;
         seen.add(url);
+
+        const verdict = verifyCandidate(
+          {
+            sourceKey: "sammanfattning",
+            sourceName: hit.title ?? url,
+            url,
+            title: hit.title ?? null,
+            content: hit.markdown ?? hit.description ?? "",
+          },
+          { gameType: "V85", raceDate: params.raceDate, trackName: track },
+        );
+        if (!verdict.accepted) {
+          rejected.push({ url, reason: verdict.reasons[verdict.reasons.length - 1] ?? verdict.code });
+          continue;
+        }
         collected.push(hit);
       }
     } catch (error: any) {
@@ -142,14 +161,38 @@ export async function collectExpertTips(params: {
     }
   }
 
-  if (collected.length === 0) {
-    throw new Error("Hittade inga experttips den här veckan. Försök igen närmare speldagen.");
-  }
-
   const sources: ExpertSource[] = collected.map((c) => ({
     title: c.title ?? c.url ?? "Källa",
     url: c.url ?? "",
   }));
+
+  // Ingen verifierad källa: spara en ärlig rapport i stället för att gissa.
+  if (collected.length === 0) {
+    const { error } = await admin.from("expert_tips_reports").upsert(
+      {
+        group_id: params.groupId,
+        round_id: params.roundId ?? null,
+        race_date: params.raceDate,
+        track_name: params.trackName ?? null,
+        status: "no_verified_tips",
+        summary:
+          `Inga verifierade experttips hittades för V85 ${dateLabel}${track ? ` på ${track}` : ""}. ` +
+          `${rejected.length} sidor granskades men gällde en annan spelform, en annan omgång eller saknade spelförslag. ` +
+          QUALITY_BLOCKED_TEXT,
+        trends: [],
+        consensus: [],
+        disagreements: [],
+        legs: [],
+        sources: [],
+        model_used: MODEL,
+        error_message: null,
+        created_by: params.userId ?? null,
+      },
+      { onConflict: "group_id,race_date" },
+    );
+    if (error) throw error;
+    return { id: undefined, sources: 0, verified: 0, rejected: rejected.length };
+  }
 
   const corpus = collected
     .map(
@@ -160,21 +203,22 @@ export async function collectExpertTips(params: {
     )
     .join("\n\n");
 
-  const prompt = `Nedan finns texter från svenska travsajter och travbloggar inför V85 ${dateLabel}${
+  const prompt = `Nedan finns verifierade tipstexter från svenska travsajter inför V85 ${dateLabel}${
     track ? ` på ${track}` : ""
-  }.
+  }. Alla texter är kontrollerade: rätt spelform, rätt datum och rätt bana.
 
 Sammanfatta vad experterna tycker. Svara med JSON i exakt denna form:
 {
   "summary": "5-8 meningar som förklarar veckans läge i enkel svenska",
   "trends": [{ "title": "kort rubrik", "text": "vad experterna resonerar lika eller olika kring" }],
-  "consensus": [{ "leg": 1, "horse": "hästnamn", "note": "varför många tipsar den" }],
-  "disagreements": [{ "leg": 1, "horse": "hästnamn", "note": "varför experterna är oense" }],
-  "legs": [{ "leg": 1, "text": "kort sammanfattning av avdelningen" }]
+  "consensus": [{ "leg": 1, "horse": "hästnamn", "note": "varför många tipsar den", "sourceUrls": ["url"] }],
+  "disagreements": [{ "leg": 1, "horse": "hästnamn", "note": "varför experterna är oense", "sourceUrls": ["url"] }],
+  "legs": [{ "leg": 1, "text": "kort sammanfattning av avdelningen", "sourceUrls": ["url"] }]
 }
 
 Regler:
 - Använd bara hästar och resonemang som finns i texterna.
+- Varje påstående måste ha minst en url i sourceUrls, hämtad från texterna ovan.
 - Om avdelningsnummer saknas, sätt leg till 0.
 - Max 6 trender, max 8 hästar i varje lista, max 8 avdelningar.
 - Skriv aldrig att något är en rekommendation – det här är bara vad andra tycker.
@@ -184,6 +228,27 @@ ${clip(corpus, 60000)}`;
 
   const result = await askModel(prompt);
 
+  const allowedUrls = new Set(sources.map((s) => s.url));
+  /** Släpper bara igenom påståenden som pekar på en verifierad källa. */
+  const sourced = (rows: unknown, max: number) =>
+    (Array.isArray(rows) ? rows : [])
+      .map((row: any) => ({
+        ...row,
+        sourceUrls: (Array.isArray(row?.sourceUrls) ? row.sourceUrls : []).filter((u: unknown) =>
+          allowedUrls.has(String(u)),
+        ),
+      }))
+      .filter((row: any) => row.sourceUrls.length > 0)
+      .slice(0, max);
+
+  const consensus = sourced(result?.consensus, 8).map((row: any) => ({
+    ...row,
+    consensusLevel: consensusLevel({
+      supportingSources: row.sourceUrls.length,
+      totalSources: sources.length,
+    }),
+  }));
+
   const row = {
     group_id: params.groupId,
     round_id: params.roundId ?? null,
@@ -192,9 +257,9 @@ ${clip(corpus, 60000)}`;
     status: "ready",
     summary: typeof result?.summary === "string" ? result.summary : null,
     trends: Array.isArray(result?.trends) ? result.trends.slice(0, 6) : [],
-    consensus: Array.isArray(result?.consensus) ? result.consensus.slice(0, 8) : [],
-    disagreements: Array.isArray(result?.disagreements) ? result.disagreements.slice(0, 8) : [],
-    legs: Array.isArray(result?.legs) ? result.legs.slice(0, 8) : [],
+    consensus,
+    disagreements: sourced(result?.disagreements, 8),
+    legs: sourced(result?.legs, 8),
     sources,
     model_used: MODEL,
     error_message: null,
@@ -208,8 +273,14 @@ ${clip(corpus, 60000)}`;
     .maybeSingle();
   if (error) throw error;
 
-  return { id: data?.id as string | undefined, sources: sources.length };
+  return {
+    id: data?.id as string | undefined,
+    sources: sources.length,
+    verified: sources.length,
+    rejected: rejected.length,
+  };
 }
+
 
 /** Torsdagsjobbet: samlar experttips för varje grupps närmaste omgång. */
 export async function collectExpertTipsForAllGroups() {
