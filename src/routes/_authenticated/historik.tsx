@@ -66,7 +66,7 @@ function HistorikPage() {
       />
 
       {stats?.hasData ? (
-        <Card className="mb-4 border-primary/40 bg-primary/5">
+        <Card className="mb-4">
           <CardContent className="p-4">
             <div className="grid gap-3 sm:grid-cols-4">
               <div>

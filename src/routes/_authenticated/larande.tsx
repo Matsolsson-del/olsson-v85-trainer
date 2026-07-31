@@ -166,7 +166,7 @@ function LarandePage() {
                         type="monotone"
                         dataKey="cumulativeNet"
                         name="Netto"
-                        stroke="hsl(var(--primary))"
+                        stroke="var(--chart-1)"
                         strokeWidth={3}
                         dot={false}
                       />
@@ -191,7 +191,7 @@ function LarandePage() {
                       <XAxis dataKey="date" tickFormatter={shortDate} fontSize={12} />
                       <YAxis domain={[0, 8]} allowDecimals={false} fontSize={12} width={30} />
                       <Tooltip labelFormatter={(l) => `Omgång ${l}`} contentStyle={{ fontSize: 14 }} />
-                      <Bar dataKey="correct" name="Rätt" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="correct" name="Rätt" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -295,7 +295,7 @@ function LarandePage() {
           </section>
 
           {/* Råd */}
-          <Card className="border-primary/40 bg-primary/5">
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Vad siffrorna säger att vi bör göra</CardTitle>
             </CardHeader>
