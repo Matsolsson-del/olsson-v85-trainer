@@ -137,7 +137,9 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
   const failures: string[] = [];
 
   async function processRace(race: any): Promise<boolean> {
-    const assessment = race.group_race_assessments?.[0];
+    const assessment = Array.isArray(race.group_race_assessments)
+      ? race.group_race_assessments[0]
+      : (race.group_race_assessments as any);
     if (assessment?.status === "locked") return false;
 
 

@@ -72,14 +72,19 @@ export async function createBetSnapshot(roundId: string, userId: string) {
 
   const legs = (races ?? []).map((race: any) => {
     const probByEntry = new Map<string, number>();
-    for (const ga of race.group_race_assessments ?? [])
+    const assessments: any[] = Array.isArray(race.group_race_assessments)
+      ? race.group_race_assessments
+      : race.group_race_assessments
+        ? [race.group_race_assessments]
+        : [];
+    for (const ga of assessments)
       for (const ge of ga.group_entry_assessments ?? [])
         probByEntry.set(ge.race_entry_id, Number(ge.group_win_probability));
 
     return {
       race_id: race.id,
       leg_number: race.leg_number,
-      notes: race.group_race_assessments?.[0]?.notes ?? null,
+      notes: assessments[0]?.notes ?? null,
       entries: (race.race_entries ?? [])
         .filter((e: any) => selected.has(e.id))
         .map((e: any) => ({
