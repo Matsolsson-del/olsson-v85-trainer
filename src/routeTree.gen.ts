@@ -35,6 +35,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as AuthenticatedOmgangarIndexRouteImport } from './routes/_authenticated/omgangar/index'
 import { Route as AuthenticatedOmgangarRoundIdRouteImport } from './routes/_authenticated/omgangar/$roundId'
 import { Route as ApiPublicAiImportRouteImport } from './routes/api/public/ai-import'
+import { Route as ApiPublicHooksExperttipsRouteImport } from './routes/api/public/hooks/experttips'
 import { Route as ApiPublicHooksResultatV85RouteImport } from './routes/api/public/hooks/resultat-v85'
 import { Route as ApiPublicHooksVeckansV85RouteImport } from './routes/api/public/hooks/veckans-v85'
 
@@ -176,6 +177,12 @@ const ApiPublicAiImportRoute = ApiPublicAiImportRouteImport.update({
   path: '/api/public/ai-import',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksExperttipsRoute =
+  ApiPublicHooksExperttipsRouteImport.update({
+    id: '/api/public/hooks/experttips',
+    path: '/api/public/hooks/experttips',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksResultatV85Route =
   ApiPublicHooksResultatV85RouteImport.update({
     id: '/api/public/hooks/resultat-v85',
@@ -215,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/api/public/ai-import': typeof ApiPublicAiImportRoute
   '/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/experttips': typeof ApiPublicHooksExperttipsRoute
   '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
   '/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/api/public/ai-import': typeof ApiPublicAiImportRoute
   '/omgangar': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/experttips': typeof ApiPublicHooksExperttipsRoute
   '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
@@ -275,6 +284,7 @@ export interface FileRoutesById {
   '/_authenticated/omgangar/$roundId': typeof AuthenticatedOmgangarRoundIdRoute
   '/api/public/ai-import': typeof ApiPublicAiImportRoute
   '/_authenticated/omgangar/': typeof AuthenticatedOmgangarIndexRoute
+  '/api/public/hooks/experttips': typeof ApiPublicHooksExperttipsRoute
   '/api/public/hooks/resultat-v85': typeof ApiPublicHooksResultatV85Route
   '/api/public/hooks/veckans-v85': typeof ApiPublicHooksVeckansV85Route
 }
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/omgangar/$roundId'
     | '/api/public/ai-import'
     | '/omgangar/'
+    | '/api/public/hooks/experttips'
     | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   fileRoutesByTo: FileRoutesByTo
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/omgangar/$roundId'
     | '/api/public/ai-import'
     | '/omgangar'
+    | '/api/public/hooks/experttips'
     | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   id:
@@ -365,6 +377,7 @@ export interface FileRouteTypes {
     | '/_authenticated/omgangar/$roundId'
     | '/api/public/ai-import'
     | '/_authenticated/omgangar/'
+    | '/api/public/hooks/experttips'
     | '/api/public/hooks/resultat-v85'
     | '/api/public/hooks/veckans-v85'
   fileRoutesById: FileRoutesById
@@ -379,6 +392,7 @@ export interface RootRouteChildren {
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicAiImportRoute: typeof ApiPublicAiImportRoute
+  ApiPublicHooksExperttipsRoute: typeof ApiPublicHooksExperttipsRoute
   ApiPublicHooksResultatV85Route: typeof ApiPublicHooksResultatV85Route
   ApiPublicHooksVeckansV85Route: typeof ApiPublicHooksVeckansV85Route
 }
@@ -567,6 +581,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAiImportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/experttips': {
+      id: '/api/public/hooks/experttips'
+      path: '/api/public/hooks/experttips'
+      fullPath: '/api/public/hooks/experttips'
+      preLoaderRoute: typeof ApiPublicHooksExperttipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/resultat-v85': {
       id: '/api/public/hooks/resultat-v85'
       path: '/api/public/hooks/resultat-v85'
@@ -638,6 +659,7 @@ const rootRouteChildren: RootRouteChildren = {
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicAiImportRoute: ApiPublicAiImportRoute,
+  ApiPublicHooksExperttipsRoute: ApiPublicHooksExperttipsRoute,
   ApiPublicHooksResultatV85Route: ApiPublicHooksResultatV85Route,
   ApiPublicHooksVeckansV85Route: ApiPublicHooksVeckansV85Route,
 }
