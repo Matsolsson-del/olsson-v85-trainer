@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AlertTriangle, CheckCircle2, Circle } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { AiImportCard } from "@/components/round/AiImportCard";
+import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -143,6 +144,7 @@ function VeckansSpel() {
 
 function Workflow({ roundId }: { roundId: string }) {
   const qc = useQueryClient();
+  const { groupId } = useActiveGroupId();
   const invalidateRound = useInvalidateRound(roundId);
   const { data, isLoading } = useRoundData(roundId);
   const { data: responsibility } = useRoundResponsibility(roundId);
