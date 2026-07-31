@@ -86,10 +86,23 @@ function latestShare(entry: any): number | null {
 
 function Redovisning({ roundId }: { roundId: string }) {
   const { data, isLoading } = useRoundData(roundId);
+  const fetchTips = useServerFn(listRoundExpertTips);
+  const { data: tips } = useQuery({
+    queryKey: ["round-expert-tips", roundId],
+    queryFn: () => fetchTips({ data: { roundId } }),
+  });
+
+  const tipsByLeg = new Map<number, any[]>();
+  for (const tip of (tips ?? []) as any[]) {
+    const leg = Number(tip.leg_number);
+    if (!Number.isFinite(leg)) continue;
+    tipsByLeg.set(leg, [...(tipsByLeg.get(leg) ?? []), tip]);
+  }
 
   if (isLoading || !data) return <Skeleton className="h-96 w-full" />;
 
   const { round, races } = data as any;
+
 
   const legs = (races as any[]).map((race) => {
     const assessment = race.group_race_assessments?.[0] ?? null;
