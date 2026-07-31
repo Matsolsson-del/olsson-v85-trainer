@@ -447,18 +447,46 @@ function Workflow({ roundId }: { roundId: string }) {
         {/* 2. AI-analys */}
         <Step number={2} title="AI:ns analys" open={currentStep === 2} state={stepState(2)}>
           <AiImportCard roundId={roundId} />
-          {aiNotes.length === 0 ? (
+          {aiAnalysed.length === 0 ? (
             <p className="text-muted-foreground">Ingen analys är gjord ännu.</p>
           ) : (
             <>
+              <div className="rounded-lg border-2 border-primary bg-card p-4">
+                <p className="text-lg font-semibold">
+                  Analysen är klar för {aiAnalysed.length} av {aiLegs.length} avdelningar.
+                </p>
+                <p className="text-muted-foreground">
+                  {aiSpikes.length === 0
+                    ? "AI:n ser ingen riktigt självklar favorit den här veckan."
+                    : `AI:n ser ${aiSpikes.length} tydlig${aiSpikes.length === 1 ? " favorit" : "a favoriter"}: avdelning ${aiSpikes
+                        .map((l) => l.leg)
+                        .join(", ")}.`}{" "}
+                  Det här är bara ett utkast – ni bestämmer själva.
+                </p>
+              </div>
+
               <ul className="space-y-2">
-                {aiNotes.slice(0, 4).map((r) => (
-                  <li key={r.leg}>
-                    <span className="font-medium">Avdelning {r.leg}: </span>
-                    <span className="text-muted-foreground">{String(r.note).slice(0, 200)}</span>
+                {aiAnalysed.map((l) => (
+                  <li key={l.leg} className="rounded-md border p-3">
+                    <p className="text-base font-medium">
+                      Avdelning {l.leg}: {l.top!.name}{" "}
+                      <span className="text-muted-foreground">({l.top!.prob} % chans)</span>
+                      {l.top!.prob >= 50 ? (
+                        <span className="ml-2 text-sm font-semibold text-primary">Spikförslag</span>
+                      ) : null}
+                    </p>
+                    {l.second !== null && (
+                      <p className="text-sm text-muted-foreground">
+                        Näst bästa häst: {l.second} % – {l.top!.prob - l.second >= 15 ? "klar skillnad" : "jämnt lopp"}
+                      </p>
+                    )}
+                    {l.note && (
+                      <p className="mt-1 text-sm text-muted-foreground">{String(l.note).slice(0, 180)}</p>
+                    )}
                   </li>
                 ))}
               </ul>
+
               <Button asChild size="lg" variant="secondary" className="h-14 w-full text-lg sm:w-auto">
                 <Link to="/ai-analys" search={{ omgang: roundId }}>
                   Se hela AI-analysen
@@ -466,6 +494,7 @@ function Workflow({ roundId }: { roundId: string }) {
               </Button>
             </>
           )}
+
           <Button
             size="lg"
             className="h-14 w-full text-lg sm:w-auto"
