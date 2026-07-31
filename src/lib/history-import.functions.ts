@@ -16,26 +16,42 @@ async function assertOwner(context: any, groupId: string) {
   if (data.role !== "owner") throw new Error("Bara gruppens ägare kan importera historik.");
 }
 
-function parseJson(text: string) {
+function failure(mode: "preview" | "import", message: string) {
+  return {
+    ok: false as const,
+    mode,
+    message,
+    errors: [],
+    preview: [],
+    imported: 0,
+    skipped: 0,
+    overwritten: 0,
+    economy_note:
+      "Historikposter är helt åtskilda från gruppens ekonomi – ingen insats eller transaktion har bokförts.",
+  };
+}
+
+/** Returnerar { payload } eller { error } – kastar aldrig på användarfel. */
+function parseJson(text: string): { payload?: any; error?: string } {
   if (typeof text !== "string" || text.trim().length === 0) {
-    throw new Error("Ingen JSON angavs.");
+    return { error: "Ingen JSON angavs." };
   }
   if (new TextEncoder().encode(text).length > MAX_JSON_BYTES) {
-    throw new Error("Filen är för stor. Max 2 MB per import.");
+    return { error: "Filen är för stor. Max 2 MB per import." };
   }
   let parsed: any;
   try {
     parsed = JSON.parse(text);
   } catch (e: any) {
-    throw new Error(`JSON-syntaxfel: ${e?.message ?? "kunde inte tolkas"}`);
+    return { error: `JSON-syntaxfel: ${e?.message ?? "kunde inte tolkas"}` };
   }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new Error("JSON måste vara ett objekt med fältet rounds.");
+    return { error: "JSON måste vara ett objekt med fältet rounds." };
   }
   if (Array.isArray(parsed.rounds) && parsed.rounds.length > MAX_ROUNDS) {
-    throw new Error(`Max ${MAX_ROUNDS} omgångar per import.`);
+    return { error: `Max ${MAX_ROUNDS} omgångar per import.` };
   }
-  return parsed;
+  return { payload: parsed };
 }
 
 /** Samma format som MCP-verktyget get_history_import_format. */
