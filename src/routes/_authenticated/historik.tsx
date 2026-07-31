@@ -141,7 +141,7 @@ function HistorikPage() {
         </div>
       )}
 
-      {query.isLoading ? (
+      {!groupId || query.isPending ? (
         <div className="space-y-3">
           <Skeleton className="h-28 w-full" />
           <Skeleton className="h-28 w-full" />

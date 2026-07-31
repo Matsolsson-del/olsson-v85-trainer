@@ -8,7 +8,7 @@ export async function loadHistoryStats(groupId: string) {
   const { data, error } = await (supabaseAdmin as any)
     .from("imported_history_rounds")
     .select(
-      "id, race_date, track_name, correct_count, payout, net_result, computed_cost, stated_cost, computed_rows, stated_rows, winners_verified, usable_for_learning, legs",
+      "id, race_date, track_name, correct_count, payout, net_result, computed_cost, stated_cost, computed_rows, stated_rows, winners_verified, usable_for_learning, review_status, legs",
     )
     .eq("group_id", groupId)
     .order("race_date", { ascending: true });

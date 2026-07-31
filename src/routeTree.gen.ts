@@ -22,6 +22,7 @@ import { Route as AuthenticatedEfterrapporterRouteImport } from './routes/_authe
 import { Route as AuthenticatedEkonomiRouteImport } from './routes/_authenticated/ekonomi'
 import { Route as AuthenticatedExperttipsRouteImport } from './routes/_authenticated/experttips'
 import { Route as AuthenticatedHistorikRouteImport } from './routes/_authenticated/historik'
+import { Route as AuthenticatedHistorikDubbletterRouteImport } from './routes/_authenticated/historik-dubbletter'
 import { Route as AuthenticatedHistorikimportRouteImport } from './routes/_authenticated/historikimport'
 import { Route as AuthenticatedInstallningarRouteImport } from './routes/_authenticated/installningar'
 import { Route as AuthenticatedKommenteraRouteImport } from './routes/_authenticated/kommentera'
@@ -107,6 +108,12 @@ const AuthenticatedHistorikRoute = AuthenticatedHistorikRouteImport.update({
   path: '/historik',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHistorikDubbletterRoute =
+  AuthenticatedHistorikDubbletterRouteImport.update({
+    id: '/historik-dubbletter',
+    path: '/historik-dubbletter',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHistorikimportRoute =
   AuthenticatedHistorikimportRouteImport.update({
     id: '/historikimport',
@@ -215,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/experttips': typeof AuthenticatedExperttipsRoute
   '/historik': typeof AuthenticatedHistorikRoute
+  '/historik-dubbletter': typeof AuthenticatedHistorikDubbletterRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
   '/kommentera': typeof AuthenticatedKommenteraRoute
@@ -246,6 +254,7 @@ export interface FileRoutesByTo {
   '/ekonomi': typeof AuthenticatedEkonomiRoute
   '/experttips': typeof AuthenticatedExperttipsRoute
   '/historik': typeof AuthenticatedHistorikRoute
+  '/historik-dubbletter': typeof AuthenticatedHistorikDubbletterRoute
   '/historikimport': typeof AuthenticatedHistorikimportRoute
   '/installningar': typeof AuthenticatedInstallningarRoute
   '/kommentera': typeof AuthenticatedKommenteraRoute
@@ -279,6 +288,7 @@ export interface FileRoutesById {
   '/_authenticated/ekonomi': typeof AuthenticatedEkonomiRoute
   '/_authenticated/experttips': typeof AuthenticatedExperttipsRoute
   '/_authenticated/historik': typeof AuthenticatedHistorikRoute
+  '/_authenticated/historik-dubbletter': typeof AuthenticatedHistorikDubbletterRoute
   '/_authenticated/historikimport': typeof AuthenticatedHistorikimportRoute
   '/_authenticated/installningar': typeof AuthenticatedInstallningarRoute
   '/_authenticated/kommentera': typeof AuthenticatedKommenteraRoute
@@ -312,6 +322,7 @@ export interface FileRouteTypes {
     | '/ekonomi'
     | '/experttips'
     | '/historik'
+    | '/historik-dubbletter'
     | '/historikimport'
     | '/installningar'
     | '/kommentera'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/ekonomi'
     | '/experttips'
     | '/historik'
+    | '/historik-dubbletter'
     | '/historikimport'
     | '/installningar'
     | '/kommentera'
@@ -375,6 +387,7 @@ export interface FileRouteTypes {
     | '/_authenticated/ekonomi'
     | '/_authenticated/experttips'
     | '/_authenticated/historik'
+    | '/_authenticated/historik-dubbletter'
     | '/_authenticated/historikimport'
     | '/_authenticated/installningar'
     | '/_authenticated/kommentera'
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       path: '/historik'
       fullPath: '/historik'
       preLoaderRoute: typeof AuthenticatedHistorikRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/historik-dubbletter': {
+      id: '/_authenticated/historik-dubbletter'
+      path: '/historik-dubbletter'
+      fullPath: '/historik-dubbletter'
+      preLoaderRoute: typeof AuthenticatedHistorikDubbletterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/historikimport': {
@@ -632,6 +652,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedEkonomiRoute: typeof AuthenticatedEkonomiRoute
   AuthenticatedExperttipsRoute: typeof AuthenticatedExperttipsRoute
   AuthenticatedHistorikRoute: typeof AuthenticatedHistorikRoute
+  AuthenticatedHistorikDubbletterRoute: typeof AuthenticatedHistorikDubbletterRoute
   AuthenticatedHistorikimportRoute: typeof AuthenticatedHistorikimportRoute
   AuthenticatedInstallningarRoute: typeof AuthenticatedInstallningarRoute
   AuthenticatedKommenteraRoute: typeof AuthenticatedKommenteraRoute
@@ -653,6 +674,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedEkonomiRoute: AuthenticatedEkonomiRoute,
   AuthenticatedExperttipsRoute: AuthenticatedExperttipsRoute,
   AuthenticatedHistorikRoute: AuthenticatedHistorikRoute,
+  AuthenticatedHistorikDubbletterRoute: AuthenticatedHistorikDubbletterRoute,
   AuthenticatedHistorikimportRoute: AuthenticatedHistorikimportRoute,
   AuthenticatedInstallningarRoute: AuthenticatedInstallningarRoute,
   AuthenticatedKommenteraRoute: AuthenticatedKommenteraRoute,

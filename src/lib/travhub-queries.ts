@@ -81,9 +81,20 @@ export function useMyProfile() {
 }
 
 export function useIsOwner(groupId: string | null) {
-  const { user } = useAuth();
-  const { data: members } = useMembers(groupId);
-  return !!members?.some((m) => m.user_id === user?.id && m.role === "owner");
+  return useOwnerStatus(groupId).isOwner;
+}
+
+/** Ägarstatus med tydliga tillstånd: laddar / fel / klart. */
+export function useOwnerStatus(groupId: string | null) {
+  const { user, loading: authLoading } = useAuth();
+  const membersQuery = useMembers(groupId);
+  const members = membersQuery.data;
+  const isLoading = authLoading || !groupId || membersQuery.isLoading || !user;
+  return {
+    isLoading,
+    isError: membersQuery.isError,
+    isOwner: !!members?.some((m) => m.user_id === user?.id && m.role === "owner"),
+  };
 }
 
 export function useRounds(groupId: string | null) {

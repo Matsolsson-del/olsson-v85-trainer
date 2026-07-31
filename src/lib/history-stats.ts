@@ -1,3 +1,5 @@
+import { statsRows, unresolvedDuplicateGroups } from "@/lib/history-review";
+
 /**
  * Räknar ut statistik från importerad spelhistorik.
  * Ren beräkning utan databas – används både på servern och i tester.
@@ -23,6 +25,7 @@ export type HistoryRow = {
   stated_rows?: number | null;
   winners_verified?: boolean | null;
   usable_for_learning?: boolean | null;
+  review_status?: string | null;
   legs?: HistoryLeg[] | null;
 };
 
@@ -36,7 +39,11 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 export type HistoryStats = ReturnType<typeof computeHistoryStats>;
 
 export function computeHistoryStats(rowsInput: HistoryRow[]) {
-  const rows = [...(rowsInput ?? [])]
+  const all = [...(rowsInput ?? [])];
+  // Spärr: så länge en dubblett är ogranskad får statistiken inte användas alls.
+  const unresolved = unresolvedDuplicateGroups(all);
+  const blocked = unresolved.length > 0;
+  const rows = (blocked ? [] : statsRows(all))
     .filter((r) => r.usable_for_learning !== false)
     .sort((a, b) => String(a.race_date).localeCompare(String(b.race_date)));
 
@@ -228,7 +235,14 @@ export function computeHistoryStats(rowsInput: HistoryRow[]) {
   }
 
   return {
-    hasData: rows.length > 0,
+    blocked,
+    unresolvedDuplicates: unresolved.length,
+    unresolvedDates: unresolved.map((g) => ({
+      track: g.rows[0].track_name ?? "Okänd bana",
+      date: String(g.rows[0].race_date),
+      count: g.rows.length,
+    })),
+    hasData: !blocked && rows.length > 0,
     summary: {
       rounds: rows.length,
       totalCost: Math.round(totalCost),

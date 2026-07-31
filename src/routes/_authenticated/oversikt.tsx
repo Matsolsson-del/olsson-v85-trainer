@@ -76,8 +76,20 @@ function OversiktPage() {
     );
   }
 
-  const active = rounds?.find((r) => r.status !== "completed") ?? null;
-  const latest = rounds?.find((r) => r.status === "completed") ?? null;
+  const today = new Date().toISOString().slice(0, 10);
+  // Spelbara omgångar = ej avgjorda, sorterade med närmast tävlingsdag först.
+  const upcoming = (rounds ?? [])
+    .filter((r) => r.status !== "completed")
+    .sort((a, b) => String(a.race_date).localeCompare(String(b.race_date)));
+  const playable = upcoming.filter((r) => String(r.race_date) >= today);
+  // Den aktuella omgången är den vi faktiskt spelar nu; helst en riktig (ej demo).
+  const active =
+    playable.find((r) => !(r as any).is_demo) ?? playable[0] ?? upcoming[upcoming.length - 1] ?? null;
+  const next = playable.find((r) => r.id !== active?.id) ?? null;
+  const latest =
+    (rounds ?? [])
+      .filter((r) => r.status === "completed")
+      .sort((a, b) => String(b.race_date).localeCompare(String(a.race_date)))[0] ?? null;
 
   return (
     <>
@@ -93,6 +105,30 @@ function OversiktPage() {
             <p className="font-medium">Du behöver inte göra något just nu.</p>
           </BigCard>
           {latest && <SenasteResultat roundId={latest.id} />}
+        </div>
+      )}
+      {next && (
+        <div className="mt-5">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl">Nästa vecka</CardTitle>
+            </CardHeader>
+            <CardContent className="text-lg">
+              <p className="font-semibold">
+                {formatDate(next.race_date)} ·{" "}
+                {(next as any).tracks?.name ?? "Bana inte klar ännu"}
+              </p>
+              <p className="mt-1 text-muted-foreground">
+                Den här omgången är inte aktuell ännu. Uppgifterna fylls på automatiskt på
+                torsdagen.
+              </p>
+              <Button asChild variant="secondary" className="mt-3 h-12">
+                <Link to="/omgangar/$roundId" params={{ roundId: next.id }}>
+                  Titta på nästa omgång
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       )}
       <div className="mt-5">
@@ -140,7 +176,7 @@ function ActiveRound({ roundId, latestId }: { roundId: string; latestId: string 
 
   return (
     <div className="space-y-5">
-      <BigCard title="Veckans V85">
+      <BigCard title="Veckans V85 – den här spelar vi nu">
         <p className="text-2xl font-semibold">
           {formatDate(round.race_date)} · {(round as any).tracks?.name ?? "Bana ej vald"}
         </p>

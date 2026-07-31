@@ -1090,6 +1090,10 @@ export type Database = {
           net_result: number | null
           payout: number | null
           race_date: string
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           row_price: number | null
           source: string | null
           spike_hits: number | null
@@ -1097,6 +1101,7 @@ export type Database = {
           stated_cost: number | null
           stated_rows: number | null
           status: string
+          superseded_by: string | null
           systems: Json
           track_name: string | null
           uncertainty_note: string | null
@@ -1123,6 +1128,10 @@ export type Database = {
           net_result?: number | null
           payout?: number | null
           race_date: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           row_price?: number | null
           source?: string | null
           spike_hits?: number | null
@@ -1130,6 +1139,7 @@ export type Database = {
           stated_cost?: number | null
           stated_rows?: number | null
           status?: string
+          superseded_by?: string | null
           systems?: Json
           track_name?: string | null
           uncertainty_note?: string | null
@@ -1156,6 +1166,10 @@ export type Database = {
           net_result?: number | null
           payout?: number | null
           race_date?: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           row_price?: number | null
           source?: string | null
           spike_hits?: number | null
@@ -1163,6 +1177,7 @@ export type Database = {
           stated_cost?: number | null
           stated_rows?: number | null
           status?: string
+          superseded_by?: string | null
           systems?: Json
           track_name?: string | null
           uncertainty_note?: string | null
@@ -1177,6 +1192,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "imported_history_rounds_superseded_by_fkey"
+            columns: ["superseded_by"]
+            isOneToOne: false
+            referencedRelation: "imported_history_rounds"
             referencedColumns: ["id"]
           },
         ]

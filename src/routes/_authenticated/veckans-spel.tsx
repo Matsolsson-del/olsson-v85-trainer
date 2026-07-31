@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { formatHedges, formatSpikes } from "@/lib/system-labels";
 import { formatCurrency, formatDate, formatDateTime, formatPercent } from "@/lib/labels";
 import {
   useActiveGroupId,
@@ -368,19 +369,11 @@ function Workflow({ roundId }: { roundId: string }) {
                     </p>
                     <p className="mt-2">
                       <span className="font-medium">Spikar: </span>
-                      {(c.spikes ?? []).length === 0
-                        ? "Inga spikar"
-                        : (c.spikes as any[])
-                            .map((s) => `avd ${s.leg_number}: ${entryLabel(s.entry_id)}`)
-                            .join(" · ")}
+                      {formatSpikes(c.spikes, entryLabel)}
                     </p>
                     <p>
                       <span className="font-medium">Garderingar: </span>
-                      {(c.hedges ?? []).length === 0
-                        ? "Inga garderingar"
-                        : (c.hedges as any[])
-                            .map((h) => `avd ${h.leg_number}: ${h.count} hästar`)
-                            .join(" · ")}
+                      {formatHedges(c.hedges)}
                     </p>
                     {c.weakest_assumption && (
                       <p className="mt-2 rounded-md bg-warning/15 p-3">
