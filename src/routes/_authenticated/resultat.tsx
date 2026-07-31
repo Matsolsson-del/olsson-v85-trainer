@@ -33,11 +33,11 @@ function BigStat({ label, value, tone }: { label: string; value: string; tone?: 
   return (
     <Card>
       <CardContent className="py-6">
-        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-base text-muted-foreground">{label}</p>
         <p
           className={
             "mt-1 text-3xl font-bold " +
-            (tone === "good" ? "text-emerald-500" : tone === "bad" ? "text-destructive" : "")
+            (tone === "good" ? "text-success" : tone === "bad" ? "text-destructive" : "")
           }
         >
           {value}
@@ -65,9 +65,11 @@ function ResultatDashboard() {
       />
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Hämtar…</p>
+        <p className="text-base text-foreground/80">Hämtar…</p>
       ) : error ? (
-        <p className="text-sm text-destructive">{(error as any).message}</p>
+        <p className="text-base font-medium text-destructive">
+          Resultaten kunde inte hämtas just nu. Ladda om sidan och försök igen.
+        </p>
       ) : !data ? null : (
         <div className="space-y-8">
           <section>
