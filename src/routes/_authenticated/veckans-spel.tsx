@@ -349,7 +349,7 @@ function Workflow({ roundId }: { roundId: string }) {
         }
       />
 
-      <Card className="mb-5 border-primary/40 bg-primary/5">
+      <Card className="mb-5 border-2 border-primary">
         <CardContent className="space-y-2 p-5">
           <p className="text-2xl font-semibold">
             {isResponsible
