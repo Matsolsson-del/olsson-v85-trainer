@@ -21,8 +21,29 @@ type DraftEntry = {
 type DraftRace = {
   pace_scenario: string;
   notes: string;
+  expert_agreement?: string;
   entries: DraftEntry[];
 };
+
+/** Kort textsammanfattning av experternas tips för en avdelning. */
+export function formatExpertTips(tips: any[]): string {
+  if (!tips || tips.length === 0) return "";
+  return tips
+    .map((t) => {
+      const alts = Array.isArray(t.alternatives) ? t.alternatives.filter(Boolean) : [];
+      const parts = [
+        t.top_pick ? `spik/förstaval ${t.top_pick}` : null,
+        alts.length > 0 ? `alternativ ${alts.join(", ")}` : null,
+        t.longshot ? `skräll ${t.longshot}` : null,
+        t.warning ? `varning: ${t.warning}` : null,
+        t.note ? `kommentar: ${t.note}` : null,
+      ].filter(Boolean);
+      const who = [t.source_name, t.expert].filter(Boolean).join(" / ") || "Okänd källa";
+      return `- ${who}: ${parts.length > 0 ? parts.join("; ") : "inget tydligt tips"}`;
+    })
+    .join("\n");
+}
+
 
 function latestShare(entry: any): number | null {
   const snaps = [...(entry.market_snapshots ?? [])].sort((a: any, b: any) =>
