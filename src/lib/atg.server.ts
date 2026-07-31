@@ -107,3 +107,42 @@ export function betDistributionToPercent(value?: number): number | null {
   if (typeof value !== "number") return null;
   return Math.round((value / 1000) * 100) / 100;
 }
+
+/** Hämtar en specifik V85-omgång utifrån ATG:s produktlista. */
+export async function fetchV85Upcoming(): Promise<AtgUpcomingGame[]> {
+  const data = await atgGet<{ upcoming?: AtgUpcomingGame[] }>("/products/V85");
+  return (data.upcoming ?? []).slice().sort((a, b) => a.startTime.localeCompare(b.startTime));
+}
+
+/** Balansuppgift i klartext, t.ex. "barfota fram". null när uppgiften saknas. */
+export function shoeText(shoes?: AtgStart["horse"]["shoes"]): string | null {
+  if (!shoes?.reported) return null;
+  const front = shoes.front?.hasShoe;
+  const back = shoes.back?.hasShoe;
+  if (front === undefined && back === undefined) return null;
+  if (front === false && back === false) return "barfota runt om";
+  if (front === false) return "barfota fram";
+  if (back === false) return "barfota bak";
+  return "skor runt om";
+}
+
+/** Vagnuppgift i klartext. null när uppgiften saknas. */
+export function sulkyText(sulky?: AtgStart["horse"]["sulky"]): string | null {
+  if (!sulky?.reported) return null;
+  const type = sulky.type?.text;
+  return type ? type : null;
+}
+
+/** Rekordtid som text, t.ex. "1.13,5M". null när uppgiften saknas. */
+export function recordText(record?: AtgStart["horse"]["record"]): string | null {
+  const t = record?.time;
+  if (!t || t.minutes === undefined || t.seconds === undefined) return null;
+  const secs = String(t.seconds).padStart(2, "0");
+  return `${t.minutes}.${secs},${t.tenths ?? 0}${record?.code ?? ""}`;
+}
+
+/** Vinnarodds i kronor (ATG anger hundradelar). null när odds saknas. */
+export function winOdds(start: AtgStart): number | null {
+  const odds = start.pools?.vinnare?.odds;
+  return typeof odds === "number" ? Math.round(odds) / 10 : null;
+}
