@@ -35,6 +35,7 @@ const SIMPLE_NAV = [
   { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
   { to: "/resultat", label: "Resultat", icon: Trophy },
   { to: "/omgangar", label: "Historik", icon: History },
+  { to: "/historik", label: "Importerad historik", icon: History },
 ] as const;
 
 const ADVANCED_NAV = [
@@ -45,6 +46,7 @@ const ADVANCED_NAV = [
   { to: "/mina-rad", label: "Mina råd", icon: Sparkles },
   { to: "/automation", label: "Automation", icon: Workflow },
   { to: "/ai-import", label: "AI-import", icon: Sparkles },
+  { to: "/historikimport", label: "Historikimport", icon: History },
   { to: "/ekonomi", label: "Ekonomi", icon: Coins },
   { to: "/installningar", label: "Inställningar", icon: Settings },
 ] as const;
