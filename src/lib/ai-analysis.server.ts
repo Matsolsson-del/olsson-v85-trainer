@@ -240,10 +240,15 @@ Experttipsen är en datapunkt, inte facit. Låt varken streckprocenten eller exp
       assessmentId = found?.id as string | undefined;
     }
 
+    const agreement = (draft.expert_agreement ?? "").trim();
+    const notesText = [draft.notes ?? "", agreement ? `Experterna: ${agreement}` : ""]
+      .filter(Boolean)
+      .join("\n\n");
+
     if (assessmentId) {
       await db
         .from("group_race_assessments")
-        .update({ pace_scenario: draft.pace_scenario ?? null, notes: draft.notes ?? null })
+        .update({ pace_scenario: draft.pace_scenario ?? null, notes: notesText || null })
         .eq("id", assessmentId);
     } else {
       const { data: inserted, error } = await db
@@ -253,8 +258,9 @@ Experttipsen är en datapunkt, inte facit. Låt varken streckprocenten eller exp
             race_id: race.id,
             status: "draft",
             pace_scenario: draft.pace_scenario ?? null,
-            notes: draft.notes ?? null,
+            notes: notesText || null,
           },
+
           { onConflict: "race_id" },
         )
         .select("id")
