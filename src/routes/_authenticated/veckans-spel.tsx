@@ -423,14 +423,21 @@ function Workflow({ roundId }: { roundId: string }) {
           {aiNotes.length === 0 ? (
             <p className="text-muted-foreground">Ingen analys är gjord ännu.</p>
           ) : (
-            <ul className="space-y-2">
-              {aiNotes.slice(0, 4).map((r) => (
-                <li key={r.leg}>
-                  <span className="font-medium">Avdelning {r.leg}: </span>
-                  <span className="text-muted-foreground">{String(r.note).slice(0, 200)}</span>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul className="space-y-2">
+                {aiNotes.slice(0, 4).map((r) => (
+                  <li key={r.leg}>
+                    <span className="font-medium">Avdelning {r.leg}: </span>
+                    <span className="text-muted-foreground">{String(r.note).slice(0, 200)}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button asChild size="lg" variant="secondary" className="h-14 w-full text-lg sm:w-auto">
+                <Link to="/ai-analys" search={{ omgang: roundId }}>
+                  Se hela AI-analysen
+                </Link>
+              </Button>
+            </>
           )}
           <Button
             size="lg"
@@ -451,6 +458,7 @@ function Workflow({ roundId }: { roundId: string }) {
               Knappen öppnas när underlaget är komplett.
             </p>
           )}
+
         </Step>
 
         {/* 3. Kommentarer */}
