@@ -996,6 +996,116 @@ export type Database = {
         }
         Relationships: []
       }
+      imported_history_rounds: {
+        Row: {
+          analysis: string | null
+          bet_stop_at: string | null
+          budget: number | null
+          computed_cost: number | null
+          computed_rows: number | null
+          correct_count: number | null
+          created_at: string
+          data_quality: string
+          group_id: string
+          id: string
+          idempotency_key: string
+          imported_by: string | null
+          legs: Json
+          lessons: string | null
+          net_result: number | null
+          payout: number | null
+          race_date: string
+          row_price: number | null
+          source: string | null
+          spike_hits: number | null
+          spikes: Json
+          stated_cost: number | null
+          stated_rows: number | null
+          status: string
+          systems: Json
+          track_name: string | null
+          uncertainty_note: string | null
+          updated_at: string
+          usable_for_learning: boolean
+          winners: Json
+          winners_verified: boolean
+        }
+        Insert: {
+          analysis?: string | null
+          bet_stop_at?: string | null
+          budget?: number | null
+          computed_cost?: number | null
+          computed_rows?: number | null
+          correct_count?: number | null
+          created_at?: string
+          data_quality?: string
+          group_id: string
+          id?: string
+          idempotency_key: string
+          imported_by?: string | null
+          legs?: Json
+          lessons?: string | null
+          net_result?: number | null
+          payout?: number | null
+          race_date: string
+          row_price?: number | null
+          source?: string | null
+          spike_hits?: number | null
+          spikes?: Json
+          stated_cost?: number | null
+          stated_rows?: number | null
+          status?: string
+          systems?: Json
+          track_name?: string | null
+          uncertainty_note?: string | null
+          updated_at?: string
+          usable_for_learning?: boolean
+          winners?: Json
+          winners_verified?: boolean
+        }
+        Update: {
+          analysis?: string | null
+          bet_stop_at?: string | null
+          budget?: number | null
+          computed_cost?: number | null
+          computed_rows?: number | null
+          correct_count?: number | null
+          created_at?: string
+          data_quality?: string
+          group_id?: string
+          id?: string
+          idempotency_key?: string
+          imported_by?: string | null
+          legs?: Json
+          lessons?: string | null
+          net_result?: number | null
+          payout?: number | null
+          race_date?: string
+          row_price?: number | null
+          source?: string | null
+          spike_hits?: number | null
+          spikes?: Json
+          stated_cost?: number | null
+          stated_rows?: number | null
+          status?: string
+          systems?: Json
+          track_name?: string | null
+          uncertainty_note?: string | null
+          updated_at?: string
+          usable_for_learning?: boolean
+          winners?: Json
+          winners_verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imported_history_rounds_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       individual_entry_assessments: {
         Row: {
           change_condition: string | null
