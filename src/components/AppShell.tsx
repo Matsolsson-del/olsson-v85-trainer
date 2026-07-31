@@ -34,11 +34,11 @@ const SIMPLE_NAV = [
 
   { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
   { to: "/resultat", label: "Resultat", icon: Trophy },
-  { to: "/omgangar", label: "Historik", icon: History },
-  { to: "/historik", label: "Importerad historik", icon: History },
+  { to: "/historik", label: "Historik", icon: History },
 ] as const;
 
 const ADVANCED_NAV = [
+  { to: "/omgangar", label: "Omgångar i hubben", icon: History },
   { to: "/analysera", label: "Analysera", icon: ClipboardList },
   { to: "/system", label: "System", icon: Grid3x3 },
   { to: "/efterrapporter", label: "Efterrapporter", icon: FileText },
