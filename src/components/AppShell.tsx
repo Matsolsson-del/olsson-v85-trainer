@@ -86,8 +86,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="flex min-h-screen">
+    <div className="min-h-dvh bg-background text-foreground">
+      <div className="flex min-h-dvh">
         <aside
           className={cn(
             "fixed inset-y-0 left-0 z-40 w-64 shrink-0 overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0",
@@ -99,7 +99,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <p className="font-serif text-lg font-semibold text-primary">
                 Familjen Olssons Travhub
               </p>
-              <p className="mt-0.5 text-xs text-sidebar-foreground/70">V85-analys och lärande</p>
+              <p className="mt-0.5 text-sm text-sidebar-foreground/80">V85-analys och lärande</p>
             </div>
 
             <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Huvudnavigation">
@@ -162,15 +162,22 @@ export function AppShell({ children }: { children: ReactNode }) {
         {open && (
           <button
             aria-label="Stäng meny"
-            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+            className="fixed inset-0 z-30 bg-foreground/50 lg:hidden"
             onClick={() => setOpen(false)}
           />
         )}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3 lg:hidden">
-            <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label="Öppna meny">
-              <Menu className="h-6 w-6" />
+          <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-background px-4 py-3 lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="min-h-11 min-w-11"
+              onClick={() => setOpen(true)}
+              aria-label="Öppna meny"
+              aria-expanded={open}
+            >
+              <Menu className="h-6 w-6" aria-hidden />
             </Button>
             <span className="font-serif font-semibold text-primary">Familjen Olssons Travhub</span>
           </header>
@@ -196,7 +203,7 @@ export function PageHeader({
     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
         <h1 className="font-serif text-3xl font-semibold text-foreground">{title}</h1>
-        {description && <p className="mt-1 max-w-2xl text-base text-white/70">{description}</p>}
+        {description && <p className="mt-1 max-w-2xl text-base text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -205,9 +212,9 @@ export function PageHeader({
 
 export function EmptyState({ title, description, action }: { title: string; description?: string; action?: ReactNode }) {
   return (
-    <div className="rounded-lg border border-dashed border-white/20 bg-surface/60 px-6 py-12 text-center">
-      <p className="text-lg font-medium text-white">{title}</p>
-      {description && <p className="mt-1 text-base text-white/70">{description}</p>}
+    <div className="rounded-lg border border-dashed border-border bg-card/60 px-6 py-12 text-center">
+      <p className="text-lg font-medium text-foreground">{title}</p>
+      {description && <p className="mt-1 text-base text-muted-foreground">{description}</p>}
       {action && <div className="mt-4 flex justify-center">{action}</div>}
     </div>
   );

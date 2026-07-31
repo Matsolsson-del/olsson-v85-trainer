@@ -32,7 +32,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   },
   component: Consent,
   errorComponent: ({ error }) => (
-    <main className="flex min-h-screen items-center justify-center px-4 text-center">
+    <main className="flex min-h-dvh items-center justify-center px-4 text-center">
       <p className="text-sm text-muted-foreground">
         Kunde inte läsa in förfrågan: {String((error as Error)?.message ?? error)}
       </p>
@@ -68,7 +68,7 @@ function Consent() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md space-y-4 rounded-lg bg-card p-6 text-card-foreground shadow-lg">
         <h1 className="font-serif text-2xl font-semibold text-primary">
           Koppla {clientName} till ditt konto
