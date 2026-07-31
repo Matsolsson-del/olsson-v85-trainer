@@ -508,8 +508,8 @@ async function logActivity(
  * Anropas av databasens schemaläggare. Kontrollerar svensk lokal tid och gör
  * ingenting om anropet ligger utanför ett planerat tidsfönster.
  */
-export async function runScheduledAutomation(now = new Date()) {
-  const slot = matchSlot(now);
+export async function runScheduledAutomation(now = new Date(), force = false) {
+  const slot = matchSlot(now) ?? (force ? { key: "manuell", mode: "full" as const } : null);
   if (!slot) {
     return {
       ran: false,

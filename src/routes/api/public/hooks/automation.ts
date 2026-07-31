@@ -24,8 +24,12 @@ export const Route = createFileRoute("/api/public/hooks/automation")({
         }
 
         try {
-          const { runScheduledAutomation } = await import("@/lib/automation-engine.server");
-          const result = await runScheduledAutomation();
+          const body = await request.json().catch(() => ({}) as any);
+          const engine = await import("@/lib/automation-engine.server");
+          // force=true används bara vid felsökning och kringgår tidsfönstret.
+          const result = body?.force
+            ? await engine.runScheduledAutomation(new Date(), true)
+            : await engine.runScheduledAutomation();
           return Response.json({ success: true, ...result });
         } catch (error: any) {
           console.error("Automatisk torsdagsimport misslyckades:", error);
