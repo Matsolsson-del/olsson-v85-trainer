@@ -7,6 +7,8 @@ import getSystemTool from "./tools/get-system";
 import proposeSystemTool from "./tools/propose-system";
 import getImportFormatTool from "./tools/get-import-format";
 import importAiAnalysisTool from "./tools/import-ai-analysis";
+import getHistoryImportFormatTool from "./tools/get-history-import-format";
+import importBettingHistoryTool from "./tools/import-betting-history";
 
 const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unset";
 
