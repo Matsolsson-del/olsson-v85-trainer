@@ -99,6 +99,8 @@ export function HistoryChartCard({ showCorrect = true }: { showCorrect?: boolean
         <CardTitle className="text-xl">Så här har spelen gått</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
+        {dupNotice}
+
         <div className="grid gap-3 sm:grid-cols-4">
           <div>
             <p className="text-sm text-muted-foreground">Omgångar</p>
