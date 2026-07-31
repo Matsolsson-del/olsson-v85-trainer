@@ -15,6 +15,7 @@ import {
   setSourceEnabled,
 } from "@/lib/automation-admin.functions";
 import { FACTS_STATUS_LABEL, SOURCE_STATUS_LABEL } from "@/lib/automation-core";
+import { CONTENT_TYPE_LABEL } from "@/lib/tip-validation";
 
 export const Route = createFileRoute("/_authenticated/automation")({
   head: () => ({
