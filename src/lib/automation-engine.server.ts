@@ -78,10 +78,16 @@ async function ensureSources(db: any, groupId: string) {
         kind: def.kind,
         enabled: def.enabled,
         access_note: def.accessNote,
+        allowed_url_patterns: def.allowedUrlPatterns,
+        reject_url_patterns: def.rejectUrlPatterns,
+        supported_games: def.supportedGames,
+        paywall: def.paywall,
+        min_interval_minutes: def.minIntervalMinutes,
       },
       { onConflict: "group_id,source_key", ignoreDuplicates: false },
     );
   }
+
   const { data } = await db
     .from("expert_tip_sources")
     .select("*")
