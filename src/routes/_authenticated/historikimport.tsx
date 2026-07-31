@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useMyProfile, useOwnerStatus } from "@/lib/travhub-queries";
 import {
