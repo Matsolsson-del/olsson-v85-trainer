@@ -219,6 +219,16 @@ export type HistoryImportOutcome = {
   skipped: number;
   overwritten: number;
   economy_note: string;
+  import_batch_id?: string | null;
+  imported_at?: string | null;
+  results?: { idempotency_key: string; action: "created" | "overwritten" | "skipped" | "failed"; id: string | null; message?: string }[];
+};
+
+export type HistoryImportOptions = {
+  /** Spårbarhet: samma id sparas i revisionsloggen för hela importen. */
+  batchId?: string | null;
+  /** Obligatorisk motivering vid överskrivning. */
+  reason?: string | null;
 };
 
 export async function processHistoryImport(
@@ -226,8 +236,10 @@ export async function processHistoryImport(
   groupId: string,
   userId: string | null,
   raw: unknown,
+  options: HistoryImportOptions = {},
 ): Promise<HistoryImportOutcome> {
   const parsed = historyImportSchemaZod.safeParse(raw);
+
   const economyNote =
     "Historikposter är helt åtskilda från gruppens ekonomi – ingen insats eller transaktion har bokförts.";
 
