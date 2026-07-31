@@ -78,9 +78,9 @@ export type HistoryRoundPreview = {
   track_name: string | null;
   race_date: string;
   legs_count: number;
-  legs: unknown[];
+  legs: any[];
   systems_count: number;
-  winners: unknown[];
+  winners: any[];
   source: string | null;
   uncertainty_note: string | null;
   missing_fields: string[];
@@ -100,8 +100,8 @@ export type HistoryRoundPreview = {
   usable_for_learning: boolean;
   status: "new" | "duplicate_skipped" | "will_overwrite";
   existing_id: string | null;
-  existing_snapshot: Record<string, unknown> | null;
-  differences: { field: string; existing: unknown; incoming: unknown }[];
+  existing_snapshot: any;
+  differences: { field: string; existing: any; incoming: any }[];
   warnings: string[];
 
 };
