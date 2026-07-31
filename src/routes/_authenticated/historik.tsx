@@ -65,6 +65,40 @@ function HistorikPage() {
         description="Gamla spel som lagts in i efterhand. De blandas aldrig ihop med omgångar som spelats via Travhubben och påverkar inte ekonomin."
       />
 
+      {stats?.hasData ? (
+        <Card className="mb-4 border-primary/40 bg-primary/5">
+          <CardContent className="p-4">
+            <div className="grid gap-3 sm:grid-cols-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Omgångar</p>
+                <p className="text-2xl font-bold">{stats.summary.rounds}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Rätt i snitt</p>
+                <p className="text-2xl font-bold">{stats.summary.avgCorrect ?? "–"} av 8</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Netto totalt</p>
+                <p
+                  className={`text-2xl font-bold ${
+                    stats.summary.net >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
+                  }`}
+                >
+                  {new Intl.NumberFormat("sv-SE").format(stats.summary.net)} kr
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Spikar som vann</p>
+                <p className="text-2xl font-bold">{stats.spikes.hitRate ?? "–"} %</p>
+              </div>
+            </div>
+            <Button variant="outline" className="mt-4 h-12" asChild>
+              <Link to="/larande">Se hela statistiken</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
+
       {isOwner ? (
         <div className="mb-4">
           <Button className="h-12" asChild>
@@ -72,6 +106,7 @@ function HistorikPage() {
           </Button>
         </div>
       ) : null}
+
 
       {query.isLoading ? (
         <div className="space-y-3">
