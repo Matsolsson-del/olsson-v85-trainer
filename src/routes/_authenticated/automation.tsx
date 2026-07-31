@@ -135,10 +135,14 @@ function AutomationPage() {
                   </span>
                 </div>
                 <p className="text-muted-foreground">
-                  {data?.sourceSummary?.withTips ?? 0} av {data?.sourceSummary?.checked ?? 0}{" "}
-                  källor har publicerat tips. Nästa automatiska körning:{" "}
-                  {data?.nextRun ? formatDateTime(data.nextRun) : "–"}.
+                  {data?.sourceSummary?.configured ?? 0} källor är inlagda.{" "}
+                  {data?.sourceSummary?.checked ?? 0} kontrollerades senast, varav{" "}
+                  {data?.sourceSummary?.withTips ?? 0} gav verifierade V85-tips och{" "}
+                  {data?.sourceSummary?.checkedWithoutTips ?? 0} inte hade något tips ännu.{" "}
+                  {data?.sourceSummary?.manualOnly ?? 0} källor får bara läsas manuellt. Nästa
+                  automatiska körning: {data?.nextRun ? formatDateTime(data.nextRun) : "–"}.
                 </p>
+
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="secondary"
