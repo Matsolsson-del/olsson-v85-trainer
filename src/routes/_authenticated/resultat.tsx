@@ -119,9 +119,8 @@ export function ResultatDashboard() {
                   />
                   <BigStat
                     label="Bästa resultat, netto"
-                    value={
-                      data.totals.bestRound ? kr(data.totals.bestRound.net) : kr(all.net > 0 ? all.net : 0)
-                    }
+                    value={all.bestNet === null ? "–" : kr(all.bestNet)}
+                    tone={all.bestNet && all.bestNet > 0 ? "good" : undefined}
                   />
                 </div>
                 <p className="mt-3 text-base text-muted-foreground">

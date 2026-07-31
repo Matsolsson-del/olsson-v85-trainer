@@ -41,6 +41,10 @@ export const getResultsOverview = createServerFn({ method: "POST" })
       roundsWithPayout: history.summary.roundsWithPayout + hub.totals.roundsWithWin,
       avgCorrect: history.summary.avgCorrect,
       bestCorrect: history.summary.bestCorrect,
+      bestNet: [
+        ...history.trend.map((t) => t.net),
+        ...(hub.totals.bestRound ? [hub.totals.bestRound.net] : []),
+      ].reduce<number | null>((best, n) => (best === null || n > best ? n : best), null),
     };
 
     return { history, hub, combined };
