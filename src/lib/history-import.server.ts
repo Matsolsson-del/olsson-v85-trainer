@@ -77,6 +77,13 @@ export type HistoryRoundPreview = {
   idempotency_key: string;
   track_name: string | null;
   race_date: string;
+  legs_count: number;
+  legs: unknown[];
+  systems_count: number;
+  winners: unknown[];
+  source: string | null;
+  uncertainty_note: string | null;
+  missing_fields: string[];
   computed_rows: number;
   stated_rows: number | null;
   rows_mismatch: boolean;
@@ -92,7 +99,11 @@ export type HistoryRoundPreview = {
   winners_verified: boolean;
   usable_for_learning: boolean;
   status: "new" | "duplicate_skipped" | "will_overwrite";
+  existing_id: string | null;
+  existing_snapshot: Record<string, unknown> | null;
+  differences: { field: string; existing: unknown; incoming: unknown }[];
   warnings: string[];
+
 };
 
 function buildRow(input: HistoryRoundInput, groupId: string, userId: string | null) {
