@@ -34,8 +34,9 @@ export function AutomationStatusCard() {
 
   const tipsText =
     summary.withTips > 0
-      ? `${summary.withTips} av ${summary.checked} experttips är inlästa.`
-      : "Inga experttips är publicerade ännu. Appen hämtar dem så fort de kommer.";
+      ? `${summary.withTips} av ${summary.configured} källor har gett verifierade experttips.`
+      : "Inga verifierade experttips har hittats ännu. Appen fortsätter leta automatiskt.";
+
 
   return (
     <Card className="mb-5">

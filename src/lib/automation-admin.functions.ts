@@ -67,14 +67,30 @@ export const getAutomationOverview = createServerFn({ method: "GET" })
       attempts: s.failure_count ?? 0,
       lastCheckedAt: s.last_checked_at,
       message: s.last_message ?? s.access_note,
+      paywall: s.paywall ?? false,
+      qualityStatus: s.quality_status ?? "unknown",
+      lastVerifiedTipAt: s.last_verified_tip_at ?? null,
+      enabled: s.enabled ?? true,
+      kind: s.kind,
     }));
 
-    const { data: tipCounts } = await context.supabase
-      .from("expert_tips")
-      .select("source_key")
-      .eq("group_id", groupId)
-      .eq("race_date", saturday)
-      .eq("is_current", true);
+    // Endast verifierade experttips räknas – nyheter och annat räknas aldrig in.
+    const [{ data: tipCounts }, { data: candidates }] = await Promise.all([
+      context.supabase
+        .from("expert_tips")
+        .select("source_key")
+        .eq("group_id", groupId)
+        .eq("race_date", saturday)
+        .eq("is_current", true)
+        .eq("classification", "expert_tip"),
+      context.supabase
+        .from("expert_tip_candidates")
+        .select("*")
+        .eq("group_id", groupId)
+        .eq("race_date", saturday)
+        .order("created_at", { ascending: false })
+        .limit(60),
+    ]);
     for (const source of sources) {
       source.tips = (tipCounts ?? []).filter((t: any) => t.source_key === source.key).length;
     }
@@ -94,12 +110,14 @@ export const getAutomationOverview = createServerFn({ method: "GET" })
       factsStatus: factsStatus({ running, races, entries }),
       sourceSummary: summarizeSources(sources),
       sources,
+      candidates: candidates ?? [],
       runs: runsRes.data ?? [],
       changes: changesRes.data ?? [],
       nextRun: nextRun(new Date()).at.toISOString(),
       plan: SCHEDULE,
     };
   });
+
 
 /** Kör automatiken direkt. Används av Mats när han vill hämta om underlaget. */
 export const runAutomationNow = createServerFn({ method: "POST" })

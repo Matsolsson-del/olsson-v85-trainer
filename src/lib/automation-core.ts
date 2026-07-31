@@ -221,10 +221,12 @@ export function changeSummary(changes: { leg: number; text: string; important: b
 
 export type SourceStatus =
   | "ok"
+  | "checked_no_tips"
   | "no_tips"
   | "temporary_error"
   | "permanent_error"
   | "access_denied"
+  | "manual_only"
   | "format_changed"
   | "invalid_content"
   | "pending";
@@ -264,20 +266,32 @@ export const FACTS_STATUS_LABEL: Record<FactsStatus, string> = {
 
 /** Vardagliga förklaringar av varje källas status. */
 export const SOURCE_STATUS_LABEL: Record<SourceStatus, string> = {
-  ok: "Tips hämtade",
+  ok: "Verifierade tips hämtade",
+  checked_no_tips: "Kontrollerad – inget verifierat tips ännu",
   no_tips: "Inget publicerat ännu",
   temporary_error: "Svarade inte – nytt försök sker automatiskt",
   permanent_error: "Fungerar inte just nu",
   access_denied: "Får inte hämtas automatiskt",
+  manual_only: "Endast manuell läsning",
   format_changed: "Sidan ser annorlunda ut",
   invalid_content: "Innehållet gick inte att tolka",
   pending: "Inte kontrollerad ännu",
 };
 
 
+
+
 export type TipsSummary = {
+  /** Antal källor som finns i registret (konfigurerade). */
+  configured: number;
+  /** Antal källor som faktiskt kontrollerades den här körningen. */
   checked: number;
+  /** Källor som gav minst ett verifierat tips. */
   withTips: number;
+  /** Källor som kontrollerades men inte hade något verifierat tips. */
+  checkedWithoutTips: number;
+  /** Källor som bara får läsas manuellt (betalvägg, inloggning). */
+  manualOnly: number;
   waiting: number;
   failed: number;
   tips: number;
@@ -285,25 +299,36 @@ export type TipsSummary = {
 };
 
 export function summarizeSources(sources: SourceState[]): TipsSummary {
-  const checked = sources.length;
+  const configured = sources.length;
+  const manualOnly = sources.filter((s) =>
+    ["manual_only", "access_denied"].includes(s.status),
+  ).length;
+  const checked = sources.filter((s) =>
+    ["ok", "checked_no_tips", "no_tips", "format_changed", "invalid_content"].includes(s.status),
+  ).length;
   const withTips = sources.filter((s) => s.status === "ok" && s.tips > 0).length;
+  const checkedWithoutTips = Math.max(0, checked - withTips);
   const failed = sources.filter((s) =>
-    ["permanent_error", "access_denied", "format_changed", "invalid_content"].includes(s.status),
+    ["permanent_error", "format_changed", "invalid_content"].includes(s.status),
   ).length;
   const waiting = sources.filter((s) =>
-    ["pending", "no_tips", "temporary_error"].includes(s.status),
+    ["pending", "no_tips", "temporary_error", "checked_no_tips"].includes(s.status),
   ).length;
   const times = sources
     .map((s) => s.lastCheckedAt)
     .filter((t): t is string => Boolean(t))
     .sort();
   return {
+    configured,
     checked,
     withTips,
+    checkedWithoutTips,
+    manualOnly,
     waiting,
     failed,
     tips: sources.reduce((sum, s) => sum + (s.tips || 0), 0),
     lastCheckedAt: times.length > 0 ? times[times.length - 1] : null,
+
   };
 }
 

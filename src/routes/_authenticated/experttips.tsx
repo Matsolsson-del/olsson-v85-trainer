@@ -33,31 +33,68 @@ export const Route = createFileRoute("/_authenticated/experttips")({
   component: ExperttipsPage,
 });
 
+type Claim = {
+  leg?: number;
+  horse?: string;
+  note?: string;
+  sourceUrls?: string[];
+  consensusLevel?: string;
+};
+
 type Report = {
   id: string;
   race_date: string;
   track_name: string | null;
+  status: string | null;
   summary: string | null;
   trends: Array<{ title?: string; text?: string }>;
-  consensus: Array<{ leg?: number; horse?: string; note?: string }>;
-  disagreements: Array<{ leg?: number; horse?: string; note?: string }>;
-  legs: Array<{ leg?: number; text?: string }>;
+  consensus: Claim[];
+  disagreements: Claim[];
+  legs: Array<{ leg?: number; text?: string; sourceUrls?: string[] }>;
   sources: Array<{ title?: string; url?: string }>;
   updated_at: string;
+};
+
+const CONSENSUS_LABEL: Record<string, string> = {
+  clear: "Tydlig samsyn – minst tre verifierade källor",
+  multiple: "Flera källor",
+  single: "En källa",
+  split: "Delade meningar",
+  none: "Ingen verifierad källa",
 };
 
 function legLabel(leg?: number) {
   return leg && leg > 0 ? `Avd ${leg}` : "Allmänt";
 }
 
-function HorseList({
-  items,
-  tone,
-}: {
-  items: Array<{ leg?: number; horse?: string; note?: string }>;
-  tone: "success" | "warning";
-}) {
-  if (!items?.length) return <p className="text-base text-muted-foreground">Inget att visa.</p>;
+/** Varje påstående visar hur många verifierade källor som står bakom det. */
+function SourceRefs({ urls }: { urls?: string[] }) {
+  if (!urls?.length) return null;
+  return (
+    <p className="mt-1 flex flex-wrap gap-2 text-sm text-muted-foreground">
+      <span>{urls.length} verifierad(e) källa/källor:</span>
+      {urls.slice(0, 4).map((u, i) => (
+        <a
+          key={i}
+          href={u}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="text-primary underline underline-offset-4"
+        >
+          Källa {i + 1}
+        </a>
+      ))}
+    </p>
+  );
+}
+
+function HorseList({ items }: { items: Claim[]; tone?: "success" | "warning" }) {
+  if (!items?.length)
+    return (
+      <p className="text-base text-muted-foreground">
+        Inga verifierade experttips har hittats för den här delen ännu.
+      </p>
+    );
   return (
     <ul className="space-y-3">
       {items.map((item, i) => (
@@ -67,13 +104,20 @@ function HorseList({
               {legLabel(item.leg)}
             </Badge>
             <span className="text-base font-semibold text-foreground">{item.horse ?? "—"}</span>
+            {item.consensusLevel && (
+              <Badge variant="outline" className="text-xs">
+                {CONSENSUS_LABEL[item.consensusLevel] ?? item.consensusLevel}
+              </Badge>
+            )}
           </div>
           {item.note && <p className="mt-1 text-base text-muted-foreground">{item.note}</p>}
+          <SourceRefs urls={item.sourceUrls} />
         </li>
       ))}
     </ul>
   );
 }
+
 
 function ExperttipsPage() {
   const { groupId } = useActiveGroupId();
@@ -143,6 +187,16 @@ function ExperttipsPage() {
 
       {latest && (
         <div className="space-y-6">
+          {latest.status === "no_verified_tips" && (
+            <Card className="border-warning">
+              <CardContent className="p-4 text-base">
+                Inga verifierade experttips har hittats ännu. Sidorna som granskades gällde en annan
+                spelform, en annan omgång eller saknade spelförslag. AI kan ändå analysera
+                tävlingsfakta, men ingen expertsamsyn redovisas.
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="flex flex-wrap items-center gap-2 text-xl">
@@ -209,8 +263,10 @@ function ExperttipsPage() {
                   <div key={i} className="rounded-lg border border-border bg-surface p-3">
                     <p className="text-base font-semibold text-foreground">{legLabel(l.leg)}</p>
                     <p className="text-base text-muted-foreground">{l.text}</p>
+                    <SourceRefs urls={l.sourceUrls} />
                   </div>
                 ))}
+
               </CardContent>
             </Card>
           )}

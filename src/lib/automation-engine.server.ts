@@ -14,6 +14,13 @@ import {
   tipKey,
   type SourceState,
 } from "./automation-core";
+import {
+  accountingSummary,
+  emptyAccounting,
+  type CandidateVerification,
+  type ExpectedRound,
+  type RunAccounting,
+} from "./tip-validation";
 import { matchSlot, nextRetryAt, nextRun, targetSaturday } from "./v85-schedule";
 import { SOURCE_REGISTRY, fetchSources, type SourceDefinition } from "./expert-tips-sources.server";
 
@@ -71,10 +78,16 @@ async function ensureSources(db: any, groupId: string) {
         kind: def.kind,
         enabled: def.enabled,
         access_note: def.accessNote,
+        allowed_url_patterns: def.allowedUrlPatterns,
+        reject_url_patterns: def.rejectUrlPatterns,
+        supported_games: def.supportedGames,
+        paywall: def.paywall,
+        min_interval_minutes: def.minIntervalMinutes,
       },
       { onConflict: "group_id,source_key", ignoreDuplicates: false },
     );
   }
+
   const { data } = await db
     .from("expert_tip_sources")
     .select("*")
@@ -139,9 +152,21 @@ export async function runAutomationForGroup(params: {
         sources_with_tips: outcome.summary?.withTips ?? 0,
         sources_waiting: outcome.summary?.waiting ?? 0,
         tips_imported: outcome.tips ?? 0,
+        candidates_found: outcome.accounting?.candidates ?? 0,
+        candidates_rejected: outcome.accounting?.rejected ?? 0,
+        candidates_reclassified: outcome.accounting?.reclassified ?? 0,
+        tips_new: outcome.accounting?.newTips ?? 0,
+        tips_updated: outcome.accounting?.updatedTips ?? 0,
+        tips_unchanged: outcome.accounting?.unchangedTips ?? 0,
+        tips_duplicates: outcome.accounting?.duplicates ?? 0,
+        tips_verified_total: outcome.accounting?.verifiedTotal ?? 0,
+        accounting_note: outcome.accounting ? accountingSummary(outcome.accounting) : null,
+        scheduled_for: now.toISOString(),
+        next_run_at: nextRun(now)?.at?.toISOString() ?? null,
         error_message: outcome.error ?? null,
         log: JSON.parse(JSON.stringify(log)),
       })
+
       .eq("id", runId);
 
     return {
@@ -193,6 +218,7 @@ type ExecuteResult = {
   changes?: number;
   sources?: SourceState[];
   summary?: ReturnType<typeof summarizeSources>;
+  accounting?: RunAccounting;
   error?: string | null;
 };
 
@@ -313,7 +339,7 @@ async function execute(
       states.push({
         key: def.key,
         name: def.name,
-        status: "access_denied",
+        status: "manual_only",
         tips: 0,
         attempts: 0,
         lastCheckedAt: row?.last_checked_at ?? null,
@@ -336,25 +362,71 @@ async function execute(
     dueDefinitions.push(def);
   }
 
+  const accounting = emptyAccounting();
   let importedTips = 0;
-  if (dueDefinitions.length > 0) {
+
+  if (dueDefinitions.length > 0 && trackName) {
+    const expected: ExpectedRound = {
+      gameType: "V85",
+      raceDate: ctx.saturday,
+      trackName,
+      gameId,
+    };
+
     const results = await fetchSources({
       sources: dueDefinitions,
-      track: trackName ?? "",
+      expected,
       dateLabel,
     });
 
     for (const result of results) {
       const row = sourceRows.find((r: any) => r.source_key === result.key);
+
+      // Alla prövade sidor sparas för revision, även de som underkändes.
+      for (const candidate of result.candidates) {
+        accounting.candidates++;
+        if (candidate.accepted) accounting.accepted++;
+        else if (candidate.code === "reclassified_as_news") accounting.reclassified++;
+        else accounting.rejected++;
+      }
+      if (result.candidates.length > 0) {
+        await db.from("expert_tip_candidates").insert(
+          result.candidates.map((c) => ({
+            group_id: ctx.groupId,
+            round_id: roundId,
+            automation_run_id: ctx.runId,
+            race_date: ctx.saturday,
+            source_key: c.sourceKey,
+            source_name: c.sourceName,
+            url: c.url,
+            title: c.title,
+            classification: c.classification,
+            code: c.code,
+            accepted: c.accepted,
+            game_type_verified: c.gameTypeVerified,
+            date_verified: c.dateVerified,
+            track_verified: c.trackVerified,
+            tip_signals: c.tipSignals,
+            reasons: c.reasons,
+          })),
+        );
+      }
+
       let saved = 0;
       if (result.status === "ok") {
-        saved = await saveTips(db, {
+        const outcome = await saveTips(db, {
           groupId: ctx.groupId,
           roundId,
           raceDate: ctx.saturday,
           sourceId: row?.id ?? null,
           tips: result.tips,
+          candidates: result.candidates,
         });
+        saved = outcome.saved;
+        accounting.newTips += outcome.created;
+        accounting.updatedTips += outcome.updated;
+        accounting.unchangedTips += outcome.unchanged;
+        accounting.duplicates += outcome.unchanged;
         importedTips += saved;
       }
 
@@ -368,6 +440,24 @@ async function execute(
           last_message: result.message,
           failure_count: attempts,
           next_attempt_at: failed ? nextRetryAt(ctx.now, attempts - 1) : null,
+          allowed_url_patterns:
+            SOURCE_REGISTRY.find((d) => d.key === result.key)?.allowedUrlPatterns ?? [],
+          reject_url_patterns:
+            SOURCE_REGISTRY.find((d) => d.key === result.key)?.rejectUrlPatterns ?? [],
+          supported_games: SOURCE_REGISTRY.find((d) => d.key === result.key)?.supportedGames ?? [],
+          paywall: SOURCE_REGISTRY.find((d) => d.key === result.key)?.paywall ?? false,
+          min_interval_minutes:
+            SOURCE_REGISTRY.find((d) => d.key === result.key)?.minIntervalMinutes ?? 45,
+          last_verified_tip_at:
+            result.status === "ok" && saved > 0 ? ctx.now.toISOString() : row?.last_verified_tip_at ?? null,
+          quality_status:
+            result.status === "ok" && saved > 0
+              ? "verified"
+              : result.status === "checked_no_tips"
+                ? "checked"
+                : failed
+                  ? "unstable"
+                  : "unknown",
         })
         .eq("group_id", ctx.groupId)
         .eq("source_key", result.key);
@@ -381,25 +471,49 @@ async function execute(
         lastCheckedAt: ctx.now.toISOString(),
         message: result.message,
       });
-      ctx.log.push({ step: "källa", key: result.key, status: result.status, tips: saved });
+      ctx.log.push({
+        step: "källa",
+        key: result.key,
+        status: result.status,
+        kandidater: result.candidates.length,
+        godkända: result.candidates.filter((c) => c.accepted).length,
+        underkända: result.candidates
+          .filter((c) => !c.accepted)
+          .map((c) => ({ url: c.url, orsak: c.code, klass: c.classification })),
+        tips: saved,
+      });
     }
+  } else if (dueDefinitions.length > 0) {
+    ctx.log.push({
+      step: "källa",
+      message: "Banan är inte bekräftad ännu – inga experttips hämtades.",
+    });
   }
+
+  /* 3. Verifierade tips totalt för dagen ---------------------------------- */
+  const { count: verifiedTotal } = await db
+    .from("expert_tips")
+    .select("id", { count: "exact", head: true })
+    .eq("group_id", ctx.groupId)
+    .eq("race_date", ctx.saturday)
+    .eq("is_current", true)
+    .eq("classification", "expert_tip");
+  accounting.verifiedTotal = verifiedTotal ?? 0;
 
   const summary = summarizeSources(states);
   const facts = factsStatus({ running: false, races, entries });
   const status: ExecuteResult["status"] =
-    facts === "ready" && summary.withTips > 0
-      ? "success"
-      : facts === "ready"
-        ? "partial"
-        : "partial";
+    facts === "ready" && summary.withTips > 0 ? "success" : "partial";
+
+  ctx.log.push({ step: "bokföring", ...accounting, text: accountingSummary(accounting) });
 
   return {
     status,
     message:
       facts === "ready"
-        ? `Underlaget är klart. ${summary.withTips} av ${summary.checked} källor har publicerat tips.`
-        : "Underlaget är delvis hämtat.",
+        ? `Tävlingsunderlaget är klart. ${summary.withTips} av ${summary.configured} källor gav verifierade tips ` +
+          `(${summary.checkedWithoutTips} kontrollerade utan tips, ${summary.manualOnly} läses bara manuellt).`
+        : "Tävlingsunderlaget är delvis hämtat.",
     roundId,
     gameId,
     trackName,
@@ -409,8 +523,10 @@ async function execute(
     changes,
     sources: states,
     summary,
+    accounting,
   };
 }
+
 
 /* -------------------------------------------------------------------------- */
 /* Tips med versionshistorik                                                  */
@@ -424,10 +540,18 @@ async function saveTips(
     raceDate: string;
     sourceId: string | null;
     tips: import("./automation-core").TipRecord[];
+    candidates: CandidateVerification[];
   },
-): Promise<number> {
-  let saved = 0;
+): Promise<{ saved: number; created: number; updated: number; unchanged: number }> {
+  let created = 0;
+  let updated = 0;
+  let unchanged = 0;
+
   for (const tip of params.tips) {
+    // Varje sparat tips måste kunna spåras till en verifierad kandidatsida.
+    const verification = params.candidates.find((c) => c.accepted && c.url === tip.url);
+    if (!verification) continue;
+
     const key = tipKey({
       raceDate: params.raceDate,
       sourceKey: tip.sourceKey,
@@ -453,7 +577,10 @@ async function saveTips(
       .maybeSingle();
 
     // Exakt samma tips igen: hoppa över helt (idempotens).
-    if (existing?.content_hash === hash) continue;
+    if (existing?.content_hash === hash) {
+      unchanged++;
+      continue;
+    }
 
     if (existing) {
       // Tidigare version bevaras, men är inte längre den aktuella.
@@ -479,11 +606,21 @@ async function saveTips(
       longshot: tip.longshot ?? null,
       warning: tip.warning ?? null,
       note: tip.note ?? null,
+      classification: verification.classification,
+      verification_code: verification.code,
+      game_type_verified: verification.gameTypeVerified,
+      date_verified: verification.dateVerified,
+      track_verified: verification.trackVerified,
+      verification_reasons: verification.reasons,
     });
-    if (!error) saved++;
+    if (!error) {
+      if (existing) updated++;
+      else created++;
+    }
   }
-  return saved;
+  return { saved: created + updated, created, updated, unchanged };
 }
+
 
 async function logActivity(
   db: any,

@@ -15,6 +15,7 @@ import {
   setSourceEnabled,
 } from "@/lib/automation-admin.functions";
 import { FACTS_STATUS_LABEL, SOURCE_STATUS_LABEL } from "@/lib/automation-core";
+import { CONTENT_TYPE_LABEL } from "@/lib/tip-validation";
 
 export const Route = createFileRoute("/_authenticated/automation")({
   head: () => ({
@@ -135,10 +136,14 @@ function AutomationPage() {
                   </span>
                 </div>
                 <p className="text-muted-foreground">
-                  {data?.sourceSummary?.withTips ?? 0} av {data?.sourceSummary?.checked ?? 0}{" "}
-                  källor har publicerat tips. Nästa automatiska körning:{" "}
-                  {data?.nextRun ? formatDateTime(data.nextRun) : "–"}.
+                  {data?.sourceSummary?.configured ?? 0} källor är inlagda.{" "}
+                  {data?.sourceSummary?.checked ?? 0} kontrollerades senast, varav{" "}
+                  {data?.sourceSummary?.withTips ?? 0} gav verifierade V85-tips och{" "}
+                  {data?.sourceSummary?.checkedWithoutTips ?? 0} inte hade något tips ännu.{" "}
+                  {data?.sourceSummary?.manualOnly ?? 0} källor får bara läsas manuellt. Nästa
+                  automatiska körning: {data?.nextRun ? formatDateTime(data.nextRun) : "–"}.
                 </p>
+
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="secondary"
@@ -170,6 +175,10 @@ function AutomationPage() {
             <CardTitle className="text-base">Experttipskällor</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
+            <p className="text-xs text-muted-foreground">
+              En källa räknas bara som klar när sidan gäller V85, rätt datum och rätt bana, och
+              verkligen innehåller ett spelförslag.
+            </p>
             {(data?.sources ?? []).length === 0 ? (
               <p className="text-muted-foreground">Källorna registreras vid första körningen.</p>
             ) : (
@@ -179,7 +188,7 @@ function AutomationPage() {
                     <p className="font-medium">{s.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {SOURCE_STATUS_LABEL[s.status as keyof typeof SOURCE_STATUS_LABEL] ?? s.status}
-                      {s.tips > 0 ? ` – ${s.tips} tips` : ""}
+                      {s.tips > 0 ? ` – ${s.tips} verifierade tips` : " – 0 verifierade tips"}
                       {s.lastCheckedAt ? ` – ${formatDateTime(s.lastCheckedAt)}` : ""}
                     </p>
                     {s.message ? (
@@ -187,7 +196,8 @@ function AutomationPage() {
                     ) : null}
                   </div>
                   <Switch
-                    checked={s.status !== "access_denied"}
+                    checked={Boolean(s.enabled) && s.kind !== "blocked"}
+                    disabled={s.kind === "blocked"}
                     onCheckedChange={(v) => handleToggle(s.key, v)}
                     aria-label={`Slå på eller av ${s.name}`}
                   />
@@ -196,6 +206,44 @@ function AutomationPage() {
             )}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Granskade sidor</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {(data?.candidates ?? []).length === 0 ? (
+              <p className="text-muted-foreground">
+                Inga sidor har granskats för {data?.saturday} ännu.
+              </p>
+            ) : (
+              (data?.candidates ?? []).slice(0, 20).map((c: any) => (
+                <div key={c.id} className="border-b pb-2 last:border-0">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="min-w-0 truncate font-medium">{c.title ?? c.url}</span>
+                    <Badge variant={c.accepted ? "default" : "secondary"}>
+                      {CONTENT_TYPE_LABEL[c.classification as keyof typeof CONTENT_TYPE_LABEL] ??
+                        c.classification}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {c.source_name} – {(c.reasons ?? []).join(" ") || "Ingen förklaring sparad."}
+                  </p>
+                  <a
+                    className="text-xs underline"
+                    href={c.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    Öppna originalsidan
+                  </a>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+
 
         <Card>
           <CardHeader className="pb-2">
