@@ -246,14 +246,15 @@ export function computeHistoryStats(rowsInput: HistoryRow[]) {
   }
 
   return {
-    blocked,
+    blocked: false,
+    preliminary,
     unresolvedDuplicates: unresolved.length,
     unresolvedDates: unresolved.map((g) => ({
       track: g.rows[0].track_name ?? "Okänd bana",
       date: String(g.rows[0].race_date),
       count: g.rows.length,
     })),
-    hasData: !blocked && rows.length > 0,
+    hasData: rows.length > 0,
     summary: {
       rounds: rows.length,
       totalCost: Math.round(totalCost),
