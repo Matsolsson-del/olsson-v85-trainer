@@ -259,6 +259,19 @@ export const FACTS_STATUS_LABEL: Record<FactsStatus, string> = {
   needs_attention: "Behöver åtgärdas",
 };
 
+/** Vardagliga förklaringar av varje källas status. */
+export const SOURCE_STATUS_LABEL: Record<SourceStatus, string> = {
+  ok: "Tips hämtade",
+  no_tips: "Inget publicerat ännu",
+  temporary_error: "Svarade inte – nytt försök sker automatiskt",
+  permanent_error: "Fungerar inte just nu",
+  access_denied: "Får inte hämtas automatiskt",
+  format_changed: "Sidan ser annorlunda ut",
+  invalid_content: "Innehållet gick inte att tolka",
+  pending: "Inte kontrollerad ännu",
+};
+
+
 export type TipsSummary = {
   checked: number;
   withTips: number;
