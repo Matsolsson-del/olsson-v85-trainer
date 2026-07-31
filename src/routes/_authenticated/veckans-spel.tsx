@@ -9,6 +9,7 @@ import { AiImportCard } from "@/components/round/AiImportCard";
 import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AutomationStatusCard } from "@/components/round/AutomationStatusCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -354,6 +355,8 @@ function Workflow({ roundId }: { roundId: string }) {
           </Button>
         }
       />
+
+      <AutomationStatusCard />
 
       <Card className="mb-5 border-2 border-primary">
         <CardContent className="space-y-2 p-5">
