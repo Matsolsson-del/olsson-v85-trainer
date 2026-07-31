@@ -92,7 +92,7 @@ function HistorikPage() {
                 <p className="text-2xl font-bold">{stats.spikes.hitRate ?? "–"} %</p>
               </div>
             </div>
-            <Button variant="outline" className="mt-4 h-12" asChild>
+            <Button variant="secondary" className="mt-4 h-12" asChild>
               <Link to="/larande">Se hela statistiken</Link>
             </Button>
           </CardContent>
@@ -134,10 +134,10 @@ function HistorikPage() {
                     {r.track_name ?? "Okänd bana"} · {formatDate(r.race_date)}
                   </CardTitle>
                   <Badge variant="secondary">Importerad historik</Badge>
-                  <Badge variant="outline">
+                  <Badge variant="secondary">
                     Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
                   </Badge>
-                  <Badge variant="outline">
+                  <Badge variant="secondary">
                     {r.winners_verified ? "Resultat verifierat" : "Resultat ofullständigt"}
                   </Badge>
                 </div>
