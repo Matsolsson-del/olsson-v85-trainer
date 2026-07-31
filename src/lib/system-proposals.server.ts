@@ -156,7 +156,12 @@ export async function buildSystemCandidates(roundId: string, userId: string) {
   const legs: Leg[] = [];
   for (const race of races ?? []) {
     const probByEntry = new Map<string, number>();
-    for (const ga of race.group_race_assessments ?? []) {
+    const assessments = Array.isArray(race.group_race_assessments)
+      ? race.group_race_assessments
+      : race.group_race_assessments
+        ? [race.group_race_assessments]
+        : [];
+    for (const ga of assessments as any[]) {
       for (const ge of ga.group_entry_assessments ?? []) {
         probByEntry.set(ge.race_entry_id, Number(ge.group_win_probability));
       }
