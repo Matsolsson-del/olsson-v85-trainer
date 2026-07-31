@@ -162,15 +162,33 @@ export async function fetchRoundData(roundId: string) {
     .eq("round_id", roundId)
     .maybeSingle();
 
+  // Vissa inbäddningar (t.ex. gruppbedömningen) returneras som ett objekt när
+  // relationen är en-till-en. Normalisera alltid till en lista så att övriga
+  // vyer kan använda samma form.
+  const asList = (value: unknown) =>
+    Array.isArray(value) ? value : value ? [value] : [];
+
+  const normalizedRaces = (races ?? []).map((race: any) => ({
+    ...race,
+    group_race_assessments: asList(race.group_race_assessments).map((a: any) => ({
+      ...a,
+      group_entry_assessments: asList(a.group_entry_assessments),
+    })),
+    individual_race_assessments: asList(race.individual_race_assessments),
+    race_results: asList(race.race_results),
+    race_postmortems: asList(race.race_postmortems),
+  }));
+
   return {
     round: round!,
-    races: races ?? [],
+    races: normalizedRaces,
     systems: systems ?? [],
     activity: activity ?? [],
     roundResult,
     postmortem,
   };
 }
+
 
 export function useRoundData(roundId: string) {
   return useQuery({
