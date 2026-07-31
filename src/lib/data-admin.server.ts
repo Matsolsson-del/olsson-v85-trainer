@@ -179,7 +179,7 @@ export async function createDemoRound(groupId: string, userId: string) {
       race_date: dateStr,
       bet_stop_at: new Date(raceDate.getTime() + 16 * 3600 * 1000).toISOString(),
       row_price: 0.5,
-      budget: 500,
+      budget: 450,
       status: "individual_analysis",
       is_demo: true,
       general_notes: "Demoomgång med påhittade hästar. Räknas aldrig in i statistik eller ekonomi.",
