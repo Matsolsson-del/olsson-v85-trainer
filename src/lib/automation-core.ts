@@ -153,6 +153,9 @@ export function diffFacts(before: FactSnapshot, after: FactSnapshot): FactChange
     const next = after[field] ?? null;
     if (prev === next) continue;
     if (next === null) continue; // saknad uppgift ersätter aldrig känd uppgift
+    // Första gången en uppgift fylls i är det ny information, inte en ändring.
+    if (prev === null && field !== "scratched") continue;
+
 
     if (field === "betSharePercent") {
       const delta = Math.abs(Number(next) - Number(prev ?? 0));
