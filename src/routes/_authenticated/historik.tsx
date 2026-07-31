@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useIsOwner } from "@/lib/travhub-queries";
 import { listImportedHistory } from "@/lib/history-import.functions";
+import { getHistoryStats } from "@/lib/history-stats.functions";
+import type { HistoryStats } from "@/lib/history-stats";
 
 export const Route = createFileRoute("/_authenticated/historik")({
   head: () => ({
