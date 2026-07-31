@@ -66,24 +66,27 @@ function Step({
   children: React.ReactNode;
 }) {
   const Icon = state === "klar" ? CheckCircle2 : state === "pagar" ? AlertTriangle : Circle;
+  const stateLabel = state === "klar" ? "Klar" : state === "pagar" ? "Pågår" : "Väntar";
+  const stateClass =
+    state === "klar"
+      ? "text-primary"
+      : state === "pagar"
+        ? "text-warning"
+        : "text-muted-foreground";
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-3 text-xl">
+        <CardTitle className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 text-xl">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-base font-semibold text-primary">
             {number}
           </span>
-          <span className="flex-1">{title}</span>
-          <Icon
-            className={
-              state === "klar"
-                ? "h-6 w-6 text-primary"
-                : state === "pagar"
-                  ? "h-6 w-6 text-warning"
-                  : "h-6 w-6 text-muted-foreground"
-            }
-            aria-hidden
-          />
+          <span className="min-w-0">{title}</span>
+          <span
+            className={`col-span-2 flex items-center gap-2 text-base font-medium ${stateClass}`}
+          >
+            <Icon className="h-5 w-5 shrink-0" aria-hidden />
+            {stateLabel}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-base leading-relaxed">{children}</CardContent>
