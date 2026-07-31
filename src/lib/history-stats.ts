@@ -203,7 +203,7 @@ export function computeHistoryStats(rowsInput: HistoryRow[]) {
   }
   if (spikeMissRounds > 0) {
     advice.push(
-      `${spikeMissRounds} av ${rows.length} omgångar sprack på en spik. Det motsvarar ${Math.round(spikeMissCost)} kr i insats.`,
+      `${spikeMissRounds} av ${rows.length} omgångar sprack på en spik. Det motsvarar ${new Intl.NumberFormat("sv-SE").format(Math.round(spikeMissCost))} kr i insats.`,
     );
   }
   if (worstLegs.length) {

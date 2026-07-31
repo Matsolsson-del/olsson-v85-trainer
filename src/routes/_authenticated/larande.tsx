@@ -312,7 +312,7 @@ function LarandePage() {
                 <Button className="h-12" asChild>
                   <Link to="/veckans-spel">Till veckans spel</Link>
                 </Button>
-                <Button variant="outline" className="h-12" asChild>
+                <Button variant="secondary" className="h-12" asChild>
                   <Link to="/historik">Se alla gamla spel</Link>
                 </Button>
               </div>
