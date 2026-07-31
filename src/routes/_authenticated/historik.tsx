@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useIsOwner } from "@/lib/travhub-queries";
 import { listImportedHistory } from "@/lib/history-import.functions";
+import { getHistoryStats } from "@/lib/history-stats.functions";
+import type { HistoryStats } from "@/lib/history-stats";
 
 export const Route = createFileRoute("/_authenticated/historik")({
   head: () => ({
@@ -41,12 +43,20 @@ function HistorikPage() {
   const { groupId } = useActiveGroupId();
   const isOwner = useIsOwner(groupId);
   const fetchRows = useServerFn(listImportedHistory);
+  const fetchStats = useServerFn(getHistoryStats);
 
   const query = useQuery({
     queryKey: ["imported-history", groupId],
     enabled: Boolean(groupId),
     queryFn: () => fetchRows({ data: { groupId: groupId! } }) as Promise<any[]>,
   });
+
+  const statsQuery = useQuery({
+    queryKey: ["history-stats", groupId],
+    enabled: Boolean(groupId),
+    queryFn: () => fetchStats({ data: { groupId: groupId! } }) as Promise<HistoryStats>,
+  });
+  const stats = statsQuery.data;
 
   return (
     <>
@@ -55,6 +65,40 @@ function HistorikPage() {
         description="Gamla spel som lagts in i efterhand. De blandas aldrig ihop med omgångar som spelats via Travhubben och påverkar inte ekonomin."
       />
 
+      {stats?.hasData ? (
+        <Card className="mb-4">
+          <CardContent className="p-4">
+            <div className="grid gap-3 sm:grid-cols-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Omgångar</p>
+                <p className="text-2xl font-bold">{stats.summary.rounds}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Rätt i snitt</p>
+                <p className="text-2xl font-bold">{stats.summary.avgCorrect ?? "–"} av 8</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Netto totalt</p>
+                <p
+                  className={`text-2xl font-bold ${
+                    stats.summary.net >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"
+                  }`}
+                >
+                  {new Intl.NumberFormat("sv-SE").format(stats.summary.net)} kr
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Spikar som vann</p>
+                <p className="text-2xl font-bold">{stats.spikes.hitRate ?? "–"} %</p>
+              </div>
+            </div>
+            <Button variant="secondary" className="mt-4 h-12" asChild>
+              <Link to="/larande">Se hela statistiken</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
+
       {isOwner ? (
         <div className="mb-4">
           <Button className="h-12" asChild>
@@ -62,6 +106,7 @@ function HistorikPage() {
           </Button>
         </div>
       ) : null}
+
 
       {query.isLoading ? (
         <div className="space-y-3">
@@ -89,10 +134,10 @@ function HistorikPage() {
                     {r.track_name ?? "Okänd bana"} · {formatDate(r.race_date)}
                   </CardTitle>
                   <Badge variant="secondary">Importerad historik</Badge>
-                  <Badge variant="outline">
+                  <Badge variant="secondary">
                     Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
                   </Badge>
-                  <Badge variant="outline">
+                  <Badge variant="secondary">
                     {r.winners_verified ? "Resultat verifierat" : "Resultat ofullständigt"}
                   </Badge>
                 </div>

@@ -179,9 +179,33 @@ export async function buildSystemCandidates(roundId: string, userId: string) {
 
   const budget = Number(round.budget);
   const rowPrice = Number(round.row_price);
-  const proposals = (["sakrare", "balanserat", "varde"] as Profile[]).map((p) =>
-    build(legs, rowPrice, budget, p),
-  );
+
+  // Kalibrering: låt den faktiska spelhistoriken avgöra vilket förslag vi rekommenderar.
+  const { loadHistoryStats } = await import("@/lib/history-stats.server");
+  let recommendedProfile: Profile = "balanserat";
+  let historyNote: string | null = null;
+  try {
+    const stats = await loadHistoryStats(round.group_id);
+    if (stats.hasData && stats.spikes.total >= 10 && stats.spikes.hitRate != null) {
+      if (stats.spikes.hitRate < 65) {
+        recommendedProfile = "sakrare";
+        historyNote = `Historiken: bara ${stats.spikes.hitRate} % av våra spikar har vunnit, och ${stats.spikes.missRounds} omgångar sprack på en spik. Därför rekommenderas det tryggare förslaget.`;
+      } else {
+        historyNote = `Historiken: ${stats.spikes.hitRate} % av våra spikar har vunnit. Balanserat förslag rekommenderas.`;
+      }
+    }
+  } catch {
+    /* historik är frivillig – förslagen fungerar ändå */
+  }
+
+  const proposals = (["sakrare", "balanserat", "varde"] as Profile[]).map((p) => {
+    const built = build(legs, rowPrice, budget, p);
+    return {
+      ...built,
+      recommended: p === recommendedProfile,
+      rationale: historyNote && p === recommendedProfile ? `${built.rationale} ${historyNote}` : built.rationale,
+    };
+  });
 
   await db.from("system_candidates").delete().eq("round_id", roundId).eq("selected", false);
 
