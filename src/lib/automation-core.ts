@@ -221,10 +221,12 @@ export function changeSummary(changes: { leg: number; text: string; important: b
 
 export type SourceStatus =
   | "ok"
+  | "checked_no_tips"
   | "no_tips"
   | "temporary_error"
   | "permanent_error"
   | "access_denied"
+  | "manual_only"
   | "format_changed"
   | "invalid_content"
   | "pending";
