@@ -134,13 +134,15 @@ export async function generateAiDraftForRound(roundId: string, userId: string) {
     .order("leg_number", { ascending: true });
   if (racesError) throw racesError;
 
-  let updated = 0;
-  for (const race of races ?? []) {
+  const failures: string[] = [];
+
+  async function processRace(race: any): Promise<boolean> {
     const assessment = race.group_race_assessments?.[0];
-    if (assessment?.status === "locked") continue;
+    if (assessment?.status === "locked") return false;
+
 
     const entries = (race.race_entries ?? []).filter((e: any) => !e.scratched);
-    if (entries.length === 0) continue;
+    if (entries.length === 0) return false;
 
     const lines = entries
       .slice()
@@ -174,7 +176,7 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
     const draft = await askModel(prompt);
     const byNumber = new Map<number, any>(entries.map((e: any) => [e.start_number, e]));
     const valid = (draft.entries ?? []).filter((d) => byNumber.has(Number(d.start_number)));
-    if (valid.length === 0) continue;
+    if (valid.length === 0) return false;
     const normalized = normalize(valid);
 
     let assessmentId = assessment?.id as string | undefined;
@@ -185,7 +187,7 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
         .select("id, status")
         .eq("race_id", race.id)
         .maybeSingle();
-      if (found?.status === "locked") continue;
+      if (found?.status === "locked") return false;
       assessmentId = found?.id as string | undefined;
     }
 
@@ -252,7 +254,31 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
       created_by: userId,
     });
 
-    updated++;
+    return true;
+  }
+
+  // Kör avdelningarna parallellt (max 4 samtidigt) så att analysen blir klar snabbt.
+  const queue = [...(races ?? [])];
+  let updated = 0;
+  const workers = Array.from({ length: Math.min(4, queue.length) }, async () => {
+    while (queue.length > 0) {
+      const race = queue.shift();
+      if (!race) return;
+      try {
+        if (await processRace(race)) updated++;
+      } catch (e: any) {
+        failures.push(`Avdelning ${race.leg_number}: ${e?.message ?? "okänt fel"}`);
+      }
+    }
+  });
+  await Promise.all(workers);
+
+  if (updated === 0) {
+    throw new Error(
+      failures.length > 0
+        ? `AI-analysen misslyckades. ${failures[0]}`
+        : "Ingen avdelning kunde analyseras – kontrollera att startfälten är importerade.",
+    );
   }
 
   await db.from("activity_log").insert({
@@ -263,5 +289,6 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
     description: `AI-utkast skapade för ${updated} avdelning(ar). Utkast – inget är låst.`,
   });
 
-  return { races: updated };
+  return { races: updated, failed: failures.length, failures };
 }
+

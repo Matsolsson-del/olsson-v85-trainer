@@ -266,20 +266,27 @@ function Workflow({ roundId }: { roundId: string }) {
 
   async function run(key: string, fn: () => Promise<any>, done: (r: any) => string) {
     setBusy(key);
+    const toastId = toast.loading(
+      key === "ai"
+        ? "AI:n läser alla åtta avdelningar. Det tar ungefär en minut – stanna kvar på sidan."
+        : "Arbetar…",
+      { duration: Infinity },
+    );
     try {
       const res = await fn();
-      toast.success(done(res));
+      toast.success(done(res), { id: toastId, duration: 8000 });
       invalidateRound();
       qc.invalidateQueries({ queryKey: ["system-candidates", roundId] });
       qc.invalidateQueries({ queryKey: ["final-check", roundId] });
       qc.invalidateQueries({ queryKey: ["bet-snapshot", roundId] });
       qc.invalidateQueries({ queryKey: ["data-origin", roundId] });
     } catch (e: any) {
-      toast.error(e?.message ?? "Något gick fel.");
+      toast.error(e?.message ?? "Något gick fel.", { id: toastId, duration: 10000 });
     } finally {
       setBusy(null);
     }
   }
+
 
   if (isLoading || !data) return <Skeleton className="h-96 w-full" />;
 
