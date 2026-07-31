@@ -1,4 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { listRoundExpertTips } from "@/lib/expert-tips.functions";
+
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
