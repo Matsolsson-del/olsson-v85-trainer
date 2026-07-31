@@ -101,8 +101,9 @@ async function askModel(prompt: string): Promise<DraftRace> {
             properties: {
               pace_scenario: { type: "string" },
               expert_agreement: { type: "string" },
-
+              notes: { type: "string" },
               entries: {
+
                 type: "array",
                 items: {
                   type: "object",
