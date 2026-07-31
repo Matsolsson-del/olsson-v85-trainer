@@ -44,7 +44,9 @@ function sessionConfig() {
     cookie: {
       httpOnly: true,
       secure: true,
-      sameSite: "lax" as const,
+      // Förhandsvisningen körs i en iframe – utan "none" skickas kakan aldrig
+      // tillbaka och lösenordet verkar aldrig fungera.
+      sameSite: "none" as const,
       path: "/",
     },
   };
