@@ -187,6 +187,16 @@ function ExperttipsPage() {
 
       {latest && (
         <div className="space-y-6">
+          {latest.status === "no_verified_tips" && (
+            <Card className="border-warning">
+              <CardContent className="p-4 text-base">
+                Inga verifierade experttips har hittats ännu. Sidorna som granskades gällde en annan
+                spelform, en annan omgång eller saknade spelförslag. AI kan ändå analysera
+                tävlingsfakta, men ingen expertsamsyn redovisas.
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="flex flex-wrap items-center gap-2 text-xl">
