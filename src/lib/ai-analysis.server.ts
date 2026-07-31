@@ -254,7 +254,31 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
       created_by: userId,
     });
 
-    updated++;
+    return true;
+  }
+
+  // Kör avdelningarna parallellt (max 4 samtidigt) så att analysen blir klar snabbt.
+  const queue = [...(races ?? [])];
+  let updated = 0;
+  const workers = Array.from({ length: Math.min(4, queue.length) }, async () => {
+    while (queue.length > 0) {
+      const race = queue.shift();
+      if (!race) return;
+      try {
+        if (await processRace(race)) updated++;
+      } catch (e: any) {
+        failures.push(`Avdelning ${race.leg_number}: ${e?.message ?? "okänt fel"}`);
+      }
+    }
+  });
+  await Promise.all(workers);
+
+  if (updated === 0) {
+    throw new Error(
+      failures.length > 0
+        ? `AI-analysen misslyckades. ${failures[0]}`
+        : "Ingen avdelning kunde analyseras – kontrollera att startfälten är importerade.",
+    );
   }
 
   await db.from("activity_log").insert({
@@ -265,5 +289,6 @@ Låt inte streckprocenten styra – motivera avvikelser mot marknaden.`;
     description: `AI-utkast skapade för ${updated} avdelning(ar). Utkast – inget är låst.`,
   });
 
-  return { races: updated };
+  return { races: updated, failed: failures.length, failures };
 }
+
