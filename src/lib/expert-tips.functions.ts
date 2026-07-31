@@ -70,3 +70,33 @@ export const refreshExpertTips = createServerFn({ method: "POST" })
       userId: context.userId,
     });
   });
+
+/** Aktuella experttips per avdelning för en omgång – används i AI-redovisningen. */
+export const listRoundExpertTips = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { roundId: string }) => {
+    if (!data?.roundId) throw new Error("roundId saknas");
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { data: round, error: roundError } = await context.supabase
+      .from("rounds")
+      .select("id, group_id, race_date")
+      .eq("id", data.roundId)
+      .maybeSingle();
+    if (roundError) throw roundError;
+    if (!round) return [];
+    await assertMember(context, round.group_id);
+
+    const { data: rows, error } = await context.supabase
+      .from("expert_tips")
+      .select(
+        "id, leg_number, source_name, expert, top_pick, alternatives, longshot, warning, note, url, published_at",
+      )
+      .eq("group_id", round.group_id)
+      .eq("race_date", round.race_date)
+      .eq("is_current", true)
+      .order("leg_number", { ascending: true });
+    if (error) throw error;
+    return rows ?? [];
+  });
