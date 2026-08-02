@@ -16,8 +16,14 @@ function num(v: any): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function arr(v: any): any[] {
+  if (Array.isArray(v)) return v;
+  if (v === null || v === undefined) return [];
+  return [v];
+}
+
 function latestShare(entry: any): number | null {
-  const snaps = [...(entry?.market_snapshots ?? [])].sort((a: any, b: any) =>
+  const snaps = [...arr(entry?.market_snapshots)].sort((a: any, b: any) =>
     String(b.captured_at).localeCompare(String(a.captured_at)),
   );
   return num(snaps[0]?.bet_share_percent);
@@ -77,7 +83,7 @@ export async function collectRoundOutcome(roundId: string): Promise<RoundOutcome
     .select("id, system_versions(id, calculated_rows, calculated_cost, locked_at, created_at, system_selections(race_id, race_entry_id))")
     .eq("round_id", roundId);
 
-  const versions = (systems ?? []).flatMap((s: any) => s.system_versions ?? []);
+  const versions = arr(systems).flatMap((s: any) => arr(s.system_versions));
   const chosen =
     versions
       .filter((v: any) => v.locked_at)
@@ -85,18 +91,17 @@ export async function collectRoundOutcome(roundId: string): Promise<RoundOutcome
     versions.sort((a: any, b: any) => String(b.created_at).localeCompare(String(a.created_at)))[0] ??
     null;
 
-  const selections: any[] = chosen?.system_selections ?? [];
+  const selections: any[] = arr(chosen?.system_selections);
 
-  const legs: LegOutcome[] = (races ?? []).map((race: any) => {
-    const entries: any[] = race.race_entries ?? [];
+  const legs: LegOutcome[] = arr(races).map((race: any) => {
+    const entries: any[] = arr(race.race_entries);
     const byId = new Map(entries.map((e: any) => [e.id, e]));
-    const winnerId = (Array.isArray(race.race_results) ? race.race_results[0] : race.race_results)
-      ?.winner_entry_id ?? null;
+    const winnerId = arr(race.race_results)[0]?.winner_entry_id ?? null;
     const winnerEntry = winnerId ? byId.get(winnerId) : null;
 
     const groupProbs = new Map<string, number | null>();
-    for (const gra of race.group_race_assessments ?? []) {
-      for (const gea of gra.group_entry_assessments ?? []) {
+    for (const gra of arr(race.group_race_assessments)) {
+      for (const gea of arr(gra.group_entry_assessments)) {
         groupProbs.set(gea.race_entry_id, num(gea.group_win_probability));
       }
     }
@@ -125,7 +130,7 @@ export async function collectRoundOutcome(roundId: string): Promise<RoundOutcome
   const decidedLegs = legs.filter((l) => l.hit !== null).length;
   const correctLegs = legs.filter((l) => l.hit === true).length;
   const cost = num(chosen?.calculated_cost);
-  const rr = Array.isArray(round.round_results) ? round.round_results[0] : round.round_results;
+  const rr = arr(round.round_results)[0];
   const winnings = num(rr?.group_winnings);
 
   return {
