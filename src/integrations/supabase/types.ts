@@ -2819,6 +2819,131 @@ export type Database = {
           },
         ]
       }
+      round_settlements: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          calculation: Json
+          created_at: string
+          fee: number
+          fetched_at: string
+          group_id: string
+          id: string
+          idempotency_key: string
+          issues: Json
+          net: number | null
+          official_game_id: string | null
+          payout_total: number | null
+          payouts: Json
+          published_at: string | null
+          race_date: string | null
+          return_percent: number | null
+          round_id: string
+          scratches: Json
+          source: string | null
+          source_url: string | null
+          status: string
+          system_cost: number | null
+          system_version_id: string | null
+          total_cost: number | null
+          track_name: string | null
+          updated_at: string
+          verification: string
+          winners: Json
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          calculation?: Json
+          created_at?: string
+          fee?: number
+          fetched_at?: string
+          group_id: string
+          id?: string
+          idempotency_key: string
+          issues?: Json
+          net?: number | null
+          official_game_id?: string | null
+          payout_total?: number | null
+          payouts?: Json
+          published_at?: string | null
+          race_date?: string | null
+          return_percent?: number | null
+          round_id: string
+          scratches?: Json
+          source?: string | null
+          source_url?: string | null
+          status?: string
+          system_cost?: number | null
+          system_version_id?: string | null
+          total_cost?: number | null
+          track_name?: string | null
+          updated_at?: string
+          verification?: string
+          winners?: Json
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          calculation?: Json
+          created_at?: string
+          fee?: number
+          fetched_at?: string
+          group_id?: string
+          id?: string
+          idempotency_key?: string
+          issues?: Json
+          net?: number | null
+          official_game_id?: string | null
+          payout_total?: number | null
+          payouts?: Json
+          published_at?: string | null
+          race_date?: string | null
+          return_percent?: number | null
+          round_id?: string
+          scratches?: Json
+          source?: string | null
+          source_url?: string | null
+          status?: string
+          system_cost?: number | null
+          system_version_id?: string | null
+          total_cost?: number | null
+          track_name?: string | null
+          updated_at?: string
+          verification?: string
+          winners?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_settlements_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_settlements_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_settlements_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_settlements_system_version_id_fkey"
+            columns: ["system_version_id"]
+            isOneToOne: false
+            referencedRelation: "system_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rounds: {
         Row: {
           ai_status: string
@@ -3076,6 +3201,7 @@ export type Database = {
           id: string
           race_entry_id: string
           race_id: string
+          reserve_order: number | null
           system_version_id: string
         }
         Insert: {
@@ -3083,6 +3209,7 @@ export type Database = {
           id?: string
           race_entry_id: string
           race_id: string
+          reserve_order?: number | null
           system_version_id: string
         }
         Update: {
@@ -3090,6 +3217,7 @@ export type Database = {
           id?: string
           race_entry_id?: string
           race_id?: string
+          reserve_order?: number | null
           system_version_id?: string
         }
         Relationships: [
