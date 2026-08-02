@@ -251,20 +251,32 @@ function HistorikOversikt() {
                   <CardTitle className="text-lg">
                     {r.track_name ?? "Okänd bana"} · {formatDate(r.race_date)}
                   </CardTitle>
-                  <Badge variant="secondary">Importerad historik</Badge>
-                  {(conflictKeys.get(
-                    `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`,
-                  ) ?? 1) > 1 ? (
-                    <Badge variant="destructive">
-                      Behöver granskas – flera systemposter samma dag
-                    </Badge>
-                  ) : null}
-                  <Badge variant="secondary">
-                    Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
-                  </Badge>
-                  <Badge variant="secondary">
-                    {r.winners_verified ? "Resultat verifierat" : "Resultat ofullständigt"}
-                  </Badge>
+                  {r.source_kind === "hub" ? (
+                    <>
+                      <Badge>Spelad i Travhubben</Badge>
+                      <Badge variant="secondary">
+                        {r.status === "approved" ? "Resultat godkänt" : "Resultat att godkänna"}
+                      </Badge>
+                    </>
+                  ) : (
+                    <>
+                      <Badge variant="secondary">Importerad historik</Badge>
+                      {(conflictKeys.get(
+                        `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`,
+                      ) ?? 1) > 1 ? (
+                        <Badge variant="destructive">
+                          Behöver granskas – flera systemposter samma dag
+                        </Badge>
+                      ) : null}
+                      <Badge variant="secondary">
+                        Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
+                      </Badge>
+                      <Badge variant="secondary">
+                        {r.winners_verified ? "Resultat verifierat" : "Resultat ofullständigt"}
+                      </Badge>
+                    </>
+                  )}
+
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-base">
