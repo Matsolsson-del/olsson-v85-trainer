@@ -241,8 +241,10 @@ function HistorikOversikt() {
       ) : (
         <div className="space-y-4">
           <p className="text-base text-foreground/80">
-            {dayCount} tävlingsdagar och totalt {rows.length} importerade systemposter. Visar{" "}
-            {visible.length} systemposter.
+            Totalt {rows.length} spel: {rows.filter((r: any) => r.source_kind === "hub").length} spelade
+            i Travhubben och {dayCount} tävlingsdagar med importerad historik. Visar{" "}
+            {visible.length} poster.
+
             {conflictDays
               ? ` ${conflictDays} tävlingsdagar har flera motstridiga poster och är märkta nedan.`
               : ""}
