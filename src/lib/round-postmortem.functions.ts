@@ -18,6 +18,11 @@ export const requestRoundPostmortem = createServerFn({ method: "POST" })
     if (!round) throw new Error("Omgången hittades inte eller så saknar du behörighet.");
 
     const { generateRoundPostmortem } = await import("@/lib/round-postmortem.server");
-    const result = await generateRoundPostmortem(data.roundId);
-    return { ok: true, outcome: result.outcome };
+    try {
+      const result = await generateRoundPostmortem(data.roundId);
+      return { ok: true, outcome: result.outcome };
+    } catch (e: any) {
+      console.error("[efteranalys] misslyckades", e?.stack ?? e);
+      throw new Error(e?.message ?? "Efteranalysen misslyckades.");
+    }
   });
