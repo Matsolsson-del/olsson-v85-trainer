@@ -135,11 +135,13 @@ function HistorikOversikt() {
   const conflictKeys = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows as any[]) {
+      if (r.source_kind === "hub") continue;
       const key = `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`;
       map.set(key, (map.get(key) ?? 0) + 1);
     }
     return map;
   }, [rows]);
+
 
   const dayCount = conflictKeys.size;
   const conflictDays = [...conflictKeys.values()].filter((n) => n > 1).length;
