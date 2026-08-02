@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { ERROR_CATEGORY_LABELS, formatCurrency } from "@/lib/labels";
 import { useInvalidateRound, type RoundData } from "@/lib/travhub-queries";
+import { EfteranalysCard } from "@/components/round/EfteranalysCard";
 
 export function ResultatTab({ data, roundId }: { data: RoundData; roundId: string }) {
   const invalidate = useInvalidateRound(roundId);
