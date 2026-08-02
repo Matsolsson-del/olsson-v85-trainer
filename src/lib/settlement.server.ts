@@ -59,7 +59,7 @@ function payoutsFromGame(game: any): PayoutTable {
   const table: PayoutTable = {};
   for (const level of [8, 7, 6, 5] as const) {
     const cell = raw[String(level)] ?? raw[level];
-    const amount = cell?.amount ?? cell;
+    const amount = typeof cell === "number" ? cell : (cell?.payout ?? cell?.amount);
     if (typeof amount === "number") table[level] = Math.round(amount) / 100;
   }
   return table;
@@ -120,7 +120,9 @@ export async function fetchOfficialResult(raceDate: string): Promise<OfficialRes
     sourceUrl: `https://www.atg.se/spel/${gameId}`,
     raceDate: String(game.startTime ?? "").slice(0, 10) || raceDate,
     trackName: arr(game.tracks)[0]?.name ?? races[0]?.track?.name ?? null,
-    publishedAt: game?.pools?.V85?.result?.updated ?? game?.updated ?? null,
+    publishedAt: game?.pools?.V85?.timestamp
+      ? new Date(String(game.pools.V85.timestamp).replace(" ", "T") + "+02:00").toISOString()
+      : null,
     fetchedAt,
     winnersByLeg,
     scratchedByLeg,
