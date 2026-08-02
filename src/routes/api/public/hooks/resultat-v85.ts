@@ -22,7 +22,13 @@ export const Route = createFileRoute("/api/public/hooks/resultat-v85")({
         try {
           const { importResultsForRecentRounds } = await import("@/lib/atg-results.server");
           const results = await importResultsForRecentRounds();
-          return Response.json({ success: true, results });
+          // Räkna maskinellt ut utfallet direkt efter hämtningen (utkast, inte godkänt).
+          const { settleRecentRounds } = await import("@/lib/settlement.server");
+          const settlements = await settleRecentRounds().catch((e: any) => ({
+            error: e?.message ?? String(e),
+          }));
+          return Response.json({ success: true, results, settlements });
+
         } catch (error: any) {
           console.error("Resultatimport från ATG misslyckades:", error);
           return new Response(
