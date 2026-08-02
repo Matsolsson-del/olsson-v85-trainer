@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { AlertTriangle, CheckCircle2, Circle } from "lucide-react";
 import { EmptyState, PageHeader } from "@/components/AppShell";
 import { AiImportCard } from "@/components/round/AiImportCard";
+import { EfteranalysCard } from "@/components/round/EfteranalysCard";
 import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -729,6 +730,7 @@ function Workflow({ roundId }: { roundId: string }) {
               <Link to="/omgangar/$roundId" params={{ roundId }}>Till efterrapporten</Link>
             </Button>
           </div>
+          <EfteranalysCard roundId={roundId} postmortem={postmortem} onDone={invalidateRound} />
         </Step>
 
         {/* Tre lager */}

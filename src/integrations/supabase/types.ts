@@ -2671,6 +2671,9 @@ export type Database = {
       round_postmortems: {
         Row: {
           ai_draft: string | null
+          ai_generated_at: string | null
+          ai_model: string | null
+          ai_stats: Json | null
           approved_at: string | null
           approved_text: string | null
           bad_decisions_despite_win: string | null
@@ -2686,6 +2689,9 @@ export type Database = {
         }
         Insert: {
           ai_draft?: string | null
+          ai_generated_at?: string | null
+          ai_model?: string | null
+          ai_stats?: Json | null
           approved_at?: string | null
           approved_text?: string | null
           bad_decisions_despite_win?: string | null
@@ -2701,6 +2707,9 @@ export type Database = {
         }
         Update: {
           ai_draft?: string | null
+          ai_generated_at?: string | null
+          ai_model?: string | null
+          ai_stats?: Json | null
           approved_at?: string | null
           approved_text?: string | null
           bad_decisions_despite_win?: string | null

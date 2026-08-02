@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { ERROR_CATEGORY_LABELS, formatCurrency } from "@/lib/labels";
 import { useInvalidateRound, type RoundData } from "@/lib/travhub-queries";
+import { EfteranalysCard } from "@/components/round/EfteranalysCard";
 
 export function ResultatTab({ data, roundId }: { data: RoundData; roundId: string }) {
   const invalidate = useInvalidateRound(roundId);
@@ -26,6 +27,7 @@ export function ResultatTab({ data, roundId }: { data: RoundData; roundId: strin
         <RaceResultCard key={race.id} race={race} onSaved={invalidate} />
       ))}
       <RoundSummary data={data} roundId={roundId} onSaved={invalidate} />
+      <EfteranalysCard roundId={roundId} postmortem={data.postmortem} onDone={invalidate} />
     </div>
   );
 }
