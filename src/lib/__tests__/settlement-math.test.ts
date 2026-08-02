@@ -107,9 +107,10 @@ describe("settleRound", () => {
     expect(r.rowsByLevel[8]).toBe(0);
     expect(r.rowsByLevel[7]).toBe(2);
     expect(r.rowsByLevel[6]).toBe(10);
-    expect(r.payoutTotal).toBe(2 * 500 + 10 * 40);
+    expect(r.rowsByLevel[5]).toBe(20);
+    expect(r.payoutTotal).toBe(2 * 500 + 10 * 40 + 20 * 8);
     expect(r.systemCost).toBe(32);
-    expect(r.net).toBe(1400 - 32);
+    expect(r.net).toBe(1560 - 32);
     expect(r.returnPercent).toBeGreaterThan(2000);
   });
 
@@ -127,6 +128,7 @@ describe("settleRound", () => {
     const r = settleRound({ legs, payouts, rowPrice: 0.5 });
     expect(r.failedSpikes).toEqual([1]);
     expect(r.rowsByLevel[7]).toBe(1);
+    expect(r.rowsByLevel[6]).toBe(0);
     expect(r.payoutTotal).toBe(500);
   });
 
