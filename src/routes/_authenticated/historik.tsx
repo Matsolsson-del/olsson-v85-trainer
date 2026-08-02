@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo, useState } from "react";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useIsOwner } from "@/lib/travhub-queries";
-import { listImportedHistory } from "@/lib/history-import.functions";
+import { listImportedHistory, listPlayedRounds } from "@/lib/history-import.functions";
 import { ResultatDashboard } from "@/routes/_authenticated/resultat";
 import { LarandePage } from "@/routes/_authenticated/larande";
 import { OmgangarPage } from "@/routes/_authenticated/omgangar/index";
@@ -102,6 +102,7 @@ function HistorikOversikt() {
   const { groupId } = useActiveGroupId();
   const isOwner = useIsOwner(groupId);
   const fetchRows = useServerFn(listImportedHistory);
+  const fetchPlayed = useServerFn(listPlayedRounds);
   const [sort, setSort] = useState<SortKey>("datum-ny");
   const [track, setTrack] = useState<string>("alla");
 
@@ -111,7 +112,17 @@ function HistorikOversikt() {
     queryFn: () => fetchRows({ data: { groupId: groupId! } }) as Promise<any[]>,
   });
 
-  const rows = query.data ?? [];
+  const playedQuery = useQuery({
+    queryKey: ["played-rounds-history", groupId],
+    enabled: Boolean(groupId),
+    queryFn: () => fetchPlayed({ data: { groupId: groupId! } }) as Promise<any[]>,
+  });
+
+  const rows = useMemo(
+    () => [...(playedQuery.data ?? []), ...(query.data ?? [])],
+    [playedQuery.data, query.data],
+  );
+
 
   const tracks = useMemo(
     () =>
@@ -124,11 +135,13 @@ function HistorikOversikt() {
   const conflictKeys = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows as any[]) {
+      if (r.source_kind === "hub") continue;
       const key = `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`;
       map.set(key, (map.get(key) ?? 0) + 1);
     }
     return map;
   }, [rows]);
+
 
   const dayCount = conflictKeys.size;
   const conflictDays = [...conflictKeys.values()].filter((n) => n > 1).length;
@@ -203,12 +216,13 @@ function HistorikOversikt() {
         </div>
       )}
 
-      {!groupId || query.isPending ? (
+      {!groupId || query.isPending || playedQuery.isPending ? (
         <div className="space-y-3">
           <Skeleton className="h-28 w-full" />
           <Skeleton className="h-28 w-full" />
         </div>
-      ) : query.isError ? (
+      ) : query.isError && playedQuery.isError ? (
+
         <Card>
           <CardContent className="p-6 text-base">
             Kunde inte hämta historiken just nu. Ladda om sidan och försök igen.
@@ -227,8 +241,10 @@ function HistorikOversikt() {
       ) : (
         <div className="space-y-4">
           <p className="text-base text-foreground/80">
-            {dayCount} tävlingsdagar och totalt {rows.length} importerade systemposter. Visar{" "}
-            {visible.length} systemposter.
+            Totalt {rows.length} spel: {rows.filter((r: any) => r.source_kind === "hub").length} spelade
+            i Travhubben och {dayCount} tävlingsdagar med importerad historik. Visar{" "}
+            {visible.length} poster.
+
             {conflictDays
               ? ` ${conflictDays} tävlingsdagar har flera motstridiga poster och är märkta nedan.`
               : ""}
@@ -240,20 +256,32 @@ function HistorikOversikt() {
                   <CardTitle className="text-lg">
                     {r.track_name ?? "Okänd bana"} · {formatDate(r.race_date)}
                   </CardTitle>
-                  <Badge variant="secondary">Importerad historik</Badge>
-                  {(conflictKeys.get(
-                    `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`,
-                  ) ?? 1) > 1 ? (
-                    <Badge variant="destructive">
-                      Behöver granskas – flera systemposter samma dag
-                    </Badge>
-                  ) : null}
-                  <Badge variant="secondary">
-                    Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
-                  </Badge>
-                  <Badge variant="secondary">
-                    {r.winners_verified ? "Resultat verifierat" : "Resultat ofullständigt"}
-                  </Badge>
+                  {r.source_kind === "hub" ? (
+                    <>
+                      <Badge>Spelad i Travhubben</Badge>
+                      <Badge variant="secondary">
+                        {r.status === "approved" ? "Resultat godkänt" : "Resultat att godkänna"}
+                      </Badge>
+                    </>
+                  ) : (
+                    <>
+                      <Badge variant="secondary">Importerad historik</Badge>
+                      {(conflictKeys.get(
+                        `${(r.track_name ?? "").trim().toLowerCase()}|${r.race_date}`,
+                      ) ?? 1) > 1 ? (
+                        <Badge variant="destructive">
+                          Behöver granskas – flera systemposter samma dag
+                        </Badge>
+                      ) : null}
+                      <Badge variant="secondary">
+                        Datakvalitet: {QUALITY_LABEL[r.data_quality] ?? r.data_quality}
+                      </Badge>
+                      <Badge variant="secondary">
+                        {r.winners_verified ? "Resultat verifierat" : "Resultat ofullständigt"}
+                      </Badge>
+                    </>
+                  )}
+
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-base">
@@ -328,9 +356,22 @@ function HistorikOversikt() {
                   </details>
                 )}
 
-                <p className="text-muted-foreground">
-                  Importerad {formatDateTime(r.created_at)}. Påverkar inte gruppens ekonomi.
-                </p>
+                {r.source_kind === "hub" ? (
+                  <p>
+                    <Link
+                      to="/omgangar/$roundId"
+                      params={{ roundId: r.round_id }}
+                      className="font-medium underline"
+                    >
+                      Öppna omgången
+                    </Link>
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Importerad {formatDateTime(r.created_at)}. Påverkar inte gruppens ekonomi.
+                  </p>
+                )}
+
               </CardContent>
             </Card>
           ))}
