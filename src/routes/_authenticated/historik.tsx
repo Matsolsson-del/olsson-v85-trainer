@@ -351,9 +351,22 @@ function HistorikOversikt() {
                   </details>
                 )}
 
-                <p className="text-muted-foreground">
-                  Importerad {formatDateTime(r.created_at)}. Påverkar inte gruppens ekonomi.
-                </p>
+                {r.source_kind === "hub" ? (
+                  <p>
+                    <Link
+                      to="/omgangar/$roundId"
+                      params={{ roundId: r.round_id }}
+                      className="font-medium underline"
+                    >
+                      Öppna omgången
+                    </Link>
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground">
+                    Importerad {formatDateTime(r.created_at)}. Påverkar inte gruppens ekonomi.
+                  </p>
+                )}
+
               </CardContent>
             </Card>
           ))}
