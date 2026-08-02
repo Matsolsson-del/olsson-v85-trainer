@@ -26,6 +26,7 @@ export function ResultatTab({ data, roundId }: { data: RoundData; roundId: strin
         <RaceResultCard key={race.id} race={race} onSaved={invalidate} />
       ))}
       <RoundSummary data={data} roundId={roundId} onSaved={invalidate} />
+      <EfteranalysCard roundId={roundId} postmortem={data.postmortem} onDone={invalidate} />
     </div>
   );
 }
