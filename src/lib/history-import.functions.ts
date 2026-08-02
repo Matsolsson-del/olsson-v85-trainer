@@ -145,3 +145,58 @@ export const listImportedHistory = createServerFn({ method: "POST" })
     if (error) throw error;
     return rows ?? [];
   });
+
+/** Omgångar som spelats i hubben och som har ett registrerat resultat. */
+export const listPlayedRounds = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { groupId: string }) => {
+    if (!data?.groupId) throw new Error("groupId saknas");
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    await assertMember(context, data.groupId);
+    const { data: rows, error } = await context.supabase
+      .from("round_settlements")
+      .select(
+        "id, round_id, race_date, track_name, status, winners, system_cost, total_cost, payout_total, net, calculation, created_at",
+      )
+      .eq("group_id", data.groupId)
+      .order("race_date", { ascending: false });
+    if (error) throw error;
+
+    return (rows ?? []).map((r: any) => {
+      const calc = (r.calculation ?? {}) as any;
+      const winnersByLeg = new Map<number, string>();
+      for (const w of (r.winners ?? []) as any[]) {
+        const first = Array.isArray(w?.winners) ? w.winners[0] : null;
+        if (w?.leg != null && first) winnersByLeg.set(Number(w.leg), String(first));
+      }
+      const legs = ((calc.legs ?? []) as any[]).map((leg: any) => ({
+        leg: leg.leg,
+        selected: ((leg.active ?? []) as any[]).map((a: any) => a.label ?? String(a.startNumber)),
+        spike: ((leg.active ?? []) as any[]).length === 1,
+        winner: winnersByLeg.get(Number(leg.leg)) ?? null,
+      }));
+      return {
+        id: r.id,
+        round_id: r.round_id,
+        source_kind: "hub" as const,
+        race_date: r.race_date,
+        track_name: r.track_name,
+        status: r.status,
+        correct_count: calc.correctLegs ?? null,
+        spike_hits: calc.winningSpikes ?? null,
+        computed_cost: r.total_cost ?? r.system_cost ?? null,
+        stated_cost: null,
+        computed_rows: calc.totalRows ?? null,
+        stated_rows: null,
+        payout: r.payout_total ?? null,
+        net_result: r.net ?? null,
+        spikes: legs.filter((l) => l.spike).map((l) => l.leg),
+        legs,
+        winners_verified: true,
+        created_at: r.created_at,
+      };
+    });
+  });
+
