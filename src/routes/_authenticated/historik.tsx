@@ -102,6 +102,7 @@ function HistorikOversikt() {
   const { groupId } = useActiveGroupId();
   const isOwner = useIsOwner(groupId);
   const fetchRows = useServerFn(listImportedHistory);
+  const fetchPlayed = useServerFn(listPlayedRounds);
   const [sort, setSort] = useState<SortKey>("datum-ny");
   const [track, setTrack] = useState<string>("alla");
 
@@ -111,7 +112,17 @@ function HistorikOversikt() {
     queryFn: () => fetchRows({ data: { groupId: groupId! } }) as Promise<any[]>,
   });
 
-  const rows = query.data ?? [];
+  const playedQuery = useQuery({
+    queryKey: ["played-rounds-history", groupId],
+    enabled: Boolean(groupId),
+    queryFn: () => fetchPlayed({ data: { groupId: groupId! } }) as Promise<any[]>,
+  });
+
+  const rows = useMemo(
+    () => [...(playedQuery.data ?? []), ...(query.data ?? [])],
+    [playedQuery.data, query.data],
+  );
+
 
   const tracks = useMemo(
     () =>
