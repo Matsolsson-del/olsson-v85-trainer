@@ -179,7 +179,7 @@ export async function buildRoundSettlement(
   const { data: races, error: racesError } = await admin
     .from("races")
     .select(
-      "id, leg_number, race_entries(id, start_number, scratched, horses(name)), race_results(winner_entry_id), entry_results:race_results(entry_results(race_entry_id, finish_position))",
+      "id, leg_number, race_entries(id, start_number, scratched, horses(name)), race_results(winner_entry_id)",
     )
     .eq("round_id", roundId)
     .order("leg_number", { ascending: true });
