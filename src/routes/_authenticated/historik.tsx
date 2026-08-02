@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo, useState } from "react";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/labels";
 import { useActiveGroupId, useIsOwner } from "@/lib/travhub-queries";
-import { listImportedHistory } from "@/lib/history-import.functions";
+import { listImportedHistory, listPlayedRounds } from "@/lib/history-import.functions";
 import { ResultatDashboard } from "@/routes/_authenticated/resultat";
 import { LarandePage } from "@/routes/_authenticated/larande";
 import { OmgangarPage } from "@/routes/_authenticated/omgangar/index";
