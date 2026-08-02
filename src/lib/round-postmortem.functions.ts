@@ -9,20 +9,19 @@ export const requestRoundPostmortem = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { data: round, error } = await context.supabase
-      .from("rounds")
-      .select("id, group_id")
-      .eq("id", data.roundId)
-      .maybeSingle();
-    if (error) throw error;
-    if (!round) throw new Error("Omgången hittades inte eller så saknar du behörighet.");
-
-    const { generateRoundPostmortem } = await import("@/lib/round-postmortem.server");
     try {
+      const { data: round, error } = await context.supabase
+        .from("rounds")
+        .select("id, group_id")
+        .eq("id", data.roundId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!round) throw new Error("Omgången hittades inte eller så saknar du behörighet.");
+
+      const { generateRoundPostmortem } = await import("@/lib/round-postmortem.server");
       const result = await generateRoundPostmortem(data.roundId);
       return { ok: true, outcome: result.outcome };
     } catch (e: any) {
-      console.error("[efteranalys] misslyckades", e?.stack ?? e);
-      throw new Error(e?.message ?? "Efteranalysen misslyckades.");
+      throw new Error("DEBUG " + (e?.message ?? "?") + " :: " + String(e?.stack ?? "").slice(0, 400));
     }
   });
