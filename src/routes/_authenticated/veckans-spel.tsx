@@ -729,6 +729,7 @@ function Workflow({ roundId }: { roundId: string }) {
               <Link to="/omgangar/$roundId" params={{ roundId }}>Till efterrapporten</Link>
             </Button>
           </div>
+          <EfteranalysCard roundId={roundId} postmortem={postmortem} onDone={invalidate} />
         </Step>
 
         {/* Tre lager */}
