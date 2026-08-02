@@ -216,12 +216,13 @@ function HistorikOversikt() {
         </div>
       )}
 
-      {!groupId || query.isPending ? (
+      {!groupId || query.isPending || playedQuery.isPending ? (
         <div className="space-y-3">
           <Skeleton className="h-28 w-full" />
           <Skeleton className="h-28 w-full" />
         </div>
-      ) : query.isError ? (
+      ) : query.isError && playedQuery.isError ? (
+
         <Card>
           <CardContent className="p-6 text-base">
             Kunde inte hämta historiken just nu. Ladda om sidan och försök igen.
