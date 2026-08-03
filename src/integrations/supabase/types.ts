@@ -3415,6 +3415,7 @@ export type Database = {
         Returns: string
       }
       entry_group_id: { Args: { _entry_id: string }; Returns: string }
+      is_any_group_member: { Args: never; Returns: boolean }
       is_group_member: { Args: { _group_id: string }; Returns: boolean }
       is_group_owner: { Args: { _group_id: string }; Returns: boolean }
       is_round_responsible: { Args: { _round_id: string }; Returns: boolean }
