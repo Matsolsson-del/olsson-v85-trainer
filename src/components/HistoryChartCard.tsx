@@ -105,8 +105,9 @@ export function HistoryChartCard({ showCorrect = true }: { showCorrect?: boolean
         {dupNotice}
 
         <p className="text-base text-muted-foreground">
-          Historiken innehåller totalt {stats.counts.importedRecords} importerade systemposter
-          fördelade på {stats.counts.raceDays} tävlingsdagar.
+          Historiken innehåller totalt {stats.counts.importedRecords} spel fördelade på{" "}
+          {stats.counts.raceDays} tävlingsdagar, både spelen i Travhubben och den importerade
+          historiken.
           {stats.counts.reviewNeededDays
             ? ` ${stats.counts.reviewNeededDays} tävlingsdagar har två motstridiga poster som Mats behöver granska.`
             : ""}

@@ -164,7 +164,9 @@ export const listPlayedRounds = createServerFn({ method: "POST" })
       .order("race_date", { ascending: false });
     if (error) throw error;
 
-    return (rows ?? []).map((r: any) => {
+    const { dedupeSettlements } = await import("@/lib/played-rounds");
+
+    return dedupeSettlements((rows ?? []) as any[]).map((r: any) => {
       const calc = (r.calculation ?? {}) as any;
       const winnersByLeg = new Map<number, string>();
       for (const w of (r.winners ?? []) as any[]) {
