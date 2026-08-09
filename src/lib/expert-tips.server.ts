@@ -282,8 +282,12 @@ ${clip(corpus, 60000)}`;
 }
 
 
-/** Torsdagsjobbet: samlar experttips för varje grupps närmaste omgång. */
-export async function collectExpertTipsForAllGroups() {
+/**
+ * Torsdagsjobbet: samlar experttips för varje grupps närmaste omgång.
+ * Med `onlyMissing` körs bara grupper som ännu saknar en färdig tipsrapport –
+ * det används av det dagliga nya försöket när torsdagen inte gav något.
+ */
+export async function collectExpertTipsForAllGroups(options?: { onlyMissing?: boolean }) {
   const admin = await getAdmin();
   const today = new Date().toISOString().slice(0, 10);
   const { data: rounds, error } = await admin
@@ -299,9 +303,21 @@ export async function collectExpertTipsForAllGroups() {
     if (!perGroup.has(round.group_id)) perGroup.set(round.group_id, round);
   }
 
-  const results: Array<{ groupId: string; ok: boolean; message?: string }> = [];
+  const results: Array<{ groupId: string; ok: boolean; skipped?: boolean; message?: string }> = [];
   for (const [groupId, round] of perGroup) {
     try {
+      if (options?.onlyMissing) {
+        const { data: existing } = await admin
+          .from("expert_tips_reports")
+          .select("status")
+          .eq("group_id", groupId)
+          .eq("race_date", round.race_date)
+          .maybeSingle();
+        if (existing?.status === "ready") {
+          results.push({ groupId, ok: true, skipped: true });
+          continue;
+        }
+      }
       await collectExpertTips({
         groupId,
         roundId: round.id,
@@ -316,3 +332,4 @@ export async function collectExpertTipsForAllGroups() {
   }
   return results;
 }
+
