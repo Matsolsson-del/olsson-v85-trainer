@@ -74,7 +74,7 @@ export function settlementToHistoryRow(r: SettlementRow): HistoryRow {
     stated_rows: null,
     winners_verified: true,
     usable_for_learning: true,
-    review_status: "resolved",
+    review_status: "active",
     legs,
   };
 }
