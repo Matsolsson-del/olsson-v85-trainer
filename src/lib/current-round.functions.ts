@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { pickCurrentRound, type RoundCandidate } from "@/lib/current-round";
+import { pickCommentRound, pickCurrentRound, type RoundCandidate } from "@/lib/current-round";
 
 export type CurrentRound = {
   id: string;
