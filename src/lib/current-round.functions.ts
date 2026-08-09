@@ -55,7 +55,7 @@ export const getCurrentRound = createServerFn({ method: "POST" })
       if (explicit) return explicit;
     }
 
-    const picked =
-      data.mode === "comment" ? pickCommentRound(candidates) : pickCurrentRound(candidates);
+    // Både Veckans spel och Kommentera hoppar vidare så snart omgången är avgjord.
+    const picked = pickCommentRound(candidates);
     return picked ?? null;
   });
