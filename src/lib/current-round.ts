@@ -69,3 +69,24 @@ export function pickCurrentRound<T extends RoundCandidate>(
   return null;
 }
 
+
+/** Statusar som betyder att omgången är spelad och avgjord. */
+const AVGJORDA_STATUSAR = new Set(["results_registered", "postmortem", "completed"]);
+
+export function isRoundSettled(r: RoundCandidate, now: Date = new Date()): boolean {
+  if (AVGJORDA_STATUSAR.has(r.status ?? "")) return true;
+  return roundDeadline(r) < now.getTime() - 6 * 60 * 60 * 1000;
+}
+
+/**
+ * Omgång att kommentera: en avgjord omgång ska aldrig visas.
+ * Så snart veckans spel är avgjort byts vyn till nästa kommande omgång,
+ * och finns ingen sådan ännu visas ingenting.
+ */
+export function pickCommentRound<T extends RoundCandidate>(
+  rounds: T[],
+  now: Date = new Date(),
+): T | null {
+  const open = (rounds ?? []).filter((r) => !r.is_demo && !isRoundSettled(r, now));
+  return pickCurrentRound(open, now);
+}
