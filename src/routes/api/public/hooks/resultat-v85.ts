@@ -27,7 +27,14 @@ export const Route = createFileRoute("/api/public/hooks/resultat-v85")({
           const settlements = await settleRecentRounds().catch((e: any) => ({
             error: e?.message ?? String(e),
           }));
-          return Response.json({ success: true, results, settlements });
+          // Söndag morgon: skapa även AI-utkast till efteranalys av gårdagens spel.
+          const { generatePostmortemsForRecentRounds } = await import(
+            "@/lib/round-postmortem.server"
+          );
+          const postmortems = await generatePostmortemsForRecentRounds().catch((e: any) => ({
+            error: e?.message ?? String(e),
+          }));
+          return Response.json({ success: true, results, settlements, postmortems });
 
         } catch (error: any) {
           console.error("Resultatimport från ATG misslyckades:", error);
