@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { computeHistoryStats, type HistoryRow, type HistoryStats } from "@/lib/history-stats";
+import { dedupeSettlements, settlementToHistoryRow } from "@/lib/played-rounds";
 
 /** Statistik över gruppens importerade spelhistorik. */
 export const getHistoryStats = createServerFn({ method: "POST" })
