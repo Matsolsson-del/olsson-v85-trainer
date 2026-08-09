@@ -21,22 +21,33 @@ describe("pickCurrentRound", () => {
     expect(picked?.id).toBe("rattvik");
   });
 
-  it("låter inte en tom framtida omgång ta över", () => {
-    const picked = pickCurrentRound(
-      [{ id: "tom", race_date: "2026-08-15", status: "draft", race_count: 0 }],
-      now,
-    );
-    expect(picked).toBeNull();
-  });
-
-  it("faller tillbaka på senaste öppna omgången när spelstoppet passerat", () => {
+  it("låter inte en tom framtida omgång ta över medan ett spel är aktuellt", () => {
     const picked = pickCurrentRound(
       [
-        { id: "gammal", race_date: "2026-07-18", status: "system_locked", race_count: 8 },
-        { id: "nyare", race_date: "2026-07-25", status: "system_locked", race_count: 8 },
+        { id: "tom", race_date: "2026-08-15", status: "draft", race_count: 0 },
+        { id: "aktuell", race_date: "2026-08-01", status: "draft", race_count: 8 },
       ],
       now,
     );
+    expect(picked?.id).toBe("aktuell");
+  });
+
+  it("visar senaste spelet kvar dagen efter loppet", () => {
+    const picked = pickCurrentRound(
+      [{ id: "nyare", race_date: "2026-07-30", status: "system_locked", race_count: 8 }],
+      now,
+    );
     expect(picked?.id).toBe("nyare");
+  });
+
+  it("byter till nästa omgång dagen efter att senaste spelet avgjorts", () => {
+    const picked = pickCurrentRound(
+      [
+        { id: "gammal", race_date: "2026-07-25", status: "system_locked", race_count: 8 },
+        { id: "nasta", race_date: "2026-08-08", status: "draft", race_count: 0 },
+      ],
+      now,
+    );
+    expect(picked?.id).toBe("nasta");
   });
 });
