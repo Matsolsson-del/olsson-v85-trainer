@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/kommentera")({
 function KommenteraPage() {
   const { groupId } = useActiveGroupId();
   const { omgang } = Route.useSearch();
-  const { data: active, isLoading, error } = useCurrentRound(groupId, omgang ?? null);
+  const { data: active, isLoading, error } = useCurrentRound(groupId, omgang ?? null, "comment");
 
   if (isLoading) {
     return (
