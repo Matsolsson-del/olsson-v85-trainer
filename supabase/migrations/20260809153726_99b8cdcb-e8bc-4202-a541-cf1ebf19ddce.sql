@@ -1,0 +1,1 @@
+update public.rounds set is_demo = false where id = '387c26d8-fa6c-4df0-94eb-cd9a92264464';
