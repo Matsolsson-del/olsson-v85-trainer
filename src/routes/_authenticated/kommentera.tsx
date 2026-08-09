@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/kommentera")({
 function KommenteraPage() {
   const { groupId } = useActiveGroupId();
   const { omgang } = Route.useSearch();
-  const { data: active, isLoading, error } = useCurrentRound(groupId, omgang ?? null);
+  const { data: active, isLoading, error } = useCurrentRound(groupId, omgang ?? null, "comment");
 
   if (isLoading) {
     return (
@@ -49,11 +49,14 @@ function KommenteraPage() {
       <>
         <PageHeader title="Läs och kommentera" />
         <EmptyState
-          title={error ? "Det gick inte att hämta omgången" : "Ingen omgång att kommentera ännu"}
+          title={error ? "Det gick inte att hämta omgången" : "Veckans spel är avgjort"}
           description={
-            error ? "Prova att ladda om sidan." : "Veckans omgång hämtas automatiskt på torsdagar."
+            error
+              ? "Prova att ladda om sidan."
+              : "Nästa omgång hämtas automatiskt på torsdag – då kan ni kommentera igen."
           }
         />
+
       </>
     );
   }

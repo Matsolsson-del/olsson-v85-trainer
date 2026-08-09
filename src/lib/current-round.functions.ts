@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { pickCurrentRound, type RoundCandidate } from "@/lib/current-round";
+import { pickCommentRound, pickCurrentRound, type RoundCandidate } from "@/lib/current-round";
 
 export type CurrentRound = {
   id: string;
@@ -17,7 +17,7 @@ export type CurrentRound = {
  */
 export const getCurrentRound = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { groupId: string; roundId?: string | null }) => {
+  .inputValidator((data: { groupId: string; roundId?: string | null; mode?: "play" | "comment" }) => {
     if (!data?.groupId) throw new Error("groupId saknas");
     return data;
   })
@@ -55,6 +55,7 @@ export const getCurrentRound = createServerFn({ method: "POST" })
       if (explicit) return explicit;
     }
 
-    const picked = pickCurrentRound(candidates);
+    const picked =
+      data.mode === "comment" ? pickCommentRound(candidates) : pickCurrentRound(candidates);
     return picked ?? null;
   });
