@@ -19,10 +19,19 @@ export const Route = createFileRoute("/api/public/hooks/experttips")({
           });
         }
 
+        let onlyMissing = false;
+        try {
+          const body = (await request.json()) as { onlyMissing?: boolean } | null;
+          onlyMissing = body?.onlyMissing === true;
+        } catch {
+          onlyMissing = false;
+        }
+
         try {
           const { collectExpertTipsForAllGroups } = await import("@/lib/expert-tips.server");
-          const results = await collectExpertTipsForAllGroups();
-          return Response.json({ success: true, results });
+          const results = await collectExpertTipsForAllGroups({ onlyMissing });
+          return Response.json({ success: true, onlyMissing, results });
+
         } catch (error: any) {
           console.error("Insamling av experttips misslyckades:", error);
           return new Response(
