@@ -276,3 +276,47 @@ export async function generateRoundPostmortem(roundId: string) {
 
   return { postmortem: saved, outcome };
 }
+
+/**
+ * Söndagskörning: skapar AI-utkast till efteranalys för nyligen spelade
+ * omgångar som redan har registrerade vinnare men saknar utkast.
+ * Idempotent – redan analyserade omgångar hoppas över.
+ */
+export async function generatePostmortemsForRecentRounds(): Promise<
+  Array<{ roundId: string; status: string }>
+> {
+  const admin = await getAdmin();
+  const since = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data: rounds } = await admin
+    .from("rounds")
+    .select("id")
+    .gte("race_date", since)
+    .lte("race_date", today);
+
+  const out: Array<{ roundId: string; status: string }> = [];
+  for (const r of arr(rounds)) {
+    try {
+      const { data: existing } = await admin
+        .from("round_postmortems")
+        .select("ai_draft")
+        .eq("round_id", r.id)
+        .maybeSingle();
+      if (existing?.ai_draft) {
+        out.push({ roundId: r.id, status: "redan analyserad" });
+        continue;
+      }
+      const outcome = await collectRoundOutcome(r.id);
+      if (outcome.decidedLegs === 0) {
+        out.push({ roundId: r.id, status: "inga vinnare ännu" });
+        continue;
+      }
+      await generateRoundPostmortem(r.id);
+      out.push({ roundId: r.id, status: "efteranalys skapad" });
+    } catch (e: any) {
+      out.push({ roundId: r.id, status: `fel: ${e?.message ?? String(e)}` });
+    }
+  }
+  return out;
+}
