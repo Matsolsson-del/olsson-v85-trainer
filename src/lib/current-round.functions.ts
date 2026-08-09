@@ -55,6 +55,7 @@ export const getCurrentRound = createServerFn({ method: "POST" })
       if (explicit) return explicit;
     }
 
-    const picked = pickCurrentRound(candidates);
+    const picked =
+      data.mode === "comment" ? pickCommentRound(candidates) : pickCurrentRound(candidates);
     return picked ?? null;
   });
