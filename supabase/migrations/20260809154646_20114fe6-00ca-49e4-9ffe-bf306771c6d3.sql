@@ -1,0 +1,1 @@
+GRANT SELECT ON TABLE public.round_settlements TO authenticated;
