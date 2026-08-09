@@ -6,9 +6,12 @@
  *  1. Bara riktiga omgångar (inte demo) som inte är avslutade.
  *  2. Först den närmast kommande omgången vars spelstopp ännu inte passerat
  *     och som har underlag (startfält inläst).
- *  3. Annars den senast spelade omgången som fortfarande är öppen och har underlag.
- *  4. Annars ingen omgång alls – en tom, preliminär framtida omgång får aldrig ta över.
+ *  3. Annars den senast spelade omgången – men bara fram till slutet av dagen
+ *     efter loppdagen. Dagen efter senaste spelet byter Veckans spel alltså vy.
+ *  4. Efter det visas nästa kommande omgång (även preliminär, utan underlag).
+ *  5. Annars ingen omgång alls.
  */
+
 
 export type RoundCandidate = {
   id: string;
