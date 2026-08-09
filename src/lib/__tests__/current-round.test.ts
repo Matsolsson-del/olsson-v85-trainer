@@ -21,12 +21,15 @@ describe("pickCurrentRound", () => {
     expect(picked?.id).toBe("rattvik");
   });
 
-  it("låter inte en tom framtida omgång ta över", () => {
+  it("låter inte en tom framtida omgång ta över medan ett spel är aktuellt", () => {
     const picked = pickCurrentRound(
-      [{ id: "tom", race_date: "2026-08-15", status: "draft", race_count: 0 }],
+      [
+        { id: "tom", race_date: "2026-08-15", status: "draft", race_count: 0 },
+        { id: "aktuell", race_date: "2026-08-01", status: "draft", race_count: 8 },
+      ],
       now,
     );
-    expect(picked).toBeNull();
+    expect(picked?.id).toBe("aktuell");
   });
 
   it("visar senaste spelet kvar dagen efter loppet", () => {
