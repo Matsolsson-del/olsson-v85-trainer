@@ -14,7 +14,14 @@ import { ResultatTab } from "@/components/round/ResultatTab";
 import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 import { AutomatikCard } from "@/components/round/AutomatikCard";
 
+const TAB_VALUES = ["startfalt", "system", "resultat", "data", "analys"] as const;
+type TabValue = (typeof TAB_VALUES)[number];
+
 export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
+  validateSearch: (search: Record<string, unknown>): { flik?: TabValue } => {
+    const flik = String(search?.["flik"] ?? "");
+    return TAB_VALUES.includes(flik as TabValue) ? { flik: flik as TabValue } : {};
+  },
   head: () => ({
     meta: [
       { title: "Omgång – Familjen Olssons Travhub" },
@@ -31,8 +38,10 @@ export const Route = createFileRoute("/_authenticated/omgangar/$roundId")({
 
 function RoundDetail() {
   const { roundId } = Route.useParams();
+  const { flik } = Route.useSearch();
   const { data, isLoading, error } = useRoundData(roundId);
   const isOwner = useIsOwner(data?.round.group_id ?? null);
+
 
   if (isLoading) return <Skeleton className="h-96 w-full" />;
   if (error || !data)
@@ -62,7 +71,7 @@ function RoundDetail() {
         {isOwner && <AutomatikCard roundId={roundId} />}
       </div>
 
-      <Tabs defaultValue="startfalt">
+      <Tabs defaultValue={flik && (flik !== "data" && flik !== "analys" ? true : isOwner) ? flik : "startfalt"}>
         <TabsList className="flex flex-wrap">
           <TabsTrigger value="startfalt">Startfält</TabsTrigger>
           <TabsTrigger value="system">System</TabsTrigger>

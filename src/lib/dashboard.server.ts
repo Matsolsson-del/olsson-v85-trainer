@@ -4,6 +4,7 @@
  */
 
 import { collectPersonalData, type PersonalStats } from "@/lib/personal-review.server";
+import { buildRoundLegs, firstLesson, type RoundLeg } from "@/lib/round-legs";
 
 async function getAdmin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -13,6 +14,12 @@ async function getAdmin() {
 function num(v: any): number {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
+}
+
+function maybeNum(v: any): number | null {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
 }
 
 export type RoundRow = {
@@ -25,6 +32,11 @@ export type RoundRow = {
   net: number;
   correctLegs: number | null;
   legs: number;
+  /** Avdelningsvis facit från den låsta systemversionen och officiellt resultat. */
+  legDetails: RoundLeg[];
+  /** Första tydliga lärdomen ur efterrapporten, om den finns. */
+  lesson: string | null;
+  settlementStatus: string | null;
 };
 
 export type MemberRow = {
@@ -32,6 +44,7 @@ export type MemberRow = {
   name: string;
   stats: PersonalStats;
 };
+
 
 export async function getDashboardData(groupId: string) {
   const admin = await getAdmin();
@@ -51,14 +64,42 @@ export async function getDashboardData(groupId: string) {
     .limit(60);
   if (error) throw error;
 
-  const roundRows: RoundRow[] = (rounds ?? []).map((r: any) => {
-    const winnings = num(r.round_results?.[0]?.group_winnings);
+  const roundIds = (rounds ?? []).map((r: any) => r.id);
 
+  // Senaste avräkningen per omgång: en post per omgång, inga dubbletter.
+  const settlementByRound = new Map<string, any>();
+  const lessonByRound = new Map<string, string | null>();
+  if (roundIds.length > 0) {
+    const [{ data: settlements }, { data: postmortems }] = await Promise.all([
+      admin
+        .from("round_settlements")
+        .select("round_id, status, system_cost, total_cost, payout_total, net, winners, calculation, created_at")
+        .in("round_id", roundIds)
+        .order("created_at", { ascending: true }),
+      admin
+        .from("round_postmortems")
+        .select("round_id, max_three_changes_to_test, approved_text")
+        .in("round_id", roundIds),
+    ]);
+    for (const s of settlements ?? []) settlementByRound.set(s.round_id, s);
+    for (const p of postmortems ?? []) {
+      lessonByRound.set(p.round_id, firstLesson(p.max_three_changes_to_test ?? p.approved_text));
+    }
+  }
+
+  const roundRows: RoundRow[] = (rounds ?? []).map((r: any) => {
+    const settlement = settlementByRound.get(r.id) ?? null;
     const versions = (r.systems ?? []).flatMap((s: any) => s.system_versions ?? []);
     const locked = versions
       .filter((v: any) => v.locked_at)
       .sort((a: any, b: any) => String(b.locked_at).localeCompare(String(a.locked_at)))[0];
-    const cost = locked ? num(locked.calculated_cost) : 0;
+
+    const cost =
+      maybeNum(settlement?.total_cost) ??
+      maybeNum(settlement?.system_cost) ??
+      (locked ? num(locked.calculated_cost) : 0);
+    const winnings =
+      maybeNum(settlement?.payout_total) ?? num(r.round_results?.[0]?.group_winnings);
 
     const winners = new Map<string, string>();
     for (const race of r.races ?? []) {
@@ -75,6 +116,12 @@ export async function getDashboardData(groupId: string) {
         if (selected.has(`${raceId}:${entryId}`)) correctLegs++;
       }
     }
+    const calcCorrect = maybeNum(settlement?.calculation?.correctLegs);
+    if (calcCorrect !== null) correctLegs = calcCorrect;
+
+    const legDetails = settlement
+      ? buildRoundLegs(settlement.calculation, settlement.winners)
+      : [];
 
     return {
       roundId: r.id,
@@ -85,9 +132,13 @@ export async function getDashboardData(groupId: string) {
       winnings,
       net: winnings - cost,
       correctLegs,
-      legs: (r.races ?? []).length,
+      legs: legDetails.length || (r.races ?? []).length,
+      legDetails,
+      lesson: lessonByRound.get(r.id) ?? null,
+      settlementStatus: settlement?.status ?? null,
     };
   });
+
 
   const played = roundRows.filter((r) => r.cost > 0 || r.winnings > 0);
   const totals = {
