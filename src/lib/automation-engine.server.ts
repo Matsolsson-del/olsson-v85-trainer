@@ -315,6 +315,28 @@ async function execute(
     races = count ?? 0;
   }
 
+  /* 1b. Tidig upptäckt: bara tävlingsunderlag, inga experttips ------------- */
+  if (ctx.mode === "facts") {
+    const ready = factsStatus({ running: false, races, entries }) === "ready";
+    return {
+      status: ready ? "success" : "partial",
+      message: ready
+        ? `Tävlingsunderlaget är hämtat: ${trackName ?? "okänd bana"}, ${races} avdelningar och ${entries} startande.`
+        : "Tävlingsunderlaget är delvis hämtat.",
+      roundId,
+      gameId,
+      trackName,
+      races,
+      entries,
+      tips: 0,
+      changes,
+      sources: [],
+      summary: summarizeSources([]),
+    };
+  }
+
+
+
   /* 2. Experttips per källa ---------------------------------------------- */
   const sourceRows = await ensureSources(db, ctx.groupId);
   const dateLabel = new Intl.DateTimeFormat("sv-SE", {
