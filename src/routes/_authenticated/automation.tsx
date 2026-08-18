@@ -29,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/automation")({
       { property: "og:title", content: "Automatisk hämtning – Familjen Olssons Travhub" },
       {
         property: "og:description",
-        content: "Status för torsdagens automatiska hämtning av V85-underlag och experttips.",
+        content: "Status för den automatiska hämtningen av V85-underlag och experttips.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -50,7 +50,7 @@ const RUN_STATUS: Record<string, string> = {
 const MODE_LABEL: Record<string, string> = {
   full: "Full hämtning",
   followup: "Efterhämtning av tips",
-  facts: "Bara tävlingsfakta",
+  facts: "Tidig hämtning av tävlingsfakta",
   tips: "Bara experttips",
 };
 
@@ -103,7 +103,7 @@ function AutomationPage() {
     <>
       <PageHeader
         title="Automatisk hämtning"
-        description="Varje torsdag klockan 07:00 hämtas lördagens V85 och experttipsen automatiskt."
+        description="Nästa omgång hämtas automatiskt så snart ATG har publicerat startlistan. Experttipsen fylls på från torsdagen."
         actions={
           <Button
             onClick={() => handleRun("full")}

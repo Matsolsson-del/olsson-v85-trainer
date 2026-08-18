@@ -182,7 +182,7 @@ function MerPage() {
               to="/automation"
               icon={Workflow}
               title="Automation"
-              description="Torsdagsjobb, körningar och teknisk importstatus."
+              description="Automatiska körningar och teknisk importstatus."
             />
             <BigLink
               to="/ai-import"

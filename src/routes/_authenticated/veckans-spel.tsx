@@ -132,7 +132,7 @@ function ExpertTipsSection({ groupId }: { groupId: string | null }) {
         <CardContent className="space-y-3 pt-0 text-base">
           {!latest ? (
             <p className="text-muted-foreground">
-              Inga experttips är insamlade ännu. De hämtas automatiskt på torsdagar.
+              Inga experttips är insamlade ännu. De hämtas automatiskt inför varje omgång.
             </p>
           ) : (
             <>
@@ -196,7 +196,7 @@ function VeckansSpel() {
         <PageHeader title="Veckans spel" />
         <EmptyState
           title="Ingen omgång den här veckan ännu"
-          description="Omgången hämtas automatiskt på torsdagar."
+          description="Nästa omgång hämtas automatiskt så snart ATG har publicerat startlistan."
           action={
             <Button asChild size="lg" className="h-14 text-lg">
               <Link to="/historik">Se tidigare omgångar</Link>

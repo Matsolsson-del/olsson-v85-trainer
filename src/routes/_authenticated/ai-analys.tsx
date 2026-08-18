@@ -56,7 +56,7 @@ function AiAnalysPage() {
         <EmptyState
           title={error ? "Det gick inte att hämta omgången" : "Ingen omgång att visa ännu"}
           description={
-            error ? "Prova att ladda om sidan." : "Veckans omgång hämtas automatiskt på torsdagar."
+            error ? "Prova att ladda om sidan." : "Nästa omgång hämtas automatiskt så snart ATG har publicerat startlistan."
           }
         />
       </>
