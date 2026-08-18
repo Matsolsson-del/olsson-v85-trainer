@@ -100,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Nederkantsmeny på mobil */}
       <nav
         aria-label="Huvudnavigation"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
         {MAIN_NAV.map(({ to, label, icon: Icon }) => (
           <Link
