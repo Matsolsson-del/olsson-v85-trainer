@@ -71,7 +71,7 @@ function RoundDetail() {
         {isOwner && <AutomatikCard roundId={roundId} />}
       </div>
 
-      <Tabs defaultValue="startfalt">
+      <Tabs defaultValue={flik && (flik !== "data" && flik !== "analys" ? true : isOwner) ? flik : "startfalt"}>
         <TabsList className="flex flex-wrap">
           <TabsTrigger value="startfalt">Startfält</TabsTrigger>
           <TabsTrigger value="system">System</TabsTrigger>
