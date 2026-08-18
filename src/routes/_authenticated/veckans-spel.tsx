@@ -11,7 +11,6 @@ import { ResultatkontrollCard } from "@/components/round/ResultatkontrollCard";
 import { ResponsibilityCard } from "@/components/round/ResponsibilityCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AutomationStatusCard } from "@/components/round/AutomationStatusCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -93,7 +92,7 @@ function Step({
         ? "text-muted-foreground"
         : "text-warning";
   return (
-    <Card>
+    <Card id={`steg-${number}`} className="scroll-mt-24">
       <details open={open}>
         <summary className="cursor-pointer list-none px-6 py-4">
           <span className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
@@ -385,8 +384,6 @@ function Workflow({ roundId }: { roundId: string }) {
         }
       />
 
-      <AutomationStatusCard />
-
       <Card className="mb-5 border-2 border-primary">
         <CardContent className="space-y-2 p-5">
           <p className="text-2xl font-semibold">
@@ -402,8 +399,16 @@ function Workflow({ roundId }: { roundId: string }) {
               : `Veckans ansvarige är ${responsibleName}. Läs analysen och lämna gärna en kommentar.`}
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <Button asChild size="lg" className="h-14 text-lg">
-              <Link to="/kommentera" search={{ omgang: roundId }}>Skriv en kommentar</Link>
+            <Button
+              size="lg"
+              className="h-14 text-lg"
+              onClick={() =>
+                document
+                  .getElementById(`steg-${currentStep}`)
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+            >
+              {next.title}
             </Button>
             <span className="inline-flex items-center rounded-md bg-surface px-4 py-2 text-base text-surface-foreground">
               Steg {currentStep} av 8: {next.title}
