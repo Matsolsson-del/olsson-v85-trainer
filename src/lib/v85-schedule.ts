@@ -83,16 +83,45 @@ export type ScheduleSlot = {
   /** 0 = söndag … 6 = lördag, i svensk lokal tid */
   weekday: number;
   hour: number;
-  /** Torsdagens 07.00 skapar omgången; övriga kompletterar bara. */
-  mode: "full" | "followup";
+  /**
+   * "facts"    = tidig upptäckt: leta efter nästa officiella V85 och hämta
+   *              bana, avdelningar och startfält. Inga experttips.
+   * "full"     = skapar/uppdaterar omgången och hämtar experttips.
+   * "followup" = kompletterar marknadsdata och experttips.
+   */
+  mode: "facts" | "full" | "followup";
 };
 
 /**
  * Veckans körningsplan i svensk lokal tid.
- * Torsdag 07.00 skapar omgången. Övriga är kompletteringskörningar som bara
- * uppdaterar fakta och hämtar experttips som publicerats senare.
+ *
+ * Söndag–onsdag körs "discovery" var tredje timme dagtid. Så snart ATG har
+ * publicerat nästa V85 skapas omgången direkt – ingen behöver vänta till
+ * torsdagen. Hittas ingen omgång avslutas körningen som "waiting".
+ *
+ * Torsdag–lördag ligger de befintliga kompletteringskörningarna kvar för
+ * marknadsdata och experttips.
  */
+const DISCOVERY_HOURS = [6, 9, 12, 15, 18, 21];
+const DISCOVERY_DAYS: Array<{ weekday: number; key: string; label: string }> = [
+  { weekday: 0, key: "sun", label: "Söndag" },
+  { weekday: 1, key: "mon", label: "Måndag" },
+  { weekday: 2, key: "tue", label: "Tisdag" },
+  { weekday: 3, key: "wed", label: "Onsdag" },
+];
+
+export const DISCOVERY_SLOTS: ScheduleSlot[] = DISCOVERY_DAYS.flatMap((day) =>
+  DISCOVERY_HOURS.map((hour) => ({
+    key: `${day.key}-${String(hour).padStart(2, "0")}`,
+    label: `${day.label} ${String(hour).padStart(2, "0")}.00`,
+    weekday: day.weekday,
+    hour,
+    mode: "facts" as const,
+  })),
+);
+
 export const SCHEDULE: ScheduleSlot[] = [
+  ...DISCOVERY_SLOTS,
   { key: "thu-07", label: "Torsdag 07.00", weekday: 4, hour: 7, mode: "full" },
   { key: "thu-12", label: "Torsdag 12.00", weekday: 4, hour: 12, mode: "followup" },
   { key: "thu-18", label: "Torsdag 18.00", weekday: 4, hour: 18, mode: "followup" },
@@ -100,6 +129,7 @@ export const SCHEDULE: ScheduleSlot[] = [
   { key: "fri-18", label: "Fredag 18.00", weekday: 5, hour: 18, mode: "followup" },
   { key: "sat-08", label: "Lördag 08.00", weekday: 6, hour: 8, mode: "followup" },
 ];
+
 
 /** Hur många minuter efter hel timme en körning fortfarande accepteras. */
 export const WINDOW_MINUTES = 55;

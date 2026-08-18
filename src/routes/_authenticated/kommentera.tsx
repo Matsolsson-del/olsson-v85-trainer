@@ -53,7 +53,7 @@ function KommenteraPage() {
           description={
             error
               ? "Prova att ladda om sidan."
-              : "Nästa omgång hämtas automatiskt på torsdag – då kan ni kommentera igen."
+              : "Nästa omgång hämtas automatiskt så snart ATG har publicerat startlistan – då kan ni kommentera igen."
           }
         />
 

@@ -103,7 +103,7 @@ function OversiktPage() {
       ) : (
         <div className="space-y-5">
           <BigCard title="Veckans V85">
-            <p>Ingen omgång är inlagd ännu. Den hämtas automatiskt på torsdagar.</p>
+            <p>Ingen omgång är inlagd ännu. Nästa omgång hämtas automatiskt så snart ATG har publicerat startlistan.</p>
           </BigCard>
           <BigCard title="Min uppgift">
             <p className="font-medium">Du behöver inte göra något just nu.</p>
@@ -123,9 +123,10 @@ function OversiktPage() {
                 {(next as any).tracks?.name ?? "Bana inte klar ännu"}
               </p>
               <p className="mt-1 text-muted-foreground">
-                Den här omgången är inte aktuell ännu. Uppgifterna fylls på automatiskt på
-                torsdagen.
+                Den här omgången är inte aktuell ännu. Uppgifterna fylls på automatiskt så snart
+                ATG har publicerat mer.
               </p>
+
               <Button asChild variant="secondary" className="mt-3 h-12">
                 <Link to="/omgangar/$roundId" params={{ roundId: next.id }}>
                   Titta på nästa omgång
