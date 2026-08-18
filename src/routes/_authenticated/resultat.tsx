@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { PageHeader } from "@/components/AppShell";
@@ -9,9 +9,6 @@ import { getResultsOverview } from "@/lib/results-overview.functions";
 
 
 export const Route = createFileRoute("/_authenticated/resultat")({
-  beforeLoad: () => {
-    throw redirect({ to: "/historik", search: { vy: "resultat" } });
-  },
   head: () => ({
     meta: [
       { title: "Resultat – Familjen Olssons Travhub" },
