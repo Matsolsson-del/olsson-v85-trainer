@@ -1,25 +1,42 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { CalendarDays, History, MessageSquare, MoreHorizontal, Users } from "lucide-react";
+import {
+  CalendarDays,
+  GraduationCap,
+  LayoutGrid,
+  MoreHorizontal,
+  Trophy,
+  Users,
+} from "lucide-react";
 import { type ReactNode } from "react";
 import { useMyProfile } from "@/lib/travhub-queries";
 import { cn } from "@/lib/utils";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const MAIN_NAV = [
-  { to: "/veckans-spel", label: "Veckans spel", icon: CalendarDays },
-  { to: "/kommentera", label: "Kommentera", icon: MessageSquare },
-  { to: "/historik", label: "Historik", icon: History },
-  { to: "/mer", label: "Mer", icon: MoreHorizontal },
+  {
+    to: "/veckans-spel",
+    label: "Veckan",
+    icon: CalendarDays,
+    match: ["/veckans-spel", "/oversikt", "/analysera", "/kommentera", "/ai-analys"],
+  },
+  { to: "/system", label: "System", icon: LayoutGrid, match: ["/system"] },
+  { to: "/resultat", label: "Resultat", icon: Trophy, match: ["/resultat"] },
+  { to: "/larande", label: "Lärdomar", icon: GraduationCap, match: ["/larande"] },
+  { to: "/mer", label: "Mer", icon: MoreHorizontal, match: ["/mer"] },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { data: profile } = useMyProfile();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  const isActive = (to: string) =>
-    to === "/mer"
-      ? !MAIN_NAV.slice(0, 3).some((n) => pathname.startsWith(n.to))
-      : pathname.startsWith(to);
+  const isActive = (to: string) => {
+    const item = MAIN_NAV.find((n) => n.to === to)!;
+    if (to === "/mer") {
+      return !MAIN_NAV.slice(0, 4).some((n) => n.match.some((m) => pathname.startsWith(m)));
+    }
+    return item.match.some((m) => pathname.startsWith(m));
+  };
+
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -83,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       {/* Nederkantsmeny på mobil */}
       <nav
         aria-label="Huvudnavigation"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-border bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
         {MAIN_NAV.map(({ to, label, icon: Icon }) => (
           <Link

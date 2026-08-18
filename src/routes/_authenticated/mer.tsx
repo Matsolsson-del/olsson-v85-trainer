@@ -126,6 +126,12 @@ function MerPage() {
           description="Hantera namn och grundinställningar."
         />
         <BigLink
+          to="/historik"
+          icon={History}
+          title="Historik"
+          description="Se tidigare V85-omgångar, importerade spel och detaljerade system."
+        />
+        <BigLink
           to="/experttips"
           icon={Newspaper}
           title="Experttips"

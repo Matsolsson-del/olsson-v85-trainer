@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -22,9 +22,6 @@ import { getHistoryStats } from "@/lib/history-stats.functions";
 import type { HistoryStats } from "@/lib/history-stats";
 
 export const Route = createFileRoute("/_authenticated/larande")({
-  beforeLoad: () => {
-    throw redirect({ to: "/historik", search: { vy: "larande" } });
-  },
   head: () => ({
     meta: [
       { title: "Lärande – Familjen Olssons Travhub" },
