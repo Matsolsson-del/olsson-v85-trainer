@@ -123,9 +123,10 @@ function OversiktPage() {
                 {(next as any).tracks?.name ?? "Bana inte klar ännu"}
               </p>
               <p className="mt-1 text-muted-foreground">
-                Den här omgången är inte aktuell ännu. Uppgifterna fylls på automatiskt på
-                torsdagen.
+                Den här omgången är inte aktuell ännu. Uppgifterna fylls på automatiskt så snart
+                ATG har publicerat mer.
               </p>
+
               <Button asChild variant="secondary" className="mt-3 h-12">
                 <Link to="/omgangar/$roundId" params={{ roundId: next.id }}>
                   Titta på nästa omgång
