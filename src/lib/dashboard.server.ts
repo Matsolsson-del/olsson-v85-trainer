@@ -4,6 +4,7 @@
  */
 
 import { collectPersonalData, type PersonalStats } from "@/lib/personal-review.server";
+import { buildRoundLegs, type RoundLeg } from "@/lib/round-legs";
 
 async function getAdmin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -13,6 +14,12 @@ async function getAdmin() {
 function num(v: any): number {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
+}
+
+function maybeNum(v: any): number | null {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
 }
 
 export type RoundRow = {
@@ -25,6 +32,11 @@ export type RoundRow = {
   net: number;
   correctLegs: number | null;
   legs: number;
+  /** Avdelningsvis facit från den låsta systemversionen och officiellt resultat. */
+  legDetails: RoundLeg[];
+  /** Första tydliga lärdomen ur efterrapporten, om den finns. */
+  lesson: string | null;
+  settlementStatus: string | null;
 };
 
 export type MemberRow = {
@@ -32,6 +44,7 @@ export type MemberRow = {
   name: string;
   stats: PersonalStats;
 };
+
 
 export async function getDashboardData(groupId: string) {
   const admin = await getAdmin();
