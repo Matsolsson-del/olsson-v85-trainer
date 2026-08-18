@@ -4,7 +4,7 @@
  */
 
 import { collectPersonalData, type PersonalStats } from "@/lib/personal-review.server";
-import { buildRoundLegs, type RoundLeg } from "@/lib/round-legs";
+import { buildRoundLegs, firstLesson, type RoundLeg } from "@/lib/round-legs";
 
 async function getAdmin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
