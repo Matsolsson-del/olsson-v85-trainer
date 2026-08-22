@@ -100,14 +100,13 @@ function AuthPage() {
     setMessage(null);
     try {
       const res = await unlockFn({ data: { password } });
-      if (res.ok) {
+      if (res.ok && "ticket" in res) {
+        saveGateTicket(res.ticket);
         setPassword("");
         await refetchGate();
         return;
       }
-      if (res.reason === "locked") {
-        setMessage("För många försök – vänta några minuter och prova igen.");
-      } else if (res.reason === "config") {
+      if (res.reason === "config") {
         setMessage("Lösenordet är inte inställt på servern ännu.");
       } else {
         setMessage("Fel lösenord – försök igen.");
@@ -123,7 +122,7 @@ function AuthPage() {
     setBusy(slug);
     if (!silent) setMessage(null);
     try {
-      const res = await signInFn({ data: { slug } });
+      const res = await signInFn({ data: { slug, ticket: getGateTicket() } });
       if (!res.ok || !("session" in res)) {
         if (!silent) setMessage("Det gick inte att öppna just nu. Försök igen.");
         return;
