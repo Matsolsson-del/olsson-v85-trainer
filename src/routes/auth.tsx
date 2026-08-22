@@ -7,7 +7,12 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getGateState, unlockFamily, signInAsMember } from "@/lib/gate.functions";
-import { getRememberedPerson, rememberPerson } from "@/lib/person-memory";
+import {
+  getRememberedPerson,
+  rememberPerson,
+  getGateTicket,
+  saveGateTicket,
+} from "@/lib/person-memory";
 
 const SLOTS = [
   { slug: "mats", label: "Mats" },
@@ -54,7 +59,11 @@ function AuthPage() {
     data: gate,
     isLoading: gateLoading,
     refetch: refetchGate,
-  } = useQuery({ queryKey: ["gate"], queryFn: () => gateFn(), retry: false });
+  } = useQuery({
+    queryKey: ["gate"],
+    queryFn: () => gateFn({ data: { ticket: getGateTicket() } }),
+    retry: false,
+  });
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
