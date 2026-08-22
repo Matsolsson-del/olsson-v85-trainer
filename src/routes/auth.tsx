@@ -7,7 +7,12 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getGateState, unlockFamily, signInAsMember } from "@/lib/gate.functions";
-import { getRememberedPerson, rememberPerson } from "@/lib/person-memory";
+import {
+  getRememberedPerson,
+  rememberPerson,
+  getGateTicket,
+  saveGateTicket,
+} from "@/lib/person-memory";
 
 const SLOTS = [
   { slug: "mats", label: "Mats" },
@@ -54,7 +59,11 @@ function AuthPage() {
     data: gate,
     isLoading: gateLoading,
     refetch: refetchGate,
-  } = useQuery({ queryKey: ["gate"], queryFn: () => gateFn(), retry: false });
+  } = useQuery({
+    queryKey: ["gate"],
+    queryFn: () => gateFn({ data: { ticket: getGateTicket() } }),
+    retry: false,
+  });
 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -91,14 +100,13 @@ function AuthPage() {
     setMessage(null);
     try {
       const res = await unlockFn({ data: { password } });
-      if (res.ok) {
+      if (res.ok && "ticket" in res) {
+        saveGateTicket(res.ticket);
         setPassword("");
         await refetchGate();
         return;
       }
-      if (res.reason === "locked") {
-        setMessage("För många försök – vänta några minuter och prova igen.");
-      } else if (res.reason === "config") {
+      if (res.reason === "config") {
         setMessage("Lösenordet är inte inställt på servern ännu.");
       } else {
         setMessage("Fel lösenord – försök igen.");
@@ -114,7 +122,7 @@ function AuthPage() {
     setBusy(slug);
     if (!silent) setMessage(null);
     try {
-      const res = await signInFn({ data: { slug } });
+      const res = await signInFn({ data: { slug, ticket: getGateTicket() } });
       if (!res.ok || !("session" in res)) {
         if (!silent) setMessage("Det gick inte att öppna just nu. Försök igen.");
         return;

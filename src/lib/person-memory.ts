@@ -24,3 +24,20 @@ export function forgetPerson() {
   localStorage.removeItem(PERSON_KEY);
   localStorage.removeItem(PERSON_EXPIRY_KEY);
 }
+
+const TICKET_KEY = "travhub.gate.ticket";
+
+export function saveGateTicket(ticket: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TICKET_KEY, ticket);
+}
+
+export function getGateTicket(): string {
+  if (typeof window === "undefined") return "";
+  return localStorage.getItem(TICKET_KEY) ?? "";
+}
+
+export function clearGateTicket() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(TICKET_KEY);
+}

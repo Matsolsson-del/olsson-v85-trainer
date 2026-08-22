@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { lockFamily } from "@/lib/gate.functions";
-import { forgetPerson } from "@/lib/person-memory";
+import { forgetPerson, clearGateTicket } from "@/lib/person-memory";
 import { useActiveGroupId, useMyProfile, useOwnerStatus } from "@/lib/travhub-queries";
 
 export const Route = createFileRoute("/_authenticated/mer")({
@@ -90,6 +90,7 @@ function MerPage() {
     await qc.cancelQueries();
     qc.clear();
     forgetPerson();
+    clearGateTicket();
     await supabase.auth.signOut();
     try {
       await lockFn();
