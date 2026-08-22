@@ -1,12 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { useSession } from "@tanstack/react-start/server";
-import { createHash, timingSafeEqual } from "node:crypto";
-
-/**
- * Familjens gemensamma lösenord kontrolleras ENBART på servern.
- * Lösenordet finns aldrig i frontend-koden, i bundlen eller i databasen –
- * det läses från miljövariabeln FAMILY_PASSWORD inuti handlern.
- */
 
 export type MemberSlot = { slug: string; label: string };
 
@@ -16,62 +8,20 @@ export const MEMBER_SLOTS: MemberSlot[] = [
   { slug: "olle", label: "Olle" },
 ];
 
-const SLOT_EMAILS: Record<string, string> = {
-  mats: "olsson-1@olssonstravhub.se",
-  bosse: "olsson-2@olssonstravhub.se",
-  olle: "olsson-3@olssonstravhub.se",
-};
-
-const NINETY_DAYS = 60 * 60 * 24 * 90;
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_MS = 5 * 60 * 1000;
-
-type GateSession = {
-  unlocked?: boolean;
-  failedAttempts?: number;
-  lockedUntil?: number;
-};
-
-function sessionConfig() {
-  const password = process.env.SESSION_SECRET;
-  if (!password || password.length < 32) {
-    throw new Error("SESSION_SECRET saknas eller är för kort på servern.");
-  }
-  return {
-    password,
-    name: "olsson-travhub-gate",
-    maxAge: NINETY_DAYS,
-    cookie: {
-      httpOnly: true,
-      secure: true,
-      // Förhandsvisningen körs i en iframe – utan "none" skickas kakan aldrig
-      // tillbaka och lösenordet verkar aldrig fungera.
-      sameSite: "none" as const,
-      path: "/",
-    },
-  };
-}
-
-function matches(input: string, expected: string) {
-  const a = createHash("sha256").update(input, "utf8").digest();
-  const b = createHash("sha256").update(expected, "utf8").digest();
-  return timingSafeEqual(a, b);
-}
-
-export const getGateState = createServerFn({ method: "GET" }).handler(async () => {
-  try {
-    const session = await useSession<GateSession>(sessionConfig());
-    const lockedUntil = session.data.lockedUntil ?? 0;
-    return {
-      unlocked: session.data.unlocked === true,
-      lockedForSeconds: lockedUntil > Date.now() ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0,
-      configured: Boolean(process.env.FAMILY_PASSWORD),
-    };
-  } catch (error) {
-    console.error("[gate] getGateState failed", error);
-    return { unlocked: false, lockedForSeconds: 0, configured: false };
-  }
-});
+export const getGateState = createServerFn({ method: "GET" })
+  .inputValidator((data: { ticket?: string } | undefined) => ({
+    ticket: typeof data?.ticket === "string" ? data.ticket : "",
+  }))
+  .handler(async ({ data }) => {
+    const { ticketIsValid } = await import("@/lib/gate.server");
+    let unlocked = false;
+    try {
+      unlocked = ticketIsValid(data.ticket);
+    } catch (error) {
+      console.error("[gate] getGateState failed", error);
+    }
+    return { unlocked, configured: Boolean(process.env.FAMILY_PASSWORD) };
+  });
 
 export const unlockFamily = createServerFn({ method: "POST" })
   .inputValidator((data: { password: string }) => ({
@@ -84,50 +34,22 @@ export const unlockFamily = createServerFn({ method: "POST" })
       return { ok: false as const, reason: "config" as const };
     }
 
-    const session = await useSession<GateSession>(sessionConfig());
-    const lockedUntil = session.data.lockedUntil ?? 0;
-    if (lockedUntil > Date.now()) {
-      return {
-        ok: false as const,
-        reason: "locked" as const,
-        lockedForSeconds: Math.ceil((lockedUntil - Date.now()) / 1000),
-      };
+    const { passwordMatches, createTicket } = await import("@/lib/gate.server");
+    if (!data.password || !passwordMatches(data.password, expected)) {
+      return { ok: false as const, reason: "wrong" as const };
     }
 
-    if (!data.password || !matches(data.password, expected)) {
-      const failed = (session.data.failedAttempts ?? 0) + 1;
-      await session.update({
-        unlocked: false,
-        failedAttempts: failed,
-        lockedUntil: failed >= MAX_ATTEMPTS ? Date.now() + LOCKOUT_MS : 0,
-      });
-      return {
-        ok: false as const,
-        reason: failed >= MAX_ATTEMPTS ? ("locked" as const) : ("wrong" as const),
-        lockedForSeconds: failed >= MAX_ATTEMPTS ? LOCKOUT_MS / 1000 : 0,
-      };
-    }
-
-    await session.update({ unlocked: true, failedAttempts: 0, lockedUntil: 0 });
-    return { ok: true as const };
+    return { ok: true as const, ticket: createTicket() };
   });
 
-export const lockFamily = createServerFn({ method: "POST" }).handler(async () => {
-  const session = await useSession<GateSession>(sessionConfig());
-  await session.clear();
-  return { ok: true as const };
-});
-
-/**
- * Personvalet sker också på servern: kontot som används för varje person
- * skyddas av MEMBER_LOGIN_PASSWORD, som aldrig lämnar servern. Klienten får
- * bara den färdiga sessionen.
- */
 export const signInAsMember = createServerFn({ method: "POST" })
-  .inputValidator((data: { slug: string }) => ({ slug: String(data?.slug ?? "") }))
+  .inputValidator((data: { slug: string; ticket?: string }) => ({
+    slug: String(data?.slug ?? ""),
+    ticket: typeof data?.ticket === "string" ? data.ticket : "",
+  }))
   .handler(async ({ data }) => {
-    const session = await useSession<GateSession>(sessionConfig());
-    if (session.data.unlocked !== true) {
+    const { ticketIsValid, SLOT_EMAILS } = await import("@/lib/gate.server");
+    if (!ticketIsValid(data.ticket)) {
       return { ok: false as const, reason: "gate" as const };
     }
 
@@ -185,3 +107,7 @@ export const signInAsMember = createServerFn({ method: "POST" })
       },
     };
   });
+
+export const lockFamily = createServerFn({ method: "POST" }).handler(async () => {
+  return { ok: true as const };
+});
